@@ -1,4 +1,4 @@
-import express from "express";
+import express, { NextFunction, Request, Response } from "express";
 import { Evento } from "./evento.js";
 
 const app = express();
@@ -20,6 +20,24 @@ const eventos = [
 //  res.send("Hola!!!");
 //});
 
+function sanitizeEventosInput(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
+  req.body.sanitizedInput = {
+    nombre: req.body.nombre,
+    descripcion: req.body.descripcion,
+    capacidad_total: req.body.capacidad_total,
+    direccion: req.body.direccion,
+    fecha_hora: req.body.fecha_hora,
+    edad_minima: req.body.edad_minima,
+  };
+  //more checks here
+
+  next();
+}
+
 app.get("/api/eventos", (req, res) => {
   res.json({ data: eventos });
 });
@@ -32,21 +50,14 @@ app.get("/api/eventos/:id", (req, res) => {
   res.json({ data: evento });
 });
 
-app.put("/api/eventos/:id", (req, res) => {
+app.put("/api/eventos/:id", sanitizeEventosInput, (req, res) => {
   const eventoIdx = eventos.findIndex((evento) => evento.id == req.params.id);
 
   if (eventoIdx === -1) {
     res.status(404).send({ message: "Evento no encontrado" });
   }
-  const input = {
-    nombre: req.body.nombre,
-    descripcion: req.body.descripcion,
-    capacidad_total: req.body.capacidad_total,
-    direccion: req.body.direccion,
-    fecha_hora: req.body.fecha_hora,
-    edad_minima: req.body.edad_minima,
-  };
-  eventos[eventoIdx] = { ...eventos[eventoIdx], ...input };
+
+  eventos[eventoIdx] = { ...eventos[eventoIdx], ...req.body.sanitizedInput };
 
   res.status(200).send({
     message: "Character updated successfully",
@@ -58,23 +69,16 @@ app.listen(3000, () => {
   console.log("Server running on http://localhost:3000/");
 });
 
-app.post("/api/eventos", (req, res) => {
-  const {
-    nombre,
-    descripcion,
-    capacidad_total,
-    direccion,
-    fecha_hora,
-    edad_minima,
-  } = req.body;
-
+app.post("/api/eventos", sanitizeEventosInput, (req, res) => {
+  const input = req.body.sanitizedInput;
+  
   const evento = new Evento(
-    nombre,
-    descripcion,
-    capacidad_total,
-    direccion,
-    fecha_hora,
-    edad_minima,
+    input.nombre,
+    input.descripcion,
+    input.capacidad_total,
+    input.direccion,
+    input.fecha_hora,
+    input.edad_minima
   );
 
   eventos.push(evento);
