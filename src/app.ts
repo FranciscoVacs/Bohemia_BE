@@ -35,6 +35,12 @@ function sanitizeEventsInput(
   };
   //more checks here
 
+Object.keys(req.body.sanitizedInput).forEach(key =>{
+  if (req.body.sanitizedInput[key] === undefined){
+    delete req.body.sanitizedInput[key]
+  }
+})
+
   next();
 }
 
@@ -45,7 +51,7 @@ app.get("/api/events", (req, res) => {
 app.get("/api/events/:id", (req, res) => {
   const event = events.find((event) => event.id === req.params.id);
   if (!event) {
-    res.status(404).send({ message: "Event no encontrado" });
+    return res.status(404).send({ message: "Event not found" });
   }
   res.json({ data: event });
 });
@@ -54,16 +60,43 @@ app.put("/api/events/:id", sanitizeEventsInput, (req, res) => {
   const eventIdx = events.findIndex((event) => event.id == req.params.id);
 
   if (eventIdx === -1) {
-    res.status(404).send({ message: "Event no encontrado" });
+    return res.status(404).send({ message: "Event not found" });
   }
 
   events[eventIdx] = { ...events[eventIdx], ...req.body.sanitizedInput };
 
-  res.status(200).send({
+  return res.status(200).send({
     message: "Character updated successfully",
     data: events[eventIdx],
   });
 });
+
+app.patch("/api/events/:id", sanitizeEventsInput, (req, res) => {
+  const eventIdx = events.findIndex((event) => event.id == req.params.id);
+
+  if (eventIdx === -1) {
+    return res.status(404).send({ message: "Event no encontrado" });
+  }
+
+  events[eventIdx] = { ...events[eventIdx], ...req.body.sanitizedInput };
+
+  return res.status(200).send({
+    message: "Character updated successfully",
+    data: events[eventIdx],
+  });
+});
+
+app.delete("/api/events/:id", (req, res)=> {
+  const eventIdx = events.findIndex((event) => event.id === req.params.id)
+  if (eventIdx=== -1){
+    res.status(404).send({message:'Event not found'})
+  }
+  else {
+  events.splice(eventIdx, 1)
+  res.status(200).send({message: 'Event deleted successfully'})
+  }
+})
+
 
 app.listen(3000, () => {
   console.log("Server running on http://localhost:3000/");
@@ -82,5 +115,9 @@ app.post("/api/events", sanitizeEventsInput, (req, res) => {
   );
 
   events.push(event);
-  res.status(201).send({ message: "Event creado", data: event });
+  return res.status(201).send({ message: "Event creado", data: event });
 });
+
+app.use((_, res)=>{
+  return res.status(404).send({message: 'Resource not found'})
+})
