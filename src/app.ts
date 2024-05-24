@@ -1,11 +1,11 @@
 import express, { NextFunction, Request, Response } from "express";
-import { Evento } from "./evento.js";
+import { Event } from "./event.js";
 
 const app = express();
 app.use(express.json());
 
-const eventos = [
-  new Evento(
+const events = [
+  new Event(
     "Wos en el luna park",
     "Es Wos!!! en el luna park!!!!",
     5000,
@@ -20,48 +20,48 @@ const eventos = [
 //  res.send("Hola!!!");
 //});
 
-function sanitizeEventosInput(
+function sanitizeEventsInput(
   req: Request,
   res: Response,
   next: NextFunction
 ) {
   req.body.sanitizedInput = {
-    nombre: req.body.nombre,
-    descripcion: req.body.descripcion,
-    capacidad_total: req.body.capacidad_total,
-    direccion: req.body.direccion,
-    fecha_hora: req.body.fecha_hora,
-    edad_minima: req.body.edad_minima,
+    name: req.body.name,
+    description: req.body.description,
+    total_capacity: req.body.total_capacity,
+    direction: req.body.direction,
+    date_time: req.body.date_time,
+    min_age: req.body.min_age,
   };
   //more checks here
 
   next();
 }
 
-app.get("/api/eventos", (req, res) => {
-  res.json({ data: eventos });
+app.get("/api/events", (req, res) => {
+  res.json({ data: events });
 });
 
-app.get("/api/eventos/:id", (req, res) => {
-  const evento = eventos.find((evento) => evento.id === req.params.id);
-  if (!evento) {
-    res.status(404).send({ message: "Evento no encontrado" });
+app.get("/api/events/:id", (req, res) => {
+  const event = events.find((event) => event.id === req.params.id);
+  if (!event) {
+    res.status(404).send({ message: "Event no encontrado" });
   }
-  res.json({ data: evento });
+  res.json({ data: event });
 });
 
-app.put("/api/eventos/:id", sanitizeEventosInput, (req, res) => {
-  const eventoIdx = eventos.findIndex((evento) => evento.id == req.params.id);
+app.put("/api/events/:id", sanitizeEventsInput, (req, res) => {
+  const eventIdx = events.findIndex((event) => event.id == req.params.id);
 
-  if (eventoIdx === -1) {
-    res.status(404).send({ message: "Evento no encontrado" });
+  if (eventIdx === -1) {
+    res.status(404).send({ message: "Event no encontrado" });
   }
 
-  eventos[eventoIdx] = { ...eventos[eventoIdx], ...req.body.sanitizedInput };
+  events[eventIdx] = { ...events[eventIdx], ...req.body.sanitizedInput };
 
   res.status(200).send({
     message: "Character updated successfully",
-    data: eventos[eventoIdx],
+    data: events[eventIdx],
   });
 });
 
@@ -69,18 +69,18 @@ app.listen(3000, () => {
   console.log("Server running on http://localhost:3000/");
 });
 
-app.post("/api/eventos", sanitizeEventosInput, (req, res) => {
+app.post("/api/events", sanitizeEventsInput, (req, res) => {
   const input = req.body.sanitizedInput;
   
-  const evento = new Evento(
-    input.nombre,
-    input.descripcion,
-    input.capacidad_total,
-    input.direccion,
-    input.fecha_hora,
-    input.edad_minima
+  const event = new Event(
+    input.name,
+    input.description,
+    input.total_capacity,
+    input.direction,
+    input.date_time,
+    input.min_age
   );
 
-  eventos.push(evento);
-  res.status(201).send({ message: "Evento creado", data: evento });
+  events.push(event);
+  res.status(201).send({ message: "Event creado", data: event });
 });

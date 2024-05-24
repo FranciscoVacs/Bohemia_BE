@@ -1,0 +1,32 @@
+### Obtener todos los events
+GET http://localhost:3000/api/events
+
+### Obtener todos un event (se usa el id)
+GET http://localhost:3000/api/events/id-de-prueba-test-lorem_ipsum
+
+### Crear nuevo character
+POST http://localhost:3000/api/events
+Content-Type: application/json
+
+{
+    "name": "Taylor Swift en la bombonera",
+    "description": "description2",
+    "total_capacity": 10000,
+    "direction": "Brandsen 805",
+    "date_time": "2024-03-26",
+    "min_age": 16
+}
+
+###modificar un event (PUT - recurso completo e idempotente)
+
+PUT http://localhost:3000/api/events/id-de-prueba-test-lorem_ipsum
+Content-Type: application/json
+
+{
+    "name": "La gorda norma",
+    "description": "anfiteatro de san telmo",
+    "total_capacity": 10,
+    "direction": "Olivarria 303",
+    "date_time": "2024-03-11",
+    "min_age": 12
+}
