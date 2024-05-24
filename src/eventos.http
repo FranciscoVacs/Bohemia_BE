@@ -16,3 +16,17 @@ Content-Type: application/json
     "fecha_hora": "2024-03-26",
     "edad_minima": 16
 }
+
+###modificar un evento (PUT - recurso completo e idempotente)
+
+PUT http://localhost:3000/api/eventos/id-de-prueba-test-lorem_ipsum
+Content-Type: application/json
+
+{
+    "nombre": "La gorda norma",
+    "descripcion": "anfiteatro de san telmo",
+    "capacidad_total": 10,
+    "direccion": "Olivarria 303",
+    "fecha_hora": "2024-03-11",
+    "edad_minima": 12
+}

@@ -1,18 +1,18 @@
-import express from 'express';
-import { Evento } from './evento.js';
+import express from "express";
+import { Evento } from "./evento.js";
 
 const app = express();
 app.use(express.json());
 
 const eventos = [
   new Evento(
-    'Wos en el luna park',
-    'Es Wos!!! en el luna park!!!!',
+    "Wos en el luna park",
+    "Es Wos!!! en el luna park!!!!",
     5000,
-    'catamarca 1540',
-    '2023-05-19',
+    "catamarca 1540",
+    "2023-05-19",
     18,
-    'id-de-prueba-test-lorem_ipsum'
+    "id-de-prueba-test-lorem_ipsum"
   ),
 ];
 
@@ -20,23 +20,45 @@ const eventos = [
 //  res.send("Hola!!!");
 //});
 
-app.get('/api/eventos', (req, res) => {
+app.get("/api/eventos", (req, res) => {
   res.json({ data: eventos });
 });
 
-app.get('/api/eventos/:id', (req, res) => {
+app.get("/api/eventos/:id", (req, res) => {
   const evento = eventos.find((evento) => evento.id === req.params.id);
   if (!evento) {
-    res.status(404).send({ message: 'Evento no encontrado' });
+    res.status(404).send({ message: "Evento no encontrado" });
   }
   res.json({ data: evento });
 });
 
-app.listen(3000, () => {
-  console.log('Server running on http://localhost:3000/');
+app.put("/api/eventos/:id", (req, res) => {
+  const eventoIdx = eventos.findIndex((evento) => evento.id == req.params.id);
+
+  if (eventoIdx === -1) {
+    res.status(404).send({ message: "Evento no encontrado" });
+  }
+  const input = {
+    nombre: req.body.nombre,
+    descripcion: req.body.descripcion,
+    capacidad_total: req.body.capacidad_total,
+    direccion: req.body.direccion,
+    fecha_hora: req.body.fecha_hora,
+    edad_minima: req.body.edad_minima,
+  };
+  eventos[eventoIdx] = { ...eventos[eventoIdx], ...input };
+
+  res.status(200).send({
+    message: "Character updated successfully",
+    data: eventos[eventoIdx],
+  });
 });
 
-app.post('/api/eventos', (req, res) => {
+app.listen(3000, () => {
+  console.log("Server running on http://localhost:3000/");
+});
+
+app.post("/api/eventos", (req, res) => {
   const {
     nombre,
     descripcion,
@@ -52,9 +74,9 @@ app.post('/api/eventos', (req, res) => {
     capacidad_total,
     direccion,
     fecha_hora,
-    edad_minima
+    edad_minima,
   );
 
   eventos.push(evento);
-  res.status(201).send({ message: 'Evento creado', data: evento });
+  res.status(201).send({ message: "Evento creado", data: evento });
 });
