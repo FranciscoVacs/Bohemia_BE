@@ -1,8 +1,11 @@
 import express, { NextFunction, Request, Response } from "express";
-import { Event } from "./event.js";
+import { Event } from "./event/event.entity.js";
+import { EventRespository } from "./event/event.repository.js";
 
 const app = express();
 app.use(express.json());
+
+const repository = new EventRespository();
 
 const events = [
   new Event(
@@ -20,11 +23,7 @@ const events = [
 //  res.send("Hola!!!");
 //});
 
-function sanitizeEventsInput(
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
+function sanitizeEventsInput(req: Request, res: Response, next: NextFunction) {
   req.body.sanitizedInput = {
     name: req.body.name,
     description: req.body.description,
@@ -35,21 +34,22 @@ function sanitizeEventsInput(
   };
   //more checks here
 
-Object.keys(req.body.sanitizedInput).forEach(key =>{
-  if (req.body.sanitizedInput[key] === undefined){
-    delete req.body.sanitizedInput[key]
-  }
-})
+  Object.keys(req.body.sanitizedInput).forEach((key) => {
+    if (req.body.sanitizedInput[key] === undefined) {
+      delete req.body.sanitizedInput[key];
+    }
+  });
 
   next();
 }
 
 app.get("/api/events", (req, res) => {
-  res.json({ data: events });
+  res.json({ data: repository.findAll() });
 });
 
 app.get("/api/events/:id", (req, res) => {
-  const event = events.find((event) => event.id === req.params.id);
+  const id = req.params.id;
+  const event = repository.findOne({ id });
   if (!event) {
     return res.status(404).send({ message: "Event not found" });
   }
@@ -57,46 +57,43 @@ app.get("/api/events/:id", (req, res) => {
 });
 
 app.put("/api/events/:id", sanitizeEventsInput, (req, res) => {
-  const eventIdx = events.findIndex((event) => event.id == req.params.id);
+  req.body.sanitizedInput.id = req.params.id;
 
-  if (eventIdx === -1) {
+  const event = repository.update(req.body.sanitizedInput);
+
+  if (!event) {
     return res.status(404).send({ message: "Event not found" });
   }
 
-  events[eventIdx] = { ...events[eventIdx], ...req.body.sanitizedInput };
-
   return res.status(200).send({
-    message: "Character updated successfully",
-    data: events[eventIdx],
+    message: "Event updated successfully",
+    data: event,
   });
 });
 
 app.patch("/api/events/:id", sanitizeEventsInput, (req, res) => {
-  const eventIdx = events.findIndex((event) => event.id == req.params.id);
 
-  if (eventIdx === -1) {
-    return res.status(404).send({ message: "Event no encontrado" });
+  req.body.sanitizedInput.id = req.params.id;
+  const event = repository.update(req.body.sanitizedInput);
+  if (!event) {
+    return res.status(404).send({ message: "Event not found" });
   }
-
-  events[eventIdx] = { ...events[eventIdx], ...req.body.sanitizedInput };
-
   return res.status(200).send({
-    message: "Character updated successfully",
-    data: events[eventIdx],
+    message: "Event updated successfully",
+    data: event,
   });
 });
 
-app.delete("/api/events/:id", (req, res)=> {
-  const eventIdx = events.findIndex((event) => event.id === req.params.id)
-  if (eventIdx=== -1){
-    res.status(404).send({message:'Event not found'})
-  }
-  else {
-  events.splice(eventIdx, 1)
-  res.status(200).send({message: 'Event deleted successfully'})
-  }
-})
+app.delete("/api/events/:id", (req, res) => {
+  const id=req.params.id
+  const event = repository.delete({id})
 
+  if (!event) {
+    res.status(404).send({ message: "Event not found" });
+  } else {
+    res.status(200).send({ message: "Event deleted successfully" });
+  }
+});
 
 app.listen(3000, () => {
   console.log("Server running on http://localhost:3000/");
@@ -104,8 +101,8 @@ app.listen(3000, () => {
 
 app.post("/api/events", sanitizeEventsInput, (req, res) => {
   const input = req.body.sanitizedInput;
-  
-  const event = new Event(
+
+  const eventInput = new Event(
     input.name,
     input.description,
     input.total_capacity,
@@ -114,10 +111,10 @@ app.post("/api/events", sanitizeEventsInput, (req, res) => {
     input.min_age
   );
 
-  events.push(event);
-  return res.status(201).send({ message: "Event creado", data: event });
+  const event = repository.add(eventInput);
+  return res.status(201).send({ message: "Event created", data: event });
 });
 
-app.use((_, res)=>{
-  return res.status(404).send({message: 'Resource not found'})
-})
+app.use((_, res) => {
+  return res.status(404).send({ message: "Resource not found" });
+});
