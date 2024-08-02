@@ -1,5 +1,5 @@
-import { repository } from "../shared/repository";
-import { Event } from "./event.entity";
+import { repository } from "../shared/repository.js";
+import { Event } from "./event.entity.js";
 
 const events = [
   new Event(
