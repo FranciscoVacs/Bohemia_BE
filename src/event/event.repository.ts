@@ -13,7 +13,7 @@ const events = [
   ),
 ];
 
-export class EventRespository implements repository<Event> {
+export class EventRepository implements repository<Event> {
   public findAll(): Event[] | undefined {
     return events;
   }
