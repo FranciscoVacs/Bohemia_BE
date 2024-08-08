@@ -1,8 +1,7 @@
 import { repository } from "../shared/repository.js";
 import { Event } from "./event.entity.js";
-import { db } from "../shared/db/conn.js";
 
-const eventsArray = [
+const events = [
   new Event(
     "Wos en el luna park",
     "Es Wos!!! en el luna park!!!!",
@@ -14,36 +13,34 @@ const eventsArray = [
   ),
 ];
 
-const events = db.collection<Event>('events')
-
 export class EventRepository implements repository<Event> {
   public async findAll(): Promise<Event[] | undefined>{
-    return await events.find().toArray()
+    return await events;
   }
 
   public async findOne(item: { id: string }): Promise<Event | undefined> {
-    return await eventsArray.find((event) => event.id == item.id);
+    return await events.find((event) => event.id == item.id);
   }
 
   public async add(item: Event): Promise<Event | undefined >{
-    eventsArray.push(item);
+    events.push(item);
     return await item;
   }
 
   public async update(item: Event): Promise<Event | undefined >{
-    const eventIdx = eventsArray.findIndex((event) => event.id == item.id);
+    const eventIdx = events.findIndex((event) => event.id == item.id);
     if (eventIdx !== -1) {
-      eventsArray[eventIdx] = { ...eventsArray[eventIdx], ...item }
+      events[eventIdx] = { ...events[eventIdx], ...item }
     }
-    return await eventsArray[eventIdx];
+    return await events[eventIdx];
   }
 
   public async delete(item: { id: string }): Promise<Event | undefined> {
-    const eventIdx = eventsArray.findIndex((event) => event.id === item.id)
+    const eventIdx = events.findIndex((event) => event.id === item.id)
     if (eventIdx !== -1) {
-        const deletedEventsArray = eventsArray[eventIdx]
-        eventsArray.splice(eventIdx, 1)
-        return await deletedEventsArray
+        const deletedEvents = events[eventIdx]
+        events.splice(eventIdx, 1)
+        return await deletedEvents
     }
   }
 }

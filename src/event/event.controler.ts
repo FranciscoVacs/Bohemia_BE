@@ -4,7 +4,7 @@ import { Event } from "./event.entity.js";
 
 const repository = new EventRepository();
 
-function sanitizeEventsInput(req: Request, res: Response, next: NextFunction) {
+async function sanitizeEventsInput(req: Request, res: Response, next: NextFunction) {
   req.body.sanitizedInput = {
     name: req.body.name,
     description: req.body.description,
@@ -22,20 +22,20 @@ function sanitizeEventsInput(req: Request, res: Response, next: NextFunction) {
   next();
 }
 
-function findAll(req: Request, res: Response) {
-  res.json({ data: repository.findAll() });
+async function findAll(req: Request, res: Response) {
+  res.json({ data: await repository.findAll() });
 }
 
-function findOne(req: Request, res: Response) {
+async function findOne(req: Request, res: Response) {
   const id = req.params.id;
-  const event = repository.findOne({ id });
+  const event = await repository.findOne({ id });
   if (!event) {
     return res.status(404).send({ message: "Event not found" });
   }
   res.json({ data: event });
 }
 
-function add(req: Request, res: Response) {
+async function add(req: Request, res: Response) {
   const input = req.body.sanitizedInput;
 
   const eventInput = new Event(
@@ -47,13 +47,13 @@ function add(req: Request, res: Response) {
     input.min_age
   );
 
-  const event = repository.add(eventInput);
+  const event = await repository.add(eventInput);
   return res.status(201).send({ message: "Event created", data: event });
 }
 
-function update(req: Request, res: Response) {
+async function update(req: Request, res: Response) {
   req.body.sanitizedInput.id = req.params.id;
-  const event = repository.update(req.body.sanitizedInput);
+  const event = await repository.update(req.body.sanitizedInput);
   if (!event) {
     return res.status(404).send({ message: "Event not found" });
   }
@@ -63,9 +63,9 @@ function update(req: Request, res: Response) {
   });
 }
 
-function remove(req: Request, res: Response) {
+async function remove(req: Request, res: Response) {
   const id = req.params.id;
-  const event = repository.delete({ id });
+  const event = await repository.delete({ id });
 
   if (!event) {
     res.status(404).send({ message: "Event not found" });

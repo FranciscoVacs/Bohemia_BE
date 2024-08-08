@@ -1,3 +1,4 @@
+import { ObjectId } from 'mongodb';
 import crypto from 'node:crypto';
 
 export class Event {
@@ -8,6 +9,7 @@ export class Event {
     public direction: string,
     public date_time: string,
     public min_age: number,
-    public id = crypto.randomUUID()
+    public id = crypto.randomUUID(),
+    public _id?: ObjectId
   ) {}
 }
