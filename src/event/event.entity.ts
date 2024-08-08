@@ -9,7 +9,6 @@ export class Event {
     public direction: string,
     public date_time: string,
     public min_age: number,
-    public id = crypto.randomUUID(),
     public _id?: ObjectId
   ) {}
 }

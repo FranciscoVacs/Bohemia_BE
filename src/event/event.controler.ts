@@ -4,7 +4,11 @@ import { Event } from "./event.entity.js";
 
 const repository = new EventRepository();
 
-async function sanitizeEventsInput(req: Request, res: Response, next: NextFunction) {
+async function sanitizeEventsInput(
+  req: Request,
+  res: Response,
+  next: NextFunction
+) {
   req.body.sanitizedInput = {
     name: req.body.name,
     description: req.body.description,
@@ -52,8 +56,7 @@ async function add(req: Request, res: Response) {
 }
 
 async function update(req: Request, res: Response) {
-  req.body.sanitizedInput.id = req.params.id;
-  const event = await repository.update(req.body.sanitizedInput);
+  const event = await repository.update(req.params.id, req.body.sanitizedInput);
   if (!event) {
     return res.status(404).send({ message: "Event not found" });
   }
