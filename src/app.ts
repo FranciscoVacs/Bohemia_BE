@@ -1,27 +1,24 @@
-import 'reflect-metadata'
 import express from "express";
-import { eventRouter } from "./event/event.routes.js";
-import { orm, syncSchema} from './shared/db/orm.js';
-import { RequestContext } from '@mikro-orm/core';
+import { corsMiddleware } from "./middlewares/cors.js";
+import { createEventosRouter } from "./routes/eventos.route.js";
+import { EventoModel } from "./models/eventos.model.js";
 
-const app = express();
-app.use(express.json());
 
-//luego de los middlewares base 
-app.use((req, res, next)=>{
-  RequestContext.create(orm.em, next)
-})
+const eventoModel = new EventoModel();
 
-//antes de las rutas y middlewares de negocio
+export const createApp = () => {
+  const app = express();
+  app.use(express.json());
+  app.use(corsMiddleware());
+  app.disable("x-powered-by");
 
-app.use("/api/events", eventRouter);
+  app.use("/api/eventos", createEventosRouter({ eventoModel }));
 
-app.use((_, res) => {
-  return res.status(404).send({ message: "Resource not found" });
-});
+  const PORT = process.env.PORT ?? 3000;
 
-await syncSchema()//solo en desarrollo
+  app.listen(PORT, () => {
+    console.log(`Server listening on port http://localhost:${PORT}`);
+  });
+};
 
-app.listen(3000, () => {
-  console.log("Server running on http://localhost:3000/");
-});
+createApp();

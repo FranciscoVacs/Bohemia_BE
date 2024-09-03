@@ -1,0 +1,33 @@
+###Recuperar todos los eventos
+GET http://localhost:3000/api/eventos
+
+###Recuperar un evento por id
+GET http://localhost:3000/api/eventos/4
+
+###Recuperar todos los eventos por porvincia
+GET http://localhost:3000/api/eventos/provincia/1
+
+###Crear un evento
+POST http://localhost:3000/api/eventos
+Content-Type: application/json
+
+{
+    "begin_datetime": "2020-01-01 00:00:00",
+    "finish_datetime": "2020-01-01 22:00:00",
+    "event_description": "A VER SI FUNCIONA to god asdfsadsadfsadfsdafsad",
+    "min_age": 10,
+    "location_id": 1
+}
+
+###Actualizar un evento
+PATCH http://localhost:3000/api/eventos/10
+Content-Type: application/json
+
+{
+    "begin_datetime": "2010-01-01 00:00:00",
+    "min_age": 100
+}
+
+
+###Eliminar un evento
+DELETE http://localhost:3000/api/eventos/10
