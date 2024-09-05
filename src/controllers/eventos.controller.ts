@@ -1,11 +1,11 @@
 import type { Request, Response } from "express";
-import { Eventos } from "../interfaces/eventos.entity.js";
-import type { EventoModel } from "../models/eventos.model.js";
+import { Eventos } from "../entities/eventos.entity.js";
+import type { IEventoModel } from "../interfaces/eventos.model.interface.js";
 
 export class EventoController {
-  private eventoModel: EventoModel;
+  private eventoModel: IEventoModel;
 
-  constructor(eventoModel: EventoModel) {
+  constructor(eventoModel: IEventoModel) {
     this.eventoModel = eventoModel;
   }
 
@@ -16,6 +16,7 @@ export class EventoController {
     } catch (error) {
       res.status(500).json({ message: "Internal Server Error" });
     }
+    console.log("get all eventos");
   };
 
   getById = async (req: Request, res: Response) => {

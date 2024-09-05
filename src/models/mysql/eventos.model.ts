@@ -1,6 +1,7 @@
 import mysql from "mysql2/promise";
 import type { ResultSetHeader, RowDataPacket } from "mysql2/promise";
-import type { Eventos } from "../interfaces/eventos.entity.js";
+import type { Eventos } from "../../entities/eventos.entity.js";
+import type { IEventoModel } from "../../interfaces/eventos.model.interface.js";
 
 const config = {
   host: "localhost",
@@ -12,7 +13,7 @@ const config = {
 
 const connection = await mysql.createConnection(config);
 
-export class EventoModel {
+export class EventoModel implements IEventoModel {
   async getAll(): Promise<Eventos[] | undefined> {
     const [eventos] = await connection.query(
       "SELECT begin_datetime, finish_datetime, event_description, min_age, location_id, id FROM eventos",

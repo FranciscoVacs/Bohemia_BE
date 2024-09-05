@@ -6,11 +6,12 @@
   "main": "app.js",
   "scripts": {
     "build1": "tsc -p ./tsconfig.json",
-    "start:dev": "tsc-watch --noClear -p ./tsconfig.json --onSuccess \"node ./dist/app.js\"",
+    "start:dev": "tsc-watch --noClear -p ./tsconfig.json --onSuccess \"node ./dist/server.js\"",
     "clean": "rimraf ./dist",
     "build": "tsc",
     "rebuild": "npm run clean && npm run build",
-    "biome": "biome check ./src"
+    "biome": "biome check ./src",
+    "biome write": "biome write ./src"
   },
   "keywords": [],
   "author": "",

@@ -1,11 +1,10 @@
 import express from "express";
 import { corsMiddleware } from "./middlewares/cors.js";
-import { EventoModel } from "./models/eventos.model.js";
 import { createEventosRouter } from "./routes/eventos.route.js";
+import type { IEventoModel } from "./interfaces/eventos.model.interface.js";
 
-const eventoModel = new EventoModel();
 
-export const createApp = () => {
+export const createApp = (eventoModel:IEventoModel) => {
   const app = express();
   app.use(express.json());
   app.use(corsMiddleware());
@@ -20,4 +19,3 @@ export const createApp = () => {
   });
 };
 
-createApp();

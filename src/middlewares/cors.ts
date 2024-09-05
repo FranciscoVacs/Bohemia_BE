@@ -3,6 +3,7 @@ import cors from "cors";
 const ACCEPTED_ORIGINS = [
   "http://localhost:8080",
   "http://localhost:1234",
+  "https://localhost:3000",
   "https://BohemiaPage.com",
 ];
 

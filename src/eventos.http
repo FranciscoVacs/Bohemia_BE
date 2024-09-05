@@ -20,7 +20,7 @@ Content-Type: application/json
 }
 
 ###Actualizar un evento
-PATCH http://localhost:3000/api/eventos/10
+PATCH http://localhost:3000/api/eventos/4
 Content-Type: application/json
 
 {
@@ -30,4 +30,4 @@ Content-Type: application/json
 
 
 ###Eliminar un evento
-DELETE http://localhost:3000/api/eventos/10
+DELETE http://localhost:3000/api/eventos/4

@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { EventoController } from "../controllers/eventos.controller.js";
 import { schemaValidator } from "../middlewares/schemaValidator.js";
-import type { EventoModel } from "../models/eventos.model.js";
+import type { IEventoModel } from "../interfaces/eventos.model.interface.js";
 import {
   CreateEventosSchema,
   UpdateEventosSchema,
@@ -12,7 +12,7 @@ export const eventosRouter = Router();
 export const createEventosRouter = ({
   eventoModel,
 }: {
-  eventoModel: EventoModel;
+  eventoModel: IEventoModel;
 }) => {
   const eventosRouter = Router();
   const eventoController = new EventoController(eventoModel);
