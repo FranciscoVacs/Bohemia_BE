@@ -1,8 +1,7 @@
 import express from "express";
 import { corsMiddleware } from "./middlewares/cors.js";
-import { createEventosRouter } from "./routes/eventos.route.js";
 import { EventoModel } from "./models/eventos.model.js";
-
+import { createEventosRouter } from "./routes/eventos.route.js";
 
 const eventoModel = new EventoModel();
 

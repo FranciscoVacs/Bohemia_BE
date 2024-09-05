@@ -1,6 +1,6 @@
-import { Request, Response } from "express";
-import { EventoModel } from "../models/eventos.model.js";
-import { Eventos } from "../interfaces/eventos.entity.js"; 
+import type { Request, Response } from "express";
+import { Eventos } from "../interfaces/eventos.entity.js";
+import type { EventoModel } from "../models/eventos.model.js";
 
 export class EventoController {
   private eventoModel: EventoModel;
@@ -16,7 +16,6 @@ export class EventoController {
     } catch (error) {
       res.status(500).json({ message: "Internal Server Error" });
     }
-    console.log("get all eventos");
   };
 
   getById = async (req: Request, res: Response) => {
@@ -40,15 +39,15 @@ export class EventoController {
         input.finish_datetime,
         input.event_description,
         input.min_age,
-        input.location_id
+        input.location_id,
       );
       const evento = await this.eventoModel.create(eventoInput);
-      return res.status(201).send({message: 'evento creado', data: evento});
+      return res.status(201).send({ message: "evento creado", data: evento });
     } catch (error) {
       res.status(500).json({ message: "Internal Server Error" });
     }
   };
-  
+
   delete = async (req: Request, res: Response) => {
     try {
       const id = req.params.id;
@@ -56,22 +55,25 @@ export class EventoController {
       if (!evento) {
         return res.status(404).json({ message: "Evento no encontrado" });
       }
-      return res.status(200).send({message: "Evento eliminado", data: evento});
+      return res
+        .status(200)
+        .send({ message: "Evento eliminado", data: evento });
     } catch (error) {
       res.status(500).json({ message: "Internal Server Error" });
     }
   };
 
-  update = async(req: Request, res: Response) => {
-    console.log("update evento", req.body);
+  update = async (req: Request, res: Response) => {
     try {
       const evento = await this.eventoModel.update(req.params.id, req.body);
-      if(!evento){
-        return res.status(404).send({message: "Evento no encontrado"});
+      if (!evento) {
+        return res.status(404).send({ message: "Evento no encontrado" });
       }
-      return res.status(200).send({message: "Evento actualizado", data: evento});
+      return res
+        .status(200)
+        .send({ message: "Evento actualizado", data: evento });
     } catch (error) {
       res.status(500).json({ message: "Internal Server Error" });
     }
-  }
+  };
 }

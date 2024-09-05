@@ -1,5 +1,6 @@
-import mysql, { RowDataPacket, ResultSetHeader } from "mysql2/promise";
-import { Eventos } from "../interfaces/eventos.entity.js";
+import mysql from "mysql2/promise";
+import type { ResultSetHeader, RowDataPacket } from "mysql2/promise";
+import type { Eventos } from "../interfaces/eventos.entity.js";
 
 const config = {
   host: "localhost",
@@ -12,9 +13,9 @@ const config = {
 const connection = await mysql.createConnection(config);
 
 export class EventoModel {
-   async getAll(): Promise<Eventos[] | undefined> {
+  async getAll(): Promise<Eventos[] | undefined> {
     const [eventos] = await connection.query(
-      "SELECT begin_datetime, finish_datetime, event_description, min_age, location_id, id FROM eventos"
+      "SELECT begin_datetime, finish_datetime, event_description, min_age, location_id, id FROM eventos",
     );
     return eventos as Eventos[];
   }
@@ -23,9 +24,9 @@ export class EventoModel {
     const parsedId = Number.parseInt(id);
     const [eventos] = await connection.query<RowDataPacket[]>(
       "SELECT begin_datetime, finish_datetime, event_description, min_age, location_id, id FROM eventos WHERE id = ?",
-      [parsedId]
+      [parsedId],
     );
-    if (eventos.length == 0) {
+    if (eventos.length === 0) {
       return undefined;
     }
     const evento = eventos[0] as Eventos;
@@ -38,7 +39,7 @@ export class EventoModel {
       const { id, ...eventoRow } = eventoInput;
       const [result] = await connection.query<ResultSetHeader>(
         "INSERT INTO eventos set ?",
-        [eventoRow]
+        [eventoRow],
       );
 
       eventoInput.id = result.insertId;
@@ -53,10 +54,7 @@ export class EventoModel {
     try {
       const eventoToBeDeleted = await this.getById(id);
       const parsedId = Number.parseInt(id);
-      await connection.query(
-        "delete FROM eventos WHERE id = ?",
-        [parsedId]
-      );
+      await connection.query("delete FROM eventos WHERE id = ?", [parsedId]);
 
       return eventoToBeDeleted as Eventos;
     } catch (error) {
@@ -68,11 +66,14 @@ export class EventoModel {
   async update(id: string, eventoInput: Eventos): Promise<Eventos | undefined> {
     try {
       const parsedId = Number.parseInt(id);
-      const {...eventoRow } = eventoInput;
+      const { ...eventoRow } = eventoInput;
       if (Object.keys(eventoRow).length === 0) {
         throw new Error("No data to update");
       }
-      await connection.query('update eventos set ? where id = ?', [eventoRow, parsedId]);
+      await connection.query("update eventos set ? where id = ?", [
+        eventoRow,
+        parsedId,
+      ]);
       return await this.getById(id);
     } catch (error) {
       console.error("Error updating evento:", error);
