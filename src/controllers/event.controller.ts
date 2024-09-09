@@ -1,18 +1,18 @@
 import type { Request, Response } from "express";
-import { Eventos } from "../entities/eventos.entity.js";
-import type { IEventoModel } from "../interfaces/eventos.model.interface.js";
+import { Event } from "../entities/event.entity.js";
+import type { IEventModel } from "../interfaces/event.model.interface.js";
 
-export class EventoController {
-  private eventoModel: IEventoModel;
+export class EventController {
+  private eventModel: IEventModel;
 
-  constructor(eventoModel: IEventoModel) {
-    this.eventoModel = eventoModel;
+  constructor(eventModel: IEventModel) {
+    this.eventModel = eventModel;
   }
 
   getAll = async (req: Request, res: Response) => {
     try {
-      const eventos = await this.eventoModel.getAll();
-      res.send(eventos);
+      const event = await this.eventModel.getAll();
+      res.send(event);
     } catch (error) {
       res.status(500).json({ message: "Internal Server Error" });
     }
@@ -21,11 +21,11 @@ export class EventoController {
   getById = async (req: Request, res: Response) => {
     try {
       const id = req.params.id;
-      const evento = await this.eventoModel.getById(id);
-      if (!evento) {
-        return res.status(404).json({ message: "Evento no encontrado" });
+      const event = await this.eventModel.getById(id);
+      if (!event) {
+        return res.status(404).json({ message: "Event no encontrado" });
       }
-      res.send(evento);
+      res.send(event);
     } catch (error) {
       res.status(500).json({ message: "Internal Server Error" });
     }
@@ -34,15 +34,15 @@ export class EventoController {
   create = async (req: Request, res: Response) => {
     try {
       const input = req.body;
-      const eventoInput = new Eventos(
+      const eventInput = new Event(
         input.begin_datetime,
         input.finish_datetime,
         input.event_description,
         input.min_age,
         input.location_id,
       );
-      const evento = await this.eventoModel.create(eventoInput);
-      return res.status(201).send({ message: "evento creado", data: evento });
+      const event = await this.eventModel.create(eventInput);
+      return res.status(201).send({ message: "event creado", data: event });
     } catch (error) {
       res.status(500).json({ message: "Internal Server Error" });
     }
@@ -51,13 +51,13 @@ export class EventoController {
   delete = async (req: Request, res: Response) => {
     try {
       const id = req.params.id;
-      const evento = await this.eventoModel.delete(id);
-      if (!evento) {
-        return res.status(404).json({ message: "Evento no encontrado" });
+      const event = await this.eventModel.delete(id);
+      if (!event) {
+        return res.status(404).json({ message: "Event no encontrado" });
       }
       return res
         .status(200)
-        .send({ message: "Evento eliminado", data: evento });
+        .send({ message: "Event eliminado", data: event });
     } catch (error) {
       res.status(500).json({ message: "Internal Server Error" });
     }
@@ -65,13 +65,13 @@ export class EventoController {
 
   update = async (req: Request, res: Response) => {
     try {
-      const evento = await this.eventoModel.update(req.params.id, req.body);
-      if (!evento) {
-        return res.status(404).send({ message: "Evento no encontrado" });
+      const event = await this.eventModel.update(req.params.id, req.body);
+      if (!event) {
+        return res.status(404).send({ message: "Event no encontrado" });
       }
       return res
         .status(200)
-        .send({ message: "Evento actualizado", data: evento });
+        .send({ message: "Event actualizado", data: event });
     } catch (error) {
       res.status(500).json({ message: "Internal Server Error" });
     }

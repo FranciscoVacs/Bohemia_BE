@@ -1,13 +1,13 @@
 import express from "express";
 import 'reflect-metadata';
 import { corsMiddleware } from "./middlewares/cors.js";
-import { createEventosRouter } from "./routes/eventos.route.js";
+import { createEventRouter } from "./routes/event.route.js";
 import{ orm, syncSchema } from "./shared/db/orm.js";
-import type { IEventoModel } from "./interfaces/eventos.model.interface.js";
+import type { IEventModel } from "./interfaces/event.model.interface.js";
 import { RequestContext } from "@mikro-orm/core";
 
 
-export const createApp = async (eventoModel:IEventoModel) => {
+export const createApp = async (eventModel:IEventModel) => {
   const app = express();
   app.use(express.json());
   app.use(corsMiddleware());
@@ -19,7 +19,7 @@ export const createApp = async (eventoModel:IEventoModel) => {
   });
 
 
-  app.use("/api/eventos", createEventosRouter({ eventoModel }));
+  app.use("/api/event", createEventRouter({ eventModel }));
 
   const PORT = process.env.PORT ?? 3000;
 

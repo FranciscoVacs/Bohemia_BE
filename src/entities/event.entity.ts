@@ -1,4 +1,4 @@
-export class Eventos {
+export class Event {
   constructor(
     public begin_datetime: string,
     public finish_datetime: string,

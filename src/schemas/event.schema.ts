@@ -2,7 +2,7 @@ import { z } from "zod";
 
 const datetimeRegex = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
 
-export const CreateEventosSchema = z.object({
+export const CreateEventSchema = z.object({
   body: z.object({
     begin_datetime: z.string().refine((val) => datetimeRegex.test(val), {
       message:
@@ -27,7 +27,7 @@ export const CreateEventosSchema = z.object({
   }),
 });
 
-export const UpdateEventosSchema = z.object({
+export const UpdateEventSchema = z.object({
   body: z
     .object({
       begin_datetime: z

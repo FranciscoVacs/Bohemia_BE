@@ -1,6 +1,6 @@
 import { createApp } from './app.js'
-import { EventoModel } from './models/mysql/eventos.model.js'
+import { EventModel } from './models/mysql/event.model.js'
 
-const eventoModel = new EventoModel();
+const eventModel = new EventModel();
 
-createApp(eventoModel);
+createApp(eventModel);

@@ -1,14 +1,14 @@
 ###Recuperar todos los eventos
-GET http://localhost:3000/api/eventos
+GET http://localhost:3000/api/event
 
 ###Recuperar un evento por id
-GET http://localhost:3000/api/eventos/4
+GET http://localhost:3000/api/event/4
 
 ###Recuperar todos los eventos por porvincia
-GET http://localhost:3000/api/eventos/provincia/1
+GET http://localhost:3000/api/event/provincia/1
 
 ###Crear un evento
-POST http://localhost:3000/api/eventos
+POST http://localhost:3000/api/event
 Content-Type: application/json
 
 {
@@ -20,7 +20,7 @@ Content-Type: application/json
 }
 
 ###Actualizar un evento
-PATCH http://localhost:3000/api/eventos/4
+PATCH http://localhost:3000/api/event/4
 Content-Type: application/json
 
 {
@@ -30,4 +30,4 @@ Content-Type: application/json
 
 
 ###Eliminar un evento
-DELETE http://localhost:3000/api/eventos/4
+DELETE http://localhost:3000/api/event/4
