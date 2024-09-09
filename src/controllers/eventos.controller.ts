@@ -16,7 +16,6 @@ export class EventoController {
     } catch (error) {
       res.status(500).json({ message: "Internal Server Error" });
     }
-    console.log("get all eventos");
   };
 
   getById = async (req: Request, res: Response) => {
