@@ -1,0 +1,35 @@
+###Recuperar todos los locationos
+GET http://localhost:3000/api/location
+
+
+###Crear un location
+# @name createLocation
+POST http://localhost:3000/api/location
+Content-Type: application/json
+
+{
+    "name": " bohema guemes",
+    "address": "ovidio lagos y guemes",
+    "city": "rosario",
+    "state": "santa fe",
+    "zip": 3000
+}
+
+###ID
+@id = {{createLocation.response.body.data.id}}
+###Recuperar un location por id
+GET http://localhost:3000/api/location/{{id}}
+
+
+###Actualizar un locationo
+PATCH http://localhost:3000/api/location/{{id}}
+Content-Type: application/json
+
+{
+    "SQL INJECTIN": "DROP TABLE location",
+    "name": "nasheeeee"
+}
+
+
+###Eliminar un locationo
+DELETE http://localhost:3000/api/location/{{id}}

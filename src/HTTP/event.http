@@ -9,6 +9,7 @@ GET http://localhost:3000/api/event/provincia/1
 
 ###Crear un evento
 POST http://localhost:3000/api/event
+# @name createEvent
 Content-Type: application/json
 
 {

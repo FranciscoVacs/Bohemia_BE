@@ -5,9 +5,12 @@ import { createEventRouter } from "./routes/event.route.js";
 import{ orm, syncSchema } from "./shared/db/orm.js";
 import type { IEventModel } from "./interfaces/event.model.interface.js";
 import { RequestContext } from "@mikro-orm/core";
+import { createLocationRouter } from "./routes/location.route.js";
+import type { ILocationModel } from "./interfaces/location.model.interface.js";
+import { errorHandler } from "./middlewares/errorHandler.js";
 
 
-export const createApp = async (eventModel:IEventModel) => {
+export const createApp = async (eventModel:IEventModel, locationModel: ILocationModel) => {
   const app = express();
   app.use(express.json());
   app.use(corsMiddleware());
@@ -18,13 +21,15 @@ export const createApp = async (eventModel:IEventModel) => {
     RequestContext.create(orm.em, next);
   });
 
-
   app.use("/api/event", createEventRouter({ eventModel }));
+  app.use("/api/location", createLocationRouter({ locationModel }));
+  
+  app.use(errorHandler);
 
-  const PORT = process.env.PORT ?? 3000;
-
+  
   await syncSchema();
 
+  const PORT = process.env.PORT ?? 3000;
   app.listen(PORT, () => {
     console.log(`Server listening on port http://localhost:${PORT}`);
   });

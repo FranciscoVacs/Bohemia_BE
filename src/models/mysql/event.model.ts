@@ -1,5 +1,5 @@
-//import mysql from "mysql2/promise";
-//import type { ResultSetHeader, RowDataPacket } from "mysql2/promise";
+import mysql from "mysql2/promise";
+import type { ResultSetHeader, RowDataPacket } from "mysql2/promise";
 import type { Event } from "../../entities/event.entity.js";
 import type { IEventModel } from "../../interfaces/event.model.interface.js";
 

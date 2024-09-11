@@ -16,15 +16,6 @@ export const CreateEventSchema = z.object({
     min_age: z.number().int().positive(),
     location_id: z.number(),
   }),
-  params: z.object({
-    id: z
-      .string()
-      .refine((val) => {
-        const num = Number.parseInt(val);
-        return !Number.isNaN(num) && num.toString() === val;
-      })
-      .optional(),
-  }),
 });
 
 export const UpdateEventSchema = z.object({
@@ -47,8 +38,7 @@ export const UpdateEventSchema = z.object({
       event_description: z.string().max(100).optional(),
       min_age: z.number().int().positive().optional(),
       location_id: z.number().optional(),
-    })
-    .optional(),
+    }),
   params: z.object({
     id: z
       .string()
@@ -56,6 +46,5 @@ export const UpdateEventSchema = z.object({
         const num = Number.parseInt(val);
         return !Number.isNaN(num) && num.toString() === val;
       })
-      .optional(),
   }),
 });

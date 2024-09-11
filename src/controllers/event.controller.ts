@@ -11,10 +11,10 @@ export class EventController {
 
   getAll = async (req: Request, res: Response) => {
     try {
-      const event = await this.eventModel.getAll();
-      res.send(event);
-    } catch (error) {
-      res.status(500).json({ message: "Internal Server Error" });
+      const events = await this.eventModel.getAll();
+      res.status(200).json({ message: "Find all events", data: events });
+    }catch (error) {
+    res.status(500).json({ message: "Internal Server Error" });
     }
   };
 
@@ -33,17 +33,11 @@ export class EventController {
 
   create = async (req: Request, res: Response) => {
     try {
-      const input = req.body;
-      const eventInput = new Event(
-        input.begin_datetime,
-        input.finish_datetime,
-        input.event_description,
-        input.min_age,
-        input.location_id,
-      );
+      const eventInput = req.body;
       const event = await this.eventModel.create(eventInput);
       return res.status(201).send({ message: "event creado", data: event });
     } catch (error) {
+      console.error("Error al crear el evento:", error);
       res.status(500).json({ message: "Internal Server Error" });
     }
   };
