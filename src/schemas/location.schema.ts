@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const CreateLocationSchema = z.object({
   body: z.object({
-    name: z.string().max(100),
+    location_name: z.string().max(100),
     address: z.string().max(100),
     city: z.string().max(100),
     state: z.string().max(100),
@@ -14,7 +14,7 @@ export const CreateLocationSchema = z.object({
 export const UpdateLocationSchema = z.object({
   body: z
     .object({
-        name: z.string().max(100).optional(),
+        location_name: z.string().max(100).optional(),
         address: z.string().max(100).optional(),
         city: z.string().max(100).optional(),
         state: z.string().max(100).optional(),

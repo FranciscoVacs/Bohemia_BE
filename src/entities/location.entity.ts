@@ -1,19 +1,21 @@
-import { Entity, OneToMany, Property,Cascade, Collection } from "@mikro-orm/core";
+import { Entity, OneToMany, Property,Cascade, Collection, Unique } from "@mikro-orm/core";
 import { BaseEntity } from "../shared/db/baseEntity.entity.js"
 import { Event } from "./event.entity.js";
 
 @Entity()
 export class Location extends BaseEntity {
-    @Property()
-    name!: string;
 
-    @Property()
+    @Property({length:100})
+    location_name!: string;
+
+    @Property({length:100})
+    @Unique()
     address!: string;
 
-    @Property()
+    @Property({length:100})
     city!: string;
 
-    @Property()
+    @Property({length:100})
     state!: string;
 
     @Property()

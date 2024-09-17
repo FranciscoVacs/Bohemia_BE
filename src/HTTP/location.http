@@ -8,8 +8,8 @@ POST http://localhost:3000/api/location
 Content-Type: application/json
 
 {
-    "name": " bohema guemes",
-    "address": "ovidio lagos y guemes",
+    "location_name": "sala de las artes",
+    "address": "ovlagos 246",
     "city": "rosario",
     "state": "santa fe",
     "zip": 3000
@@ -21,15 +21,15 @@ Content-Type: application/json
 GET http://localhost:3000/api/location/{{id}}
 
 
-###Actualizar un locationo
+###Actualizar un location
 PATCH http://localhost:3000/api/location/{{id}}
 Content-Type: application/json
 
 {
     "SQL INJECTIN": "DROP TABLE location",
-    "name": "nasheeeee"
+    "location_name": "centro cultural guemes"
 }
 
 
-###Eliminar un locationo
+###Eliminar un location
 DELETE http://localhost:3000/api/location/{{id}}

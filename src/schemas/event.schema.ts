@@ -4,6 +4,7 @@ const datetimeRegex = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
 
 export const CreateEventSchema = z.object({
   body: z.object({
+    event_name: z.string().max(100),
     begin_datetime: z.string().refine((val) => datetimeRegex.test(val), {
       message:
         "Invalid datetime format. Expected format: 'YYYY-MM-DD HH:MM:SS'",
@@ -14,13 +15,14 @@ export const CreateEventSchema = z.object({
     }),
     event_description: z.string().max(100),
     min_age: z.number().int().positive(),
-    location_id: z.number(),
+    location: z.number(),
   }),
 });
 
 export const UpdateEventSchema = z.object({
   body: z
     .object({
+      event_name: z.string().max(100).optional(),
       begin_datetime: z
         .string()
         .refine((val) => datetimeRegex.test(val), {
@@ -37,7 +39,7 @@ export const UpdateEventSchema = z.object({
         .optional(),
       event_description: z.string().max(100).optional(),
       min_age: z.number().int().positive().optional(),
-      location_id: z.number().optional(),
+      location: z.number().optional(),
     }),
   params: z.object({
     id: z

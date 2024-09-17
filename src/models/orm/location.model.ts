@@ -12,8 +12,7 @@ export class LocationModel implements ILocationModel{
 
     async getById(id: string): Promise<Location | undefined> {
         const parsedId = Number.parseInt(id);
-        return await this.em.findOneOrFail(Location, parsedId);
-        
+        return await this.em.findOneOrFail(Location, parsedId, { populate: ['events'] });
     }
 
     async create(locationInput: Location): Promise<Location | undefined> {
@@ -31,7 +30,6 @@ export class LocationModel implements ILocationModel{
     async update(id: string, locationUpdates: Partial<Location>): Promise<void> {
         const parsedId = Number.parseInt(id);
         const locationToUpdate = await this.em.findOneOrFail(Location, parsedId);
-        console.log(locationToUpdate); 
         this.em.assign(locationToUpdate, locationUpdates);
         await this.em.flush();        
       }

@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { EventController } from "../controllers/event.controller.js";
-import { schemaValidator } from "../middlewares/schemaValidator.js";
 import type { IEventModel } from "../interfaces/event.model.interface.js";
+import { schemaValidator } from "../middlewares/schemaValidator.js";
 import {
   CreateEventSchema,
   UpdateEventSchema,

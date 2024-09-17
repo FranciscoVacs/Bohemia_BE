@@ -1,6 +1,6 @@
-import type { Request, Response } from "express";
-import { Event } from "../entities/event.entity.js";
+import type { Request, Response, NextFunction } from "express";
 import type { IEventModel } from "../interfaces/event.model.interface.js";
+import { errorHandler } from "../middlewares/errorHandler.js";
 
 export class EventController {
   private eventModel: IEventModel;
@@ -9,65 +9,55 @@ export class EventController {
     this.eventModel = eventModel;
   }
 
-  getAll = async (req: Request, res: Response) => {
+  getAll = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const events = await this.eventModel.getAll();
       res.status(200).json({ message: "Find all events", data: events });
-    }catch (error) {
-    res.status(500).json({ message: "Internal Server Error" });
+    } catch (error) {
+      next(errorHandler);
     }
   };
 
-  getById = async (req: Request, res: Response) => {
+  getById = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const id = req.params.id;
       const event = await this.eventModel.getById(id);
-      if (!event) {
-        return res.status(404).json({ message: "Event no encontrado" });
-      }
-      res.send(event);
+      res.status(200).send({message:'Event found', data: event});
     } catch (error) {
-      res.status(500).json({ message: "Internal Server Error" });
+      next(error);
     }
   };
 
-  create = async (req: Request, res: Response) => {
+  create = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const eventInput = req.body;
       const event = await this.eventModel.create(eventInput);
-      return res.status(201).send({ message: "event creado", data: event });
+      return res
+        .status(201)
+        .send({ message: "Event created", data: event });
     } catch (error) {
-      console.error("Error al crear el evento:", error);
-      res.status(500).json({ message: "Internal Server Error" });
+      next(error);
     }
   };
 
-  delete = async (req: Request, res: Response) => {
+  delete = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const id = req.params.id;
-      const event = await this.eventModel.delete(id);
-      if (!event) {
-        return res.status(404).json({ message: "Event no encontrado" });
-      }
-      return res
-        .status(200)
-        .send({ message: "Event eliminado", data: event });
+      await this.eventModel.delete(id);
+      return res.status(200).send({ message: "Event deleted" });
     } catch (error) {
-      res.status(500).json({ message: "Internal Server Error" });
+      next(error);
     }
   };
 
-  update = async (req: Request, res: Response) => {
+  update = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const event = await this.eventModel.update(req.params.id, req.body);
-      if (!event) {
-        return res.status(404).send({ message: "Event no encontrado" });
-      }
-      return res
-        .status(200)
-        .send({ message: "Event actualizado", data: event });
+      const id = req.params.id;
+      console.log(req.body); 
+      await this.eventModel.update(id, req.body);
+      return res.status(200).send({ message: "Event updated" });
     } catch (error) {
-      res.status(500).json({ message: "Internal Server Error" });
+      next(error);
     }
   };
 }

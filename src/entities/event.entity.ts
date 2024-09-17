@@ -5,13 +5,16 @@ import { Location } from "./location.entity.js";
 
 @Entity()
 export class Event extends BaseEntity {
-  @Property()
-  begin_datetime!: string;
+  @Property({ length: 100 })
+  event_name!: string;
 
   @Property()
-  finish_datetime!: string;
+  begin_datetime!: Date;
 
   @Property()
+  finish_datetime!: Date;
+
+  @Property({ length: 500 })
   event_description!: string;
 
   @Property()

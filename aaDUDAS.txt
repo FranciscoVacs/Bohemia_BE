@@ -1,0 +1,24 @@
+dudas:
+
+-puedo traer solo el nombre de la provincia y el nombre de la locacion o teng que traer todo el objeto?
+-como hago que un usuario sea administrador y pueda crear eventos?
+-explicacion de propiedad rel de mikroorm
+-
+-------------------------------------------------
+
+crud simple
+-provincia
+-usuario
+-album
+
+crud dep
+-tipo-entrada-> evento 
+-locacion-> provincia
+
+cuu/epic
+-crear evento c/tipo-entrada
+-compra c/entrada
+
+para AD: descuento(relacionar con evento y con entrada), login, seguridad
+
+
