@@ -12,7 +12,7 @@ export class LocationModel implements ILocationModel{
 
     async getById(id: string): Promise<Location | undefined> {
         const parsedId = Number.parseInt(id);
-        return await this.em.findOneOrFail(Location, parsedId, { populate: ['events'] });
+        return await this.em.findOneOrFail(Location, parsedId, { populate: ['event', 'city'] });
     }
 
     async create(locationInput: Location): Promise<Location | undefined> {

@@ -10,9 +10,7 @@ Content-Type: application/json
 {
     "location_name": "sala de las artes",
     "address": "ovlagos 246",
-    "city": "rosario",
-    "state": "santa fe",
-    "zip": 3000
+    "city": 1
 }
 
 ###ID

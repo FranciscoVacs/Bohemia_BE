@@ -11,7 +11,7 @@ export class EventModel implements IEventModel {
 
   async getById(id: string): Promise<Event | undefined> {
     const parsedId = Number.parseInt(id);
-    return await this.em.findOneOrFail(Event, parsedId, { populate: ["location"] });
+    return await this.em.findOneOrFail(Event, parsedId, { populate: ["location", "location.city"] });
   }
 
   async create(eventInput: Event): Promise<Event | undefined> {

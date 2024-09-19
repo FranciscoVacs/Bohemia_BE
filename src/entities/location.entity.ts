@@ -1,6 +1,8 @@
-import { Entity, OneToMany, Property,Cascade, Collection, Unique } from "@mikro-orm/core";
+import { Entity, OneToMany, ManyToOne, Property,Cascade, Collection, Unique } from "@mikro-orm/core";
+import type   { Rel } from "@mikro-orm/core";
 import { BaseEntity } from "../shared/db/baseEntity.entity.js"
 import { Event } from "./event.entity.js";
+import { City } from "./city.entity.js";
 
 @Entity()
 export class Location extends BaseEntity {
@@ -12,15 +14,9 @@ export class Location extends BaseEntity {
     @Unique()
     address!: string;
 
-    @Property({length:100})
-    city!: string;
-
-    @Property({length:100})
-    state!: string;
-
-    @Property()
-    zip!: number;
+    @ManyToOne(() => City, { nullable: false })
+    city!: Rel<City>;
 
     @OneToMany(()=>Event, event=>event.location, {cascade:[Cascade.ALL]})
-    events = new Collection<Event>(this);
+    event = new Collection<Event>(this);
 }
