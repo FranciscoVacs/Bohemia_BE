@@ -1,9 +1,10 @@
 dudas:
 
+-como uso multer, como envio en un post los datos del evento junto con una foto?, donde se almacena la foto?
 -puedo traer solo el nombre de la provincia y el nombre de la locacion o teng que traer todo el objeto?
 -como hago que un usuario sea administrador y pueda crear eventos?
 -explicacion de propiedad rel de mikroorm
--
+-el syncschema de mikroorm del app.ts, como funcionaria la api si eso no esta, hay que sacarlo en produccion?
 -------------------------------------------------
 
 crud simple
