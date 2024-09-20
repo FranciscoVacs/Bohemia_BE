@@ -10,10 +10,10 @@ export class TicketType extends BaseEntity {
     ticketType_name!: string;
 
     @Property()
-    startDateTime!: Date;
+    begin_datetime!: Date;
 
     @Property()
-    endDateTime!: Date;
+    finish_datetime!: Date;
 
     @Property()
     price!: number;

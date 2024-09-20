@@ -9,8 +9,8 @@ Content-Type: application/json
 
 {
     "ticketType_name": "sala de las artes",
-    "startDateTime": "2021-10-31 20:00:00",
-    "endDateTime": "2021-17-31 23:00:00",
+    "begin_datetime": "2021-10-10 20:00:00",
+    "finish_datetime": "2021-10-30 23:00:00",
     "price": 1000,
     "event": 1
 }
@@ -27,7 +27,7 @@ Content-Type: application/json
 
 {
     "SQL INJECTIN": "DROP TABLE ticketType",
-    "ticketType_name": "centro cultural guemes"
+    "ticketType_name": "preventa 01"
 }
 
 

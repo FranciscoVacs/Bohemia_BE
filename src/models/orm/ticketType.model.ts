@@ -12,7 +12,7 @@ export class TicketTypeModel implements ITicketTypeModel{
 
     async getById(id: string): Promise<TicketType | undefined> {
         const parsedId = Number.parseInt(id);
-        return await this.em.findOneOrFail(TicketType, parsedId);
+        return await this.em.findOneOrFail(TicketType, parsedId, { populate: ['event','event.location','event.location.city'] });
     }
 
     async create(ticketTypeInput: TicketType): Promise<TicketType | undefined> {
