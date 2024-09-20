@@ -1,11 +1,28 @@
 dudas:
 
--como uso multer, como envio en un post los datos del evento junto con una foto?, donde se almacena la foto?
--puedo traer solo el nombre de la provincia y el nombre de la locacion o teng que traer todo el objeto?
--como hago que un usuario sea administrador y pueda crear eventos?
+-tengo que hacer que la maxima cantidad de los ticketstypes,
+ no sea mayor que la max capacidad de la locacion
+-los tickets vendidos no pueden ser mas que los tickets disponibles ni
+ en la locacion ni en el ticket ticketstypes
+-agrego un estados a los tickets type por si se agotan? y que cuando termina la fecha tambien se cambie?
+
+
+-como hago que un usuario sea administrador y pueda crear eventos y subir fotos al album?
+-como uso multer, como envio en un post los datos del evento junto con una foto?
+, donde se almacena la foto?
+-como hacer que la entrada se genere en la compra? que hacemos con el tema 
+de pagar la entrada? el post de la compra hace un post de entrada y despues un get de entrada?
 -explicacion de propiedad rel de mikroorm
--el syncschema de mikroorm del app.ts, como funcionaria la api si eso no esta, hay que sacarlo en produccion?
--------------------------------------------------
+
+Tienes 3 formas de trabajar con archivos:
+1) Los guardas en el disco del server, y luego en la base de datos guardas el filepath,
+ asi luego cuando pides ese registro, reemplazas ese filepath con tu url publica, ejemplo
+  /public/uploads/filename.ext
+2) Guardar los archivos como blob en base de datos, pero aqui tendras que trabajar
+ serializando y deserializando el blob para poder mostrarlo
+3)  Usando algun bucket, tipo s3, o el de next, el cual te permite tener un
+ manejo mas simple de los uploads, lo malo? Cuestan dinero si se quiere para algo productivo
+-----------------------------------------------------------------------------------------------
 
 crud simple
 -provincia

@@ -12,6 +12,7 @@ Content-Type: application/json
     "begin_datetime": "2021-10-10 20:00:00",
     "finish_datetime": "2021-10-30 23:00:00",
     "price": 1000,
+    "max_quantity":100,
     "event": 1
 }
 

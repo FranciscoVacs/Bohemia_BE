@@ -14,6 +14,9 @@ export class Location extends BaseEntity {
     @Unique()
     address!: string;
 
+    @Property()
+    max_capacity!: number;
+
     @ManyToOne(() => City, { nullable: false })
     city!: Rel<City>;
 

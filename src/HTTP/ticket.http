@@ -1,0 +1,32 @@
+###Recuperar todos los ticketos
+GET http://localhost:3000/api/ticket
+
+
+###Crear un ticket
+# @name createTicket
+POST http://localhost:3000/api/ticket
+Content-Type: application/json
+
+{
+    "qr_code": "123456",
+    "ticketType": 4
+}
+
+###ID
+@id = {{createTicket.response.body.data.id}}
+###Recuperar un ticket por id
+GET http://localhost:3000/api/ticket/{{id}}
+
+
+###Actualizar un ticket
+PATCH http://localhost:3000/api/ticket/{{id}}
+Content-Type: application/json
+
+{
+    "SQL INJECTIN": "DROP TABLE ticket",
+    "qr_code": "654321"
+}
+
+
+###Eliminar un ticket
+DELETE http://localhost:3000/api/ticket/{{id}}

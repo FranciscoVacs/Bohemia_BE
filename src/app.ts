@@ -12,12 +12,16 @@ import { createCityRouter } from "./routes/city.route.js";
 import type { ICityModel } from "./interfaces/city.model.interface.js";
 import { createTicketTypeRouter } from "./routes/ticketType.route.js";
 import type { ITicketTypeModel } from "./interfaces/ticketType.model.interface.js";
+import { createTicketRouter } from "./routes/ticket.route.js";
+import type { ITicketModel } from "./interfaces/ticket.model.interface.js";
 
 export const createApp = async (
   eventModel: IEventModel,
   locationModel: ILocationModel,
   cityModel: ICityModel,
   ticketTypeModel: ITicketTypeModel,
+  ticketModel: ITicketModel,
+
 ) => {
   const app = express();
   app.use(express.json());
@@ -32,6 +36,7 @@ export const createApp = async (
   app.use("/api/location", createLocationRouter({ locationModel }));
   app.use("/api/city", createCityRouter({ cityModel }));
   app.use("/api/ticketType", createTicketTypeRouter({ ticketTypeModel }));
+  app.use("/api/ticket", createTicketRouter({ ticketModel }));
 
   app.use(errorHandler);
 

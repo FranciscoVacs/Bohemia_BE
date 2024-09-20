@@ -2,6 +2,7 @@ import { Entity, OneToMany, ManyToOne, Property,Cascade, Collection, Unique } fr
 import type   { Rel } from "@mikro-orm/core";
 import { BaseEntity } from "../shared/db/baseEntity.entity.js"
 import { Event } from "./event.entity.js";
+import { Ticket } from "./ticket.entity.js";
 
 @Entity()
 export class TicketType extends BaseEntity {
@@ -18,7 +19,13 @@ export class TicketType extends BaseEntity {
     @Property()
     price!: number;
 
+    @Property()
+    max_quantity!: number;
+    
     @ManyToOne(() => Event, { nullable: false })
     event!: Rel<Event>;
 
-}
+    @OneToMany(() => Ticket, ticket => ticket.ticketType)
+    tickets = new Collection<Ticket>(this);
+
+  }

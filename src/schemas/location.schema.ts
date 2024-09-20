@@ -4,6 +4,7 @@ export const CreateLocationSchema = z.object({
   body: z.object({
     location_name: z.string().max(100),
     address: z.string().max(100),
+    max_capacity: z.number().int().positive(),
     city: z.number().int().positive(),
     event: z.array(z.number()).optional(),
   }),
@@ -14,6 +15,7 @@ export const UpdateLocationSchema = z.object({
     .object({
         location_name: z.string().max(100).optional(),
         address: z.string().max(100).optional(),
+        max_capacity: z.number().int().positive().optional(),
         city: z.array(z.number()).optional(),
         event: z.array(z.number()).optional(),
     }),

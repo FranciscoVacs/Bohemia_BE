@@ -10,6 +10,7 @@ Content-Type: application/json
 {
     "location_name": "sala de las artes",
     "address": "ovlagos 246",
+    "max_capacity": 100,
     "city": 1
 }
 
@@ -25,7 +26,8 @@ Content-Type: application/json
 
 {
     "SQL INJECTIN": "DROP TABLE location",
-    "location_name": "centro cultural guemes"
+    "location_name": "centro cultural guemes",
+    "max_capacity": 2000
 }
 
 
