@@ -8,9 +8,9 @@ POST http://localhost:3000/api/city
 Content-Type: application/json
 
 {
-    "city_name": "Rosario",
-    "province": "Santa fe",
-    "zip_code": 2000
+    "city_name": "CABA",
+    "province": "Buenos Aires",
+    "zip_code": 3000
 }
 
 ###ID

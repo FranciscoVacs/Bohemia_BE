@@ -9,16 +9,17 @@ import type { IEventModel } from "./interfaces/event.model.interface.js";
 import { createLocationRouter } from "./routes/location.route.js";
 import type { ILocationModel } from "./interfaces/location.model.interface.js";
 import { createCityRouter } from "./routes/city.route.js";
-import type { ICityModel } from "./interfaces/city.model.interface.js";
 import { createTicketTypeRouter } from "./routes/ticketType.route.js";
 import type { ITicketTypeModel } from "./interfaces/ticketType.model.interface.js";
 import { createTicketRouter } from "./routes/ticket.route.js";
 import type { ITicketModel } from "./interfaces/ticket.model.interface.js";
+import type { IModel } from "./interfaces/model.interface.js";
+import type { City } from "./entities/city.entity.js";
 
 export const createApp = async (
   eventModel: IEventModel,
   locationModel: ILocationModel,
-  cityModel: ICityModel,
+  cityModel: IModel<City>,
   ticketTypeModel: ITicketTypeModel,
   ticketModel: ITicketModel,
 
