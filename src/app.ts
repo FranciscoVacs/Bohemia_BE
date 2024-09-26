@@ -5,23 +5,24 @@ import { corsMiddleware } from "./middlewares/cors.js";
 import { orm, syncSchema } from "./shared/db/orm.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
 import { createEventRouter } from "./routes/event.route.js";
-import type { IEventModel } from "./interfaces/event.model.interface.js";
 import { createLocationRouter } from "./routes/location.route.js";
-import type { ILocationModel } from "./interfaces/location.model.interface.js";
 import { createCityRouter } from "./routes/city.route.js";
 import { createTicketTypeRouter } from "./routes/ticketType.route.js";
-import type { ITicketTypeModel } from "./interfaces/ticketType.model.interface.js";
 import { createTicketRouter } from "./routes/ticket.route.js";
-import type { ITicketModel } from "./interfaces/ticket.model.interface.js";
 import type { IModel } from "./interfaces/model.interface.js";
 import type { City } from "./entities/city.entity.js";
+import type{ Ticket } from "./entities/ticket.entity.js";
+import type { Event } from "./entities/event.entity.js";
+import type { Location } from "./entities/location.entity.js";
+import type { TicketType } from "./entities/ticketType.entity.js";
+
 
 export const createApp = async (
-  eventModel: IEventModel,
-  locationModel: ILocationModel,
+  eventModel: IModel<Event>,
+  locationModel: IModel<Location>,
   cityModel: IModel<City>,
-  ticketTypeModel: ITicketTypeModel,
-  ticketModel: ITicketModel,
+  ticketTypeModel: IModel<TicketType>,
+  ticketModel: IModel<Ticket>,
 
 ) => {
   const app = express();

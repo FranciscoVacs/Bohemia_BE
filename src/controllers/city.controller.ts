@@ -7,13 +7,4 @@ export class CityController extends BaseController<City> {
   constructor(protected model: IModel<City>) {
     super(model);
   }
-  
-  getAll = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const cities = await this.model.getAll();
-      res.status(200).json({ message: "Find all cities", data: cities });
-    } catch (error) {
-      next(error);
-    }
-  };
 }

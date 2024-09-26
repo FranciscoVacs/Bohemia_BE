@@ -8,9 +8,9 @@ POST http://localhost:3000/api/location
 Content-Type: application/json
 
 {
-    "location_name": "sala de las artes",
-    "address": "ovlagos 246",
-    "max_capacity": 100,
+    "location_name": "costanera cultural",
+    "address": "corrientes 543",
+    "max_capacity": 1000,
     "city": 1
 }
 
