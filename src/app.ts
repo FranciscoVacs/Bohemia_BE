@@ -9,12 +9,16 @@ import { createLocationRouter } from "./routes/location.route.js";
 import { createCityRouter } from "./routes/city.route.js";
 import { createTicketTypeRouter } from "./routes/ticketType.route.js";
 import { createTicketRouter } from "./routes/ticket.route.js";
+import { createUserRouter } from "./routes/user.route.js";
+import { createPurchaseRouter } from "./routes/purchase.route.js";
 import type { IModel } from "./interfaces/model.interface.js";
 import type { City } from "./entities/city.entity.js";
 import type{ Ticket } from "./entities/ticket.entity.js";
 import type { Event } from "./entities/event.entity.js";
 import type { Location } from "./entities/location.entity.js";
 import type { TicketType } from "./entities/ticketType.entity.js";
+import type { User } from "./entities/user.entity.js";
+import type { Purchase } from "./entities/purchase.entity.js";
 
 
 export const createApp = async (
@@ -23,7 +27,8 @@ export const createApp = async (
   cityModel: IModel<City>,
   ticketTypeModel: IModel<TicketType>,
   ticketModel: IModel<Ticket>,
-
+  userModel: IModel<User>,
+  purchaseModel: IModel<Purchase>,
 ) => {
   const app = express();
   app.use(express.json());
@@ -37,8 +42,10 @@ export const createApp = async (
   app.use("/api/event", createEventRouter({ eventModel }));
   app.use("/api/location", createLocationRouter({ locationModel }));
   app.use("/api/city", createCityRouter({ cityModel }));
-  app.use("/api/ticketType", createTicketTypeRouter({ ticketTypeModel }));
+  app.use("/api/event/:eventId/ticketType", createTicketTypeRouter({ ticketTypeModel }));
   app.use("/api/ticket", createTicketRouter({ ticketModel }));
+  app.use("/api/user", createUserRouter({ userModel }));
+  app.use("/api/purchase", createPurchaseRouter({ purchaseModel }));
 
   app.use(errorHandler);
 

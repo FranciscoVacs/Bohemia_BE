@@ -26,6 +26,6 @@ export class TicketType extends BaseEntity {
     event!: Rel<Event>;
 
     @OneToMany(() => Ticket, ticket => ticket.ticketType)
-    tickets = new Collection<Ticket>(this);
+    ticket = new Collection<Ticket>(this);
 
   }

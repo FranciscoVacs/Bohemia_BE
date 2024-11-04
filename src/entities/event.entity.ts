@@ -25,5 +25,5 @@ export class Event extends BaseEntity {
   location!: Rel<Location>;
 
   @OneToMany(()=>TicketType, ticketType=>ticketType.event, {cascade:[Cascade.ALL]})
-    ticketType = new Collection<TicketType>(this);
+  ticketType = new Collection<TicketType>(this);
 }

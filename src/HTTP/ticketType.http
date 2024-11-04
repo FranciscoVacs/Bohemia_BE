@@ -1,10 +1,10 @@
 ###Recuperar todos los ticketTypeos
-GET http://localhost:3000/api/ticketType
+GET http://localhost:3000/api/event/1/ticketType
 
 
 ###Crear un ticketType
 # @name createTicketType
-POST http://localhost:3000/api/ticketType
+POST http://localhost:3000/api/event/1/ticketType
 Content-Type: application/json
 
 {
@@ -13,17 +13,17 @@ Content-Type: application/json
     "finish_datetime": "2021-10-30 23:00:00",
     "price": 1000,
     "max_quantity":100,
-    "event": 1
+    "event": 2
 }
 
 ###ID
 @id = {{createTicketType.response.body.data.id}}
 ###Recuperar un ticketType por id
-GET http://localhost:3000/api/ticketType/{{id}}
+GET http://localhost:3000/api/event/1/ticketType/{{id}}
 
 
 ###Actualizar un ticketType
-PATCH http://localhost:3000/api/ticketType/{{id}}
+PATCH http://localhost:3000/api/event/1/ticketType/{{id}}
 Content-Type: application/json
 
 {
@@ -33,4 +33,4 @@ Content-Type: application/json
 
 
 ###Eliminar un ticketType
-DELETE http://localhost:3000/api/ticketType/{{id}}
+DELETE http://localhost:3000/api/event/1/ticketType/{{id}}

@@ -8,8 +8,8 @@ POST http://localhost:3000/api/ticket
 Content-Type: application/json
 
 {
-    "qr_code": "123456",
-    "ticketType": 4
+    "qr_code": "QQQQQQQQQQQQQQQQQQQQQQQQQQ",
+    "ticketType": 2
 }
 
 ###ID

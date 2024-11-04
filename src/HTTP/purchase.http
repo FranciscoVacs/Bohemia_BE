@@ -1,0 +1,34 @@
+###Recuperar todos los purchases
+GET http://localhost:3000/api/purchase
+
+
+###Crear un purchase
+# @name createPurchase
+POST http://localhost:3000/api/purchase
+Content-Type: application/json
+
+{
+    "payment_method": "Visa Crédito",
+    "discount_applied": 0,
+    "total_price": 100,
+    "user": 1
+}
+
+###ID
+@id = {{createPurchase.response.body.data.id}}
+###Recuperar un purchase por id
+GET http://localhost:3000/api/purchase/{{id}}
+
+
+###Actualizar un purchase
+PATCH http://localhost:3000/api/purchase/{{id}}
+Content-Type: application/json
+
+{
+    "SQL INJECTIN": "DROP TABLE purchase",
+    "total_price": 3000
+}
+
+
+###Eliminar un purchase
+DELETE http://localhost:3000/api/purchase/{{id}}

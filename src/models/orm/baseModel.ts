@@ -11,7 +11,6 @@ export class BaseModel<T> implements IModel<T> {
 
   async getById(id: string): Promise<T | undefined> {
     const parsedId = Number.parseInt(id);
-    console.log("UUUUUUUUUUUUUUU");
     return await this.em.findOne(this.entityClass, parsedId);
   }
 
