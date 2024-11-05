@@ -8,12 +8,12 @@ POST http://localhost:3000/api/event/1/ticketType
 Content-Type: application/json
 
 {
-    "ticketType_name": "sala de las artes",
+    "ticketType_name": "ultravip",
     "begin_datetime": "2021-10-10 20:00:00",
     "finish_datetime": "2021-10-30 23:00:00",
-    "price": 1000,
-    "max_quantity":100,
-    "event": 2
+    "price": 3500,
+    "max_quantity":400,
+    "event": 5
 }
 
 ###ID
