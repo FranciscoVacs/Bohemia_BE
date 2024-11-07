@@ -9,10 +9,8 @@ export class UserModel extends BaseModel<User> implements IUserModel<User> {
     super(em, User);
   }
 
-
-
-  async existsByEmail(email: string): Promise<boolean> {
+  async existsByEmail(email: string): Promise<User | null> {
     const user = await this.em.findOne(User, { email });
-    return user !== null;
+    return user;
   }
 }

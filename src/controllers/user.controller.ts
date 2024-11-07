@@ -15,7 +15,7 @@ export class UserController extends BaseController<User> {
       const {email, user_name, user_surname, password, birth_date} = req.body;
       const userExists = await this.model.existsByEmail(email);
 
-      if (userExists) {
+      if (userExists !== null) {
         return res.status(400).json({ message: "The user already exists" });
       }
 
@@ -31,9 +31,32 @@ export class UserController extends BaseController<User> {
       } as RequiredEntityData<User>);
 
       return res.status(201).send({ message: "User created", data: newUser });
+
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  login = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const {email, password} = req.body;
+      const userExists = await this.model.existsByEmail(email);
+
+      if (!userExists) {
+        return res.status(400).json({ message: "The user does not exist" });
+      }
+
+      const validPass = await bcrypt.compare(password, userExists.password)
+
+      if (!validPass) {
+        return res.status(400).json({ message: "Invalid password" });
+      }
+
+      return res.status(200).json({ message: "User logged in" });
       
     } catch (error) {
       next(error);
     }
   };
+
 }

@@ -37,6 +37,6 @@ export const UpdateUserSchema = z.object({
       .refine((val) => {
         const num = Number.parseInt(val);
         return !Number.isNaN(num) && num.toString() === val;
-      })
+      }).optional(),
   }),
 });

@@ -19,6 +19,7 @@ export const createUserRouter = ({
   userRouter.get("/:id", schemaValidator(UpdateUserSchema), userController.getById);
   userRouter.post("/", schemaValidator(CreateUserSchema), userController.create);
   userRouter.post("/register", schemaValidator(CreateUserSchema), userController.register);
+  userRouter.post("/login", schemaValidator(UpdateUserSchema), userController.login);
   userRouter.patch("/:id", schemaValidator(UpdateUserSchema), userController.update);
   userRouter.delete("/:id", schemaValidator(UpdateUserSchema), userController.delete);
 
