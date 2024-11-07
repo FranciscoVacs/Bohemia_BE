@@ -19,6 +19,7 @@ import type { Location } from "./entities/location.entity.js";
 import type { TicketType } from "./entities/ticketType.entity.js";
 import type { User } from "./entities/user.entity.js";
 import type { Purchase } from "./entities/purchase.entity.js";
+import type { IUserModel } from "./interfaces/user.interface.js";
 
 
 export const createApp = async (
@@ -27,7 +28,7 @@ export const createApp = async (
   cityModel: IModel<City>,
   ticketTypeModel: IModel<TicketType>,
   ticketModel: IModel<Ticket>,
-  userModel: IModel<User>,
+  userModel: IUserModel<User>, // 👈 Inject the user model, para los nuevos metodos
   purchaseModel: IModel<Purchase>,
 ) => {
   const app = express();

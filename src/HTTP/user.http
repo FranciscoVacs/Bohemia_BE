@@ -4,11 +4,11 @@ GET http://localhost:3000/api/user
 
 ###Crear un user
 # @name createUser
-POST http://localhost:3000/api/user
+POST http://localhost:3000/api/user/register
 Content-Type: application/json
 
 {
-    "email": "magdalenda@gmail.com",
+    "email": "tatgfdsafdas",
     "user_name": "magdalena",
     "user_surname": "gomez",
     "password": "123456",
