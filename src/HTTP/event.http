@@ -23,7 +23,7 @@ GET http://localhost:3000/api/event/{{id}}
 
 
 ###Actualizar un evento
-PATCH http://localhost:3000/api/event/{{id}}
+PATCH http://localhost:3000/api/event/5
 Content-Type: application/json
 
 {

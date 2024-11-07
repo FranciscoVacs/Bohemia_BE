@@ -4,6 +4,7 @@ import { BaseController } from "./baseController.js";
 import type { Request, Response, NextFunction } from "express";
 import bcrypt from "bcrypt";
 import type { RequiredEntityData } from "@mikro-orm/core";
+import { generateToken } from "../middlewares/auth.js";
 
 export class UserController extends BaseController<User> {
   constructor(protected model: IUserModel<User>) {
@@ -52,7 +53,9 @@ export class UserController extends BaseController<User> {
         return res.status(400).json({ message: "Invalid password" });
       }
 
-      return res.status(200).json({ message: "User logged in" });
+      const token = generateToken(email);
+
+      return res.status(200).json({ message: "User logged in", token });
       
     } catch (error) {
       next(error);
@@ -60,3 +63,4 @@ export class UserController extends BaseController<User> {
   };
 
 }
+
