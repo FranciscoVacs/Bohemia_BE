@@ -20,6 +20,7 @@ import type { TicketType } from "./entities/ticketType.entity.js";
 import type { User } from "./entities/user.entity.js";
 import type { Purchase } from "./entities/purchase.entity.js";
 import type { IUserModel } from "./interfaces/user.interface.js";
+import dotenv from "dotenv";
 
 
 export const createApp = async (
@@ -31,6 +32,7 @@ export const createApp = async (
   userModel: IUserModel<User>, // 👈 Inject the user model, para los nuevos metodos
   purchaseModel: IModel<Purchase>,
 ) => {
+  dotenv.config();
   const app = express();
   app.use(express.json());
   app.use(corsMiddleware());
@@ -53,6 +55,7 @@ export const createApp = async (
   await syncSchema();
 
   const PORT = process.env.PORT ?? 3000;
+
   app.listen(PORT, () => {
     console.log(`Server listening on port http://localhost:${PORT}`);
   });

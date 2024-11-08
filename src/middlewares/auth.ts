@@ -1,10 +1,11 @@
 import type { Request, Response, NextFunction } from "express";
 import jsonwebtoken from "jsonwebtoken";   
 
-const JWT_TOKEN_SECRET= "secret";
+
+
 
 export const generateToken = (email : string) => {
-   return jsonwebtoken.sign({email}, JWT_TOKEN_SECRET, {expiresIn: '1h'});
+   return jsonwebtoken.sign({email}, process.env.JWT_TOKEN_SECRET || 'tokentest', {expiresIn: '1h'});
 };
 
 export const verifyToken = (req: Request, res: Response, next: NextFunction) => {
@@ -15,7 +16,7 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction) => 
     }
 
     try{
-        jsonwebtoken.verify(token, JWT_TOKEN_SECRET); 
+        jsonwebtoken.verify(token, process.env.JWT_TOKEN_SECRET || 'tokentest'); 
         next();
     }
     catch(error) {

@@ -31,7 +31,9 @@ export class UserController extends BaseController<User> {
         birth_date,
       } as RequiredEntityData<User>);
 
-      return res.status(201).send({ message: "User created", data: newUser });
+      const token = generateToken(email);//generate token para usuario recien creado
+
+      return res.status(201).header('token',token).send({ message: "User created", data: newUser });//mando el token junto con la data del usuario recien creado
 
     } catch (error) {
       next(error);
@@ -55,7 +57,7 @@ export class UserController extends BaseController<User> {
 
       const token = generateToken(email);
 
-      return res.status(200).json({ message: "User logged in", token });
+      return res.status(200).header('token', token).send({ message: "User logged in"});
       
     } catch (error) {
       next(error);
