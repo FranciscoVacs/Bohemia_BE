@@ -14,8 +14,8 @@ export const CreateEventSchema = z.object({
       "Invalid datetime format. Expected format: 'YYYY-MM-DDTHH:MM:SS±HH:MM' or 'YYYY-MM-DDTHH:MM:SSZ'",
     }),
     event_description: z.string().max(100),
-    min_age: z.number().int().positive(),
-    location: z.number(),
+    min_age: z.coerce.number().int().positive(),
+    location: z.coerce.number(),
   }),
 });
 
@@ -38,8 +38,8 @@ export const UpdateEventSchema = z.object({
         })
         .optional(),
       event_description: z.string().max(100).optional(),
-      min_age: z.number().int().positive().optional(),
-      location: z.number().optional(),
+      min_age: z.coerce.number().int().positive().optional(),
+      location: z.coerce.number().optional(),
     }),
   params: z.object({
     id: z
