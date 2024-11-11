@@ -21,6 +21,7 @@ import type { User } from "./entities/user.entity.js";
 import type { Purchase } from "./entities/purchase.entity.js";
 import type { IUserModel } from "./interfaces/user.interface.js";
 import dotenv from "dotenv";
+import multer from "multer";
 
 
 export const createApp = async (
@@ -32,7 +33,10 @@ export const createApp = async (
   userModel: IUserModel<User>, // 👈 Inject the user model, para los nuevos metodos
   purchaseModel: IModel<Purchase>,
 ) => {
-  dotenv.config();
+  const envFound = dotenv.config();
+  if (envFound.error) {
+    throw new Error("⚠️  Couldn't find .env file  ⚠️");
+  }
   const app = express();
   app.use(express.json());
   app.use(corsMiddleware());

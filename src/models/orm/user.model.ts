@@ -1,6 +1,6 @@
 import { User } from "../../entities/user.entity.js";
 import  type { IUserModel } from "../../interfaces/user.interface.js";
-import { BaseModel } from "./baseModel.js";
+import { BaseModel } from "./base.Model.js";
 import type { EntityManager, RequiredEntityData } from "@mikro-orm/mysql";
 
 

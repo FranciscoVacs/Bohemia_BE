@@ -8,11 +8,12 @@ POST http://localhost:3000/api/event
 Content-Type: application/json
 
 {
-    "event_name": "evtnotooo",
+    "event_name": "pruebapostman",
     "begin_datetime": "2021-10-31 20:00:00",
     "finish_datetime": "2021-10-31 23:00:00",
-    "event_description": "Fiesta de gagas",
+    "event_description": "Fiesta de postamn",
     "min_age": 50,
+    "cover_photo": "a",
     "location": 1
 }
 

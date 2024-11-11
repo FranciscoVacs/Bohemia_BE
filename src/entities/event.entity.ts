@@ -21,6 +21,9 @@ export class Event extends BaseEntity {
   @Property()
   min_age!: number;
 
+  @Property()
+  cover_photo!: string;
+
   @ManyToOne(() => Location, { nullable: false })
   location!: Rel<Location>;
 

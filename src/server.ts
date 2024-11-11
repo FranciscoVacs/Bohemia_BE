@@ -1,5 +1,5 @@
 import { createApp } from './app.js'
-import { BaseModel } from './models/orm/baseModel.js'
+import { BaseModel } from './models/orm/base.Model.js'
 import { EventModel } from './models/orm/event.model.js'
 import { City } from './entities/city.entity.js'
 import { Location } from './entities/location.entity.js'
