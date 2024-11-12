@@ -45,12 +45,13 @@ export const createApp = async (
   app.use(express.json());
   app.use(corsMiddleware());
   app.disable("x-powered-by");
-  app.use('/public', express.static(path.join(__dirname, '../public')));
+  app.use('/public/uploads', express.static(path.join(__dirname, '../public/uploads')));
 
 
   app.use((req, res, next) => {
     RequestContext.create(orm.em, next);
   });
+
 
   app.use("/api/event", createEventRouter({ eventModel }));
   app.use("/api/location", createLocationRouter({ locationModel }));

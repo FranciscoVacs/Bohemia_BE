@@ -12,14 +12,15 @@ export class EventController extends BaseController<Event> {
   create = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { event_name, begin_datetime, finish_datetime, event_description, min_age, location } = req.body;
-      const cover_photo = req.file ? req.file.path : ''; // Ruta de la foto de portada
+      const fileName = req.file?.filename;
+      const basePath = `${req.protocol}://${req.hostname}:${process.env.PORT}/public/uploads/`;
       const event = await this.model.create({
         event_name,
         begin_datetime,
         finish_datetime,
         event_description,
         min_age,
-        cover_photo,
+        cover_photo: `${basePath}${fileName}` || "",
         location,
       }as RequiredEntityData<Event>);
 
@@ -36,7 +37,9 @@ export class EventController extends BaseController<Event> {
 
       // Agrega cover_photo solo si hay un nuevo archivo
       if (req.file) {
-        body.cover_photo = req.file.path;
+        const fileName = req.file.filename;
+        const basePath = `${req.protocol}://${req.hostname}:${process.env.PORT}/public/uploads/`;
+        body.cover_photo = `${basePath}${fileName}`;
       }
 
       await this.model.update(id, body);

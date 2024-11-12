@@ -7,12 +7,11 @@ import { error } from "node:console";
 
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
-
 const storage = multer.diskStorage({
   destination: path.join(__dirname, "../../public/uploads"),
   filename: (req: Request , file: Express.Multer.File, cb: (error:Error | null, destination:string) => void
 )=> {
-    cb(null, file.originalname);
+    cb(null, `${Date.now()}_${file.originalname}`);
   }
 });
 
