@@ -6,4 +6,9 @@ export class CityModel extends BaseModel<City> {
   constructor(em: EntityManager) {
     super(em, City);
   }
+  async getById(id: string): Promise<City | undefined> {
+    const parsedId = Number.parseInt(id);
+    const item =  await this.em.findOneOrFail(City, parsedId, {populate: ["location","location.event"]});
+    return item;
+  }
 }

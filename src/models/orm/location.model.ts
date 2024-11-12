@@ -7,4 +7,10 @@ export class LocationModel extends BaseModel<Location> {
     super(em, Location);
   }
 
+  async getById(id: string): Promise<Location | undefined> {
+    const parsedId = Number.parseInt(id);
+    const item =  await this.em.findOneOrFail(Location, parsedId, {populate: ["event"]});
+    return item;
+  }
+
 }
