@@ -8,8 +8,6 @@ import { error } from "node:console";
 const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
 const __dirname = path.dirname(__filename); // get the name of the directory
 
-console.log(__dirname);
-
 const storage = multer.diskStorage({
   destination: path.join(__dirname, "../../public/uploads"),
   filename: (req: Request , file: Express.Multer.File, cb: (error:Error | null, destination:string) => void
@@ -34,6 +32,8 @@ export const uploader = (req: Request, res: Response, next: NextFunction) => {
     limits: { fileSize: maxSize },
     fileFilter,
   }).single("cover_photo")(req, res, (err) =>{
+    console.log("22222222222222222222222222222222222222222222222");
+
     if(err instanceof multer.MulterError){
       return res.status(400).json({
         message: "Max file size 5MB",
@@ -44,7 +44,7 @@ export const uploader = (req: Request, res: Response, next: NextFunction) => {
         message: err.message,
       });
     }
-    if (!req.file) {
+    if (req.method === "POST" && !req.file) {    // Si es PATCH y no se envió archivo, permitimos que continúe
       return res.status(400).json({
         message: "Please upload a file, jpg, jpeg or png",
       });
@@ -53,5 +53,8 @@ export const uploader = (req: Request, res: Response, next: NextFunction) => {
   });
 
 };
+
+
+
 
 

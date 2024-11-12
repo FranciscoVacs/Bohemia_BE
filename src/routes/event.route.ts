@@ -16,12 +16,10 @@ export const createEventRouter = ({
   eventModel: IModel<Event>;
 }) => {
   const eventController = new EventController(eventModel);
-
   eventRouter.get("/", eventController.getAll);
   eventRouter.get("/:id", schemaValidator(UpdateEventSchema), eventController.getById);
-  eventRouter.post("/", uploader, schemaValidator(CreateEventSchema), eventController.create);
-  eventRouter.patch("/:id", schemaValidator(UpdateEventSchema),verifyToken, eventController.update);
+  eventRouter.post("/",uploader, schemaValidator(CreateEventSchema), eventController.create);
+  eventRouter.patch("/:id",uploader, schemaValidator(UpdateEventSchema), eventController.update);
   eventRouter.delete("/:id", schemaValidator(UpdateEventSchema), eventController.delete);
-
   return eventRouter;
 };

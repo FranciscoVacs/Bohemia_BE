@@ -10,6 +10,7 @@ export class EventController extends BaseController<Event> {
   }
 
   create = async (req: Request, res: Response, next: NextFunction) => {
+    console.log("1111111111111111111");
     try {
       const { event_name, begin_datetime, finish_datetime, event_description, min_age, location } = req.body;
       const cover_photo = req.file ? req.file.path : ''; // Ruta de la foto de portada
@@ -28,5 +29,24 @@ export class EventController extends BaseController<Event> {
       next(error);
     }
   };
+
+  update = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const id = req.params.id;
+      const { body } = req;
+
+      // Agrega cover_photo solo si hay un nuevo archivo
+      if (req.file) {
+        body.cover_photo = req.file.path;
+      }
+
+      await this.model.update(id, body);
+      return res.status(200).send({ message: "Item updated" });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+
   
 }

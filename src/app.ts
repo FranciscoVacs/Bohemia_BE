@@ -21,7 +21,8 @@ import type { User } from "./entities/user.entity.js";
 import type { Purchase } from "./entities/purchase.entity.js";
 import type { IUserModel } from "./interfaces/user.interface.js";
 import dotenv from "dotenv";
-import multer from "multer";
+import path from "node:path";
+import { fileURLToPath } from 'node:url';
 
 
 export const createApp = async (
@@ -33,14 +34,19 @@ export const createApp = async (
   userModel: IUserModel<User>, // 👈 Inject the user model, para los nuevos metodos
   purchaseModel: IModel<Purchase>,
 ) => {
+  
   const envFound = dotenv.config();
   if (envFound.error) {
     throw new Error("⚠️  Couldn't find .env file  ⚠️");
   }
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = path.dirname(__filename);
   const app = express();
   app.use(express.json());
   app.use(corsMiddleware());
   app.disable("x-powered-by");
+  app.use('/public', express.static(path.join(__dirname, '../public')));
+
 
   app.use((req, res, next) => {
     RequestContext.create(orm.em, next);
