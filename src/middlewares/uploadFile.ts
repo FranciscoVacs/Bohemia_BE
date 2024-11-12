@@ -32,7 +32,6 @@ export const uploader = (req: Request, res: Response, next: NextFunction) => {
     limits: { fileSize: maxSize },
     fileFilter,
   }).single("cover_photo")(req, res, (err) =>{
-    console.log("22222222222222222222222222222222222222222222222");
 
     if(err instanceof multer.MulterError){
       return res.status(400).json({

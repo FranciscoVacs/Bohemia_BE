@@ -5,6 +5,7 @@ import { Purchase } from "./purchase.entity.js";
 @Entity()
 export class User extends BaseEntity {
 
+
     @Property({length:100})
     @Unique()
     email!: string;

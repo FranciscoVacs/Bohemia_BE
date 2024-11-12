@@ -21,7 +21,6 @@
     "@mikro-orm/mysql": "6.3.8",
     "@mikro-orm/sql-highlighter": "1.0.1",
     "@types/bcrypt": "^5.0.2",
-    "@types/dotenv": "^8.2.3",
     "@types/jsonwebtoken": "^9.0.7",
     "@types/multer": "^1.4.12",
     "bcrypt": "^5.1.1",
@@ -30,8 +29,9 @@
     "express": "4.19.2",
     "jsonwebtoken": "^9.0.2",
     "multer": "1.4.5-lts.1",
-    "mysql2": "^3.11.0",
+    "mysql2": "^3.11.4",
     "reflect-metadata": "0.2.2",
+    "uuid": "^11.0.3",
     "zod": "3.23.8"
   },
   "devDependencies": {
@@ -40,6 +40,7 @@
     "@types/express": "4.17.21",
     "@types/luxon": "^3.4.2",
     "@types/node": "20.12.12",
+    "@types/uuid": "^10.0.0",
     "rimraf": "^6.0.1",
     "tsc-watch": "6.2.0",
     "typescript": "5.4.5"

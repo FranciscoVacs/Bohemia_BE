@@ -10,7 +10,6 @@ export class EventController extends BaseController<Event> {
   }
 
   create = async (req: Request, res: Response, next: NextFunction) => {
-    console.log("1111111111111111111");
     try {
       const { event_name, begin_datetime, finish_datetime, event_description, min_age, location } = req.body;
       const cover_photo = req.file ? req.file.path : ''; // Ruta de la foto de portada
