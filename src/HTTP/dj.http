@@ -1,0 +1,33 @@
+###Recuperar todos los citys
+GET http://localhost:3000/api/dj
+
+
+###Crear un city
+# @name createCity
+POST http://localhost:3000/api/dj
+Content-Type: application/json
+
+{
+    "dj_name": "sdfafs",
+    "dj_surname": "asdfasdf",
+    "dj_apodo": "sdfsadfas"
+}
+
+###ID
+@id = {{createCity.response.body.data.id}}
+###Recuperar un city por id
+GET http://localhost:3000/api/city/1
+
+
+###Actualizar un city
+PATCH http://localhost:3000/api/city/{{id}}
+Content-Type: application/json
+
+{
+    "SQL INJECTIN": "DROP TABLE city",
+    "city_name": "Rafaela"
+}
+
+
+###Eliminar un city
+DELETE http://localhost:3000/api/city/{{id}}

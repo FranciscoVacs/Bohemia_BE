@@ -3,6 +3,7 @@ import type { Rel } from "@mikro-orm/core";
 import { BaseEntity } from "../shared/db/baseEntity.entity.js"
 import { Location } from "./location.entity.js";
 import { TicketType } from "./ticketType.entity.js";
+import { Dj } from "./dj.entity.js";
 
 @Entity()
 export class Event extends BaseEntity {
@@ -26,6 +27,9 @@ export class Event extends BaseEntity {
 
   @ManyToOne(() => Location, { nullable: false })
   location!: Rel<Location>;
+
+  @ManyToOne(() => Dj, { nullable: false })
+  dj!: Rel<Dj>;
 
   @OneToMany(()=>TicketType, ticketType=>ticketType.event, {cascade:[Cascade.ALL]})
   ticketType = new Collection<TicketType>(this);

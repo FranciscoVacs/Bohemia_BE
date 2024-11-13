@@ -11,7 +11,7 @@ export class EventController extends BaseController<Event> {
 
   create = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const { event_name, begin_datetime, finish_datetime, event_description, min_age, location } = req.body;
+      const { event_name, begin_datetime, finish_datetime, event_description, min_age, location,dj } = req.body;
       const fileName = req.file?.filename;
       const basePath = `${req.protocol}://${req.hostname}:${process.env.PORT}/public/uploads/`;
       const event = await this.model.create({
@@ -22,6 +22,7 @@ export class EventController extends BaseController<Event> {
         min_age,
         cover_photo: `${basePath}${fileName}` || "",
         location,
+        dj,
       }as RequiredEntityData<Event>);
 
       return res.status(201).send({ message: "Item created", data: event });

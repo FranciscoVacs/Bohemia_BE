@@ -23,6 +23,8 @@ import type { IUserModel } from "./interfaces/user.interface.js";
 import dotenv from "dotenv";
 import path from "node:path";
 import { fileURLToPath } from 'node:url';
+import type { Dj } from "./entities/dj.entity.js";
+import { createDjRouter } from "./routes/dj.route.js";
 
 
 export const createApp = async (
@@ -33,6 +35,7 @@ export const createApp = async (
   ticketModel: IModel<Ticket>,
   userModel: IUserModel<User>, // 👈 Inject the user model, para los nuevos metodos
   purchaseModel: IModel<Purchase>,
+  djModel: IModel<Dj>
 ) => {
   
   const envFound = dotenv.config();
@@ -60,6 +63,7 @@ export const createApp = async (
   app.use("/api/ticket", createTicketRouter({ ticketModel }));
   app.use("/api/user", createUserRouter({ userModel }));
   app.use("/api/purchase", createPurchaseRouter({ purchaseModel }));
+  app.use("/api/dj", createDjRouter({ djModel }));
 
   app.use(errorHandler);
 

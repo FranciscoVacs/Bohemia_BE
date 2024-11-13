@@ -16,6 +16,7 @@ export const CreateEventSchema = z.object({
     event_description: z.string().max(100),
     min_age: z.coerce.number().int().positive(),
     location: z.coerce.number(),
+    dj: z.coerce.number(),
   }),
 });
 
@@ -40,6 +41,7 @@ export const UpdateEventSchema = z.object({
       event_description: z.string().max(100).optional(),
       min_age: z.coerce.number().int().positive().optional(),
       location: z.coerce.number().optional(),
+      dj: z.coerce.number().optional(),
     }),
   params: z.object({
     id: z

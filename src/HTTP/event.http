@@ -14,7 +14,8 @@ Content-Type: application/json
     "event_description": "Fiesta de postamn",
     "min_age": 50,
     "cover_photo": "a",
-    "location": 1
+    "location": 1,
+    "dj": 1
 }
 
 ###ID
