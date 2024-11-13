@@ -37,7 +37,7 @@ export class BaseController<T> {
     try {
       const id = req.params.id;
       await this.model.update(id, req.body);
-      return res.status(200).send({ message: "Item updated" });
+      return res.status(200).send({ message: "Item updated", data: req.body });
     } catch (error) {
       next(error);
     }

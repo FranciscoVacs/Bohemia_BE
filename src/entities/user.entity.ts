@@ -22,6 +22,9 @@ export class User extends BaseEntity {
     @Property()
     birth_date!: Date;
 
+    @Property({default: false})
+    isAdmin!: boolean;
+
     @OneToMany(()=> Purchase, purchase=>purchase.user, {cascade:[Cascade.ALL]})
     purchase = new Collection<Purchase>(this);
 }

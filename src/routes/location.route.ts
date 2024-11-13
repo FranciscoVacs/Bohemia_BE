@@ -4,6 +4,7 @@ import { schemaValidator } from "../middlewares/schemaValidator.js";
 import { CreateLocationSchema, UpdateLocationSchema } from "../schemas/location.schema.js";
 import type{ IModel } from "../interfaces/model.interface.js";
 import type { Location } from "../entities/location.entity.js";
+import { verifyToken, isAdmin } from "../middlewares/auth.js";
 
 export const locationRouter = Router();
 
@@ -16,9 +17,9 @@ export const createLocationRouter = ({
 
   locationRouter.get("/", locationController.getAll);
   locationRouter.get("/:id", schemaValidator(UpdateLocationSchema), locationController.getById);
-  locationRouter.post("/", schemaValidator(CreateLocationSchema), locationController.create);
-  locationRouter.patch("/:id", schemaValidator(UpdateLocationSchema), locationController.update);
-  locationRouter.delete("/:id", schemaValidator(UpdateLocationSchema), locationController.delete);
+  locationRouter.post("/", verifyToken, isAdmin,schemaValidator(CreateLocationSchema), locationController.create);
+  locationRouter.patch("/:id", verifyToken, isAdmin,schemaValidator(UpdateLocationSchema), locationController.update);
+  locationRouter.delete("/:id", verifyToken, isAdmin,schemaValidator(UpdateLocationSchema), locationController.delete);
 
   return locationRouter;
 };
