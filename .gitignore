@@ -1,6 +1,9 @@
 # coverage reports
 coverage
 
+# remove public uploads
+public/uploads
+
 # API keys and secrets
 .env
 
