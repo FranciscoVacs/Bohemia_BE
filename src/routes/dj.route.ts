@@ -18,8 +18,8 @@ export const createDjRouter = ({
   djRouter.get("/", djController.getAll);
   djRouter.get("/:id", schemaValidator(UpdateDjSchema), djController.getById);
   djRouter.post("/",schemaValidator(CreateDjSchema), djController.create);
-  djRouter.patch("/:id", verifyToken, isAdmin,schemaValidator(UpdateDjSchema), djController.update);
-  djRouter.delete("/:id",verifyToken, isAdmin, schemaValidator(UpdateDjSchema), djController.delete);
+  djRouter.patch("/:id",   schemaValidator(UpdateDjSchema), djController.update);
+  djRouter.delete("/:id",   schemaValidator(UpdateDjSchema), djController.delete);
 
   return djRouter;
 };

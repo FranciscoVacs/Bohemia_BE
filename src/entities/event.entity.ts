@@ -31,6 +31,6 @@ export class Event extends BaseEntity {
   @ManyToOne(() => Dj, { nullable: false })
   dj!: Rel<Dj>;
 
-  @OneToMany(()=>TicketType, ticketType=>ticketType.event, {cascade:[Cascade.ALL]})
+  @OneToMany(()=>TicketType, ticketType=>ticketType.event, {cascade:[Cascade.ALL], orphanRemoval: true})
   ticketType = new Collection<TicketType>(this);
 }

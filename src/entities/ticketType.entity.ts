@@ -21,8 +21,9 @@ export class TicketType extends BaseEntity {
 
     @Property()
     max_quantity!: number;
+
     
-    @ManyToOne(() => Event, { nullable: false })
+    @ManyToOne(() => Event, { nullable: false ,deleteRule: 'CASCADE'})
     event!: Rel<Event>;
 
     @OneToMany(() => Ticket, ticket => ticket.ticketType)

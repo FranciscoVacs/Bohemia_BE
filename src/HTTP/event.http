@@ -36,4 +36,5 @@ Content-Type: application/json
 
 
 ###Eliminar un evento
-DELETE http://localhost:3000/api/event/{{id}}
+DELETE http://localhost:3000/api/event/2
+
