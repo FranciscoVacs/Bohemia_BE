@@ -33,17 +33,17 @@ export const uploader = (req: Request, res: Response, next: NextFunction) => {
   }).single("cover_photo")(req, res, (err) =>{
 
     if(err instanceof multer.MulterError){
-      return res.status(400).json({
+      return res.status(400).send({
         message: "Max file size 5MB",
       });
     };
     if (err) {
-      return res.status(400).json({
+      return res.status(400).send({
         message: err.message,
       });
     }
     if (req.method === "POST" && !req.file) {    // Si es PATCH y no se envió archivo, permitimos que continúe
-      return res.status(400).json({
+      return res.status(400).send({
         message: "Please upload a file, jpg, jpeg or png",
       });
     }

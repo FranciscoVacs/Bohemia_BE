@@ -13,13 +13,13 @@ export const schemaValidator =
       next();
     } catch (error) {
       if (error instanceof ZodError) {
-        return res.status(400).json(
+        return res.status(400).send(
           error.issues.map((issue) => ({
             message: issue.message,
             path: issue.path,
           })),
         );
       }
-      return res.status(400).json({ message: "internal server error" });
+      return res.status(400).send({ message: "internal server error" });
     }
   };

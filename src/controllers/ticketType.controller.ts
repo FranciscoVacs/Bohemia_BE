@@ -7,4 +7,5 @@ export class TicketTypeController extends BaseController<TicketType> {
   constructor(protected model: IModel<TicketType>) {
     super(model);
   }
+  
 }

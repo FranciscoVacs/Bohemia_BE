@@ -18,7 +18,8 @@ export class UserController extends BaseController<User> {
       const userExists = await this.model.getByEmail(email);
 
       if (userExists !== null) {
-        return res.status(400).json({ message: "The user already exists" });
+        const message = "The user already exists";
+        return res.status(400).send({ message});
       }
 
       const cryptedPass = await bcrypt.hash(password, 10);
@@ -32,7 +33,7 @@ export class UserController extends BaseController<User> {
         birth_date,
       } as RequiredEntityData<User>);
 
-      const token = generateToken(email, false);//generate token para usuario recien creado
+      const token = generateToken(newUser?.id, email, false);//generate token para usuario recien creado
 
       return res.status(201).header('token',token).send({ message: "User created", data: newUser });//mando el token junto con la data del usuario recien creado
 
@@ -47,18 +48,22 @@ export class UserController extends BaseController<User> {
       const userExists = await this.model.getByEmail(email);
 
       if (!userExists) {
-        return res.status(400).json({ message: "The user does not exist" });
+        const message = "The user does not exist";  
+        return res.status(400).send({ message});
       }
 
       const validPass = await bcrypt.compare(password, userExists.password)
 
       if (!validPass) {
-        return res.status(400).json({ message: "Invalid password" });
+        const message = "Invalid password";
+        return res.status(400).send({ message});
       }
 
-      const token = generateToken(email,userExists.isAdmin);//genero token para usuario logueado
+      const token = generateToken(userExists.id,email,userExists.isAdmin);//genero token para usuario logueado
 
-      return res.status(200).header('token', token).send({ message: "User logged in"});
+      const message = "User logged in";
+
+      return res.status(200).header('token', token).send({ message});
       
     } catch (error) {
       next(error);

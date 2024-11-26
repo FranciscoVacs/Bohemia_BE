@@ -7,7 +7,7 @@ export class BaseController<T> {
   getAll = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const items = await this.model.getAll();
-      res.status(200).json({ message: "Find all items", data: items });
+      res.status(200).send({ message: "Find all items", data: items });
     } catch (error) {
       next(error);
     }

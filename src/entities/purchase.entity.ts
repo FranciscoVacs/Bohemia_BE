@@ -3,30 +3,37 @@ import type   { Rel } from "@mikro-orm/core";
 import { BaseEntity } from "../shared/db/baseEntity.entity.js"
 import { User } from "./user.entity.js";
 import { Ticket } from "./ticket.entity.js";
+import { Payment } from "mercadopago";
+import { TicketType } from "./ticketType.entity.js";
 
 @Entity()
 export class Purchase extends BaseEntity {
 
-    @Enum(() => PaymentMethod)
-    payment_method!: PaymentMethod;
-
     @Property()
-    discount_applied!: 0;
+    ticket_quantity!: number;
 
-    @Property()
+    @Enum(() => PaymentStatus)
+    payment_status: PaymentStatus= PaymentStatus.PENDING;
+
+    @Property({default: 0})
+    discount_applied!: number;
+
+    @Property({default: 0})
     total_price!: number;
 
     @ManyToOne(() => User, { nullable: false })
     user!: Rel<User>;
+
+    @ManyToOne(() => TicketType, { nullable: false })
+    ticket_type!: Rel<TicketType>;
 
     @OneToMany(() => Ticket, (ticket) => ticket.purchase, { cascade: [Cascade.ALL] })
     ticket = new Collection<Ticket>(this);
 
 }
 
-export enum PaymentMethod {
-    VISA_CREDITO = "Visa Crédito",
-    VISA_DEBITO = "Visa Débito",
-    MASTERCARD_CREDITO = "MasterCard Crédito",
-    MASTERCARD_DEBITO = "MasterCard Débito",
+export enum PaymentStatus {
+    PENDING = "Pending",
+    APPROVED = "Approved",
+    REJECTED = "Rejected",
 }

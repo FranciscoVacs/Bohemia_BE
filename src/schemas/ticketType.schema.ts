@@ -13,8 +13,8 @@ export const CreateTicketTypeSchema = z.object({
       message:
         "Invalid datetime format. Expected format: 'YYYY-MM-DD HH:MM:SS'",
     }),
-    price: z.number().positive().int(),
-    event: z.number(),
+    price: z.coerce.number().positive().int(),
+    event: z.coerce.number(),
   }),
 });
 
@@ -24,8 +24,8 @@ export const UpdateTicketTypeSchema = z.object({
       ticketType_name: z.string().max(100).optional(),
       begin_datetime: z.date().optional(),
       finish_datetime: z.date().optional(),
-      price: z.number().positive().int().optional(),
-      event: z.number().optional(),
+      price: z.coerce.number().positive().int().optional(),
+      event: z.coerce.number().optional(),
     }),
   params: z.object({
     id: z
