@@ -1,4 +1,5 @@
 import type { NextFunction, Request, Response } from "express";
+import { path } from "pdfkit";
 import { type AnyZodObject, ZodError } from "zod";
 
 export const schemaValidator =
@@ -21,5 +22,4 @@ export const schemaValidator =
         );
       }
       return res.status(400).send({ message: "internal server error" });
-    }
-  };
+    }}

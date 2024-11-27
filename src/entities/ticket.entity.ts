@@ -20,9 +20,6 @@ export class Ticket extends BaseEntity {
     @Property()
     number_in_ticket_type!: number;
 
-    @ManyToOne(() => TicketType, { nullable: false, deleteRule: "CASCADE" })
-    ticket_type!: Rel<TicketType>;
-
     @ManyToOne(() => Purchase, { nullable: false })
     purchase!: Rel<Purchase>;
 
