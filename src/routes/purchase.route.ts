@@ -18,10 +18,10 @@ export const createPurchaseRouter = ({
   const purchaseController = new PurchaseController(purchaseModel);
 
   purchaseRouter.get("/", purchaseController.getAll);
-  purchaseRouter.get("/:id", verifyToken,    schemaValidator(UpdatePurchaseSchema), purchaseController.getById);
-  purchaseRouter.post("/", verifyToken,  /*schemaValidator(CreatePurchaseSchema),*/ purchaseController.create);
-  purchaseRouter.patch("/:id", verifyToken, isAdmin,     schemaValidator(UpdatePurchaseSchema), purchaseController.update);
-  purchaseRouter.delete("/:id",  verifyToken, isAdmin,   schemaValidator(UpdatePurchaseSchema), purchaseController.delete);
+  purchaseRouter.get("/:id",   schemaValidator(UpdatePurchaseSchema), purchaseController.getById);
+  purchaseRouter.post("/",   /*schemaValidator(CreatePurchaseSchema),*/ purchaseController.create);
+  purchaseRouter.patch("/:id",     schemaValidator(UpdatePurchaseSchema), purchaseController.update);
+  purchaseRouter.delete("/:id",   schemaValidator(UpdatePurchaseSchema), purchaseController.delete);
 
   return purchaseRouter;
 };

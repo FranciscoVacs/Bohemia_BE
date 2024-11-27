@@ -10,10 +10,10 @@ import { TicketType } from "./ticketType.entity.js";
 export class Purchase extends BaseEntity {
 
     @Property()
-    ticket_quantity!: number;
+    ticket_numbers!: number;
 
     @Enum(() => PaymentStatus)
-    payment_status: PaymentStatus= PaymentStatus.PENDING;
+    payment_status!: PaymentStatus;
 
     @Property({default: 0})
     discount_applied!: number;
@@ -23,7 +23,7 @@ export class Purchase extends BaseEntity {
 
     @ManyToOne(() => User, { nullable: false })
     user!: Rel<User>;
-
+    
     @ManyToOne(() => TicketType, { nullable: false })
     ticket_type!: Rel<TicketType>;
 
@@ -37,3 +37,7 @@ export enum PaymentStatus {
     APPROVED = "Approved",
     REJECTED = "Rejected",
 }
+function Hidden(): (target: Purchase, propertyKey: "user") => void {
+    throw new Error("Function not implemented.");
+}
+

@@ -22,7 +22,7 @@ const locationModel = new LocationModel(getEntityManager());
 const eventModel = new EventModel(getEntityManager()); //para usar los métodos personalizados
 const ticketTypeModel = new TicketTypeModel(getEntityManager());//para usar los métodos personalizados
 const ticketModel = new BaseModel(getEntityManager(), Ticket);
-const userModel = new UserModel(getEntityManager()); //para métodos de UserModel
-const purchaseModel = new PurchaseModel(getEntityManager());
+const userModel = new UserModel(getEntityManager()); //para métodos nuevos de UserModel
+const purchaseModel = new PurchaseModel(getEntityManager());//para métodos nuevos de PurhcaseModel
 
 createApp(eventModel, locationModel, cityModel, ticketTypeModel, ticketModel, userModel, purchaseModel, djModel);
