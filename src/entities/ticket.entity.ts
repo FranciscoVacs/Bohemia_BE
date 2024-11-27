@@ -26,20 +26,4 @@ export class Ticket extends BaseEntity {
     @ManyToOne(() => Purchase, { nullable: false })
     purchase!: Rel<Purchase>;
 
-    @BeforeCreate()
-    async setNumbers() {
-        // Calcula el número en la compra
-        this.number_in_purchase =
-            (await this.purchase.ticket.loadCount()) + 1;
-
-        // Calcula el número en el tipo de entrada
-        this.number_in_ticket_type =
-            (await this.ticket_type.ticket.loadCount()) + 1;
-    }
-
-    
-   // @BeforeCreate()
-    //async updateTicketTypeAvailability() {
-      //  this.ticket_type.decreaseAvailableQuantity();
-    //}
 }

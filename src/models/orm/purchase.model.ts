@@ -16,11 +16,14 @@ export class PurchaseModel extends BaseModel<Purchase> {
     const parsedTTId = Number.parseInt(ticketType_id);
     const parsedUID= Number.parseInt(user_id);
     const ticketType: TicketType = await this.em.findOneOrFail(TicketType,parsedTTId,{populate: ["event"]});
-    if(ticketType.available_tickets <= ticket_quantity){
+    if(ticketType.available_tickets < ticket_quantity){
       throw new Error("Not enough tickets available for this purchase");
     }
     const actualUser: User = await this.em.findOneOrFail(User, parsedUID);
-    const new_stock_tickets= ticketType.available_tickets - ticket_quantity;
+    const new_stock_tickets = ticketType.available_tickets - ticket_quantity;
+    console.log("new_stock_tickets", new_stock_tickets);
+    console.log("available_tickets", ticketType.available_tickets);
+
     this.em.assign(ticketType, {"available_tickets": new_stock_tickets});
     const total_price = ticketType.price * ticket_quantity;
     const purchseActual = this.em.create(Purchase, {
@@ -38,8 +41,8 @@ export class PurchaseModel extends BaseModel<Purchase> {
       this.em.create(Ticket,
         {
           qr_code: uuid(),
-          number_in_purchase: 0,
-          number_in_ticket_type: 0,
+          number_in_purchase: i+1,
+          number_in_ticket_type: ticketType.max_quantity-ticketType.available_tickets,
           ticket_type: ticketType,
           purchase: purchseActual,
         }as Ticket);
