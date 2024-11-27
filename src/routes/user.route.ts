@@ -18,6 +18,7 @@ export const createUserRouter = ({
 
   userRouter.get("/", verifyToken, isAdmin, userController.getAll);
   userRouter.get("/:id", schemaValidator(UpdateUserSchema), userController.getById);
+  userRouter.get("/tickets/:id", schemaValidator(UpdateUserSchema), userController.showTickets);
   userRouter.post("/", schemaValidator(CreateUserSchema), userController.create);
   userRouter.post("/register", schemaValidator(CreateUserSchema), userController.register);
   userRouter.post("/login", schemaValidator(UpdateUserSchema), userController.login);

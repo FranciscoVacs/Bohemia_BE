@@ -70,5 +70,16 @@ export class UserController extends BaseController<User> {
     }
   };
 
+  showTickets = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const id = req.params.id;
+      const userTickets = await this.model.showTickets(id);
+      return res.status(200).send({ data: userTickets });
+      
+    } catch (error) {
+      next(error);
+    }
+  }
+
 }
 
