@@ -17,9 +17,9 @@ export const createLocationRouter = ({
 
   locationRouter.get("/", locationController.getAll);
   locationRouter.get("/:id", schemaValidator(UpdateLocationSchema), locationController.getById);
-  locationRouter.post("/",  schemaValidator(CreateLocationSchema), locationController.create);
-  locationRouter.patch("/:id",  schemaValidator(UpdateLocationSchema), locationController.update);
-  locationRouter.delete("/:id",  schemaValidator(UpdateLocationSchema), locationController.delete);
+  locationRouter.post("/",  verifyToken, isAdmin, schemaValidator(CreateLocationSchema), locationController.create);
+  locationRouter.patch("/:id", verifyToken, isAdmin,  schemaValidator(UpdateLocationSchema), locationController.update);
+  locationRouter.delete("/:id", verifyToken, isAdmin,  schemaValidator(UpdateLocationSchema), locationController.delete);
 
   return locationRouter;
 };

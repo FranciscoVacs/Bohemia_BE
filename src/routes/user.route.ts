@@ -5,6 +5,7 @@ import { CreateUserSchema, UpdateUserSchema } from "../schemas/user.schema.js";
 import type{ IModel } from "../interfaces/model.interface.js";
 import type { User } from "../entities/user.entity.js";
 import type { IUserModel } from "../interfaces/user.interface.js";
+import { isAdmin, verifyToken } from "../middlewares/auth.js";
 
 export const userRouter = Router();
 
@@ -15,7 +16,7 @@ export const createUserRouter = ({
 }) => {
   const userController = new UserController(userModel);   // 👈 Inject the user model, para los nuevos metodos
 
-  userRouter.get("/", userController.getAll);
+  userRouter.get("/", verifyToken, isAdmin, userController.getAll);
   userRouter.get("/:id", schemaValidator(UpdateUserSchema), userController.getById);
   userRouter.post("/", schemaValidator(CreateUserSchema), userController.create);
   userRouter.post("/register", schemaValidator(CreateUserSchema), userController.register);

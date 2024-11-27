@@ -7,11 +7,4 @@ export class TicketModel extends BaseModel<Ticket> {
     super(em, Ticket);
   }
   
-  async create(data: RequiredEntityData<Ticket>): Promise<Ticket | undefined> {
-    const entity = this.em.create(Ticket, data);
-    const ticketType = await this.em.findOneOrFail("TicketType", {id: entity.ticket_type.id});
-    //ticketType.decreaseAvailableQuantity();
-    await this.em.flush();
-    return entity;
-  }
 }

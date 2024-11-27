@@ -17,9 +17,9 @@ export const createCityRouter = ({
 
   cityRouter.get("/", cityController.getAll);
   cityRouter.get("/:id", schemaValidator(UpdateCitySchema), cityController.getById);
-  cityRouter.post("/",    schemaValidator(CreateCitySchema), cityController.create);
-  cityRouter.patch("/:id",    schemaValidator(UpdateCitySchema), cityController.update);
-  cityRouter.delete("/:id",    schemaValidator(UpdateCitySchema), cityController.delete);
+  cityRouter.post("/", verifyToken, isAdmin,  schemaValidator(CreateCitySchema), cityController.create);
+  cityRouter.patch("/:id", verifyToken, isAdmin,    schemaValidator(UpdateCitySchema), cityController.update);
+  cityRouter.delete("/:id",  verifyToken, isAdmin,   schemaValidator(UpdateCitySchema), cityController.delete);
 
   return cityRouter;
 };

@@ -18,8 +18,8 @@ export const createEventRouter = ({
   const eventController = new EventController(eventModel);
   eventRouter.get("/",  eventController.getAll);
   eventRouter.get("/:id", schemaValidator(UpdateEventSchema), eventController.getById);
-  eventRouter.post("/", uploader, schemaValidator(CreateEventSchema), eventController.create);
-  eventRouter.patch("/:id", uploader, schemaValidator(UpdateEventSchema), eventController.update);
-  eventRouter.delete("/:id", schemaValidator(UpdateEventSchema), eventController.delete);
+  eventRouter.post("/",verifyToken, isAdmin,  uploader, schemaValidator(CreateEventSchema), eventController.create);
+  eventRouter.patch("/:id",verifyToken, isAdmin,  uploader, schemaValidator(UpdateEventSchema), eventController.update);
+  eventRouter.delete("/:id", verifyToken, isAdmin, schemaValidator(UpdateEventSchema), eventController.delete);
   return eventRouter;
 };

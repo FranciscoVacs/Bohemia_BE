@@ -24,7 +24,7 @@ export class TicketType extends BaseEntity {
     max_quantity!: number;
 
     @Property()
-    available_quantity!: number;
+    available_tickets!: number;
     
     @ManyToOne(() => Event, { nullable: false ,deleteRule: 'CASCADE'})
     event!: Rel<Event>;
@@ -37,7 +37,7 @@ export class TicketType extends BaseEntity {
 
     @BeforeCreate()
     initializeAvailableQuantity() {
-         this.available_quantity = this.max_quantity;
+         this.available_tickets= this.max_quantity;
     }
 
 

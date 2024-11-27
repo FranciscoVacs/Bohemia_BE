@@ -4,7 +4,7 @@ import { schemaValidator } from "../middlewares/schemaValidator.js";
 import { CreateTicketTypeSchema, UpdateTicketTypeSchema } from "../schemas/ticketType.schema.js";
 import type{ IModel } from "../interfaces/model.interface.js";
 import type { TicketType } from "../entities/ticketType.entity.js";
-import {   } from "../middlewares/auth.js";
+import { isAdmin, verifyToken } from "../middlewares/auth.js";
 
 export const ticketTypeRouter = Router();
 
@@ -17,9 +17,9 @@ export const createTicketTypeRouter = ({
 
   ticketTypeRouter.get("/", ticketTypeController.getAll);
   ticketTypeRouter.get("/:id", schemaValidator(UpdateTicketTypeSchema), ticketTypeController.getById);
-  ticketTypeRouter.post("/",  schemaValidator(CreateTicketTypeSchema), ticketTypeController.create);
-  ticketTypeRouter.patch("/:id",schemaValidator(UpdateTicketTypeSchema), ticketTypeController.update);
-  ticketTypeRouter.delete("/:id",schemaValidator(UpdateTicketTypeSchema), ticketTypeController.delete);
+  ticketTypeRouter.post("/", verifyToken, isAdmin,   schemaValidator(CreateTicketTypeSchema), ticketTypeController.create);
+  ticketTypeRouter.patch("/:id",verifyToken, isAdmin, schemaValidator(UpdateTicketTypeSchema), ticketTypeController.update);
+  ticketTypeRouter.delete("/:id",verifyToken, isAdmin, schemaValidator(UpdateTicketTypeSchema), ticketTypeController.delete);
 
   return ticketTypeRouter;
 };

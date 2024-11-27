@@ -10,6 +10,7 @@ import { LocationModel } from './models/orm/location.model.js';
 import { CityModel } from './models/orm/city.model.js';
 import { Dj } from './entities/dj.entity.js';
 import { TicketTypeModel } from './models/orm/ticketType.model.js';
+import { PurchaseModel } from './models/orm/purchase.model.js';
 
 // Función para generar un nuevo EntityManager `fork()` para cada solicitud
 const getEntityManager = () => orm.em.fork();
@@ -22,6 +23,6 @@ const eventModel = new EventModel(getEntityManager()); //para usar los métodos 
 const ticketTypeModel = new TicketTypeModel(getEntityManager());//para usar los métodos personalizados
 const ticketModel = new BaseModel(getEntityManager(), Ticket);
 const userModel = new UserModel(getEntityManager()); //para métodos de UserModel
-const purchaseModel = new BaseModel(getEntityManager(), Purchase);
+const purchaseModel = new PurchaseModel(getEntityManager());
 
 createApp(eventModel, locationModel, cityModel, ticketTypeModel, ticketModel, userModel, purchaseModel, djModel);

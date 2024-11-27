@@ -24,7 +24,7 @@ export class EventController extends BaseController<Event> {
         location,
         dj,
       }as RequiredEntityData<Event>);
-
+      
       return res.status(201).send({ message: "Item created", data: event });
     } catch (error) {
       next(error);

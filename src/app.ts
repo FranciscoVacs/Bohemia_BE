@@ -25,6 +25,7 @@ import path from "node:path";
 import { fileURLToPath } from 'node:url';
 import type { Dj } from "./entities/dj.entity.js";
 import { createDjRouter } from "./routes/dj.route.js";
+import type { IPurchaseModel } from "./interfaces/purchase.interface.js";
 
 
 export const createApp = async (
@@ -34,7 +35,7 @@ export const createApp = async (
   ticketTypeModel: IModel<TicketType>,
   ticketModel: IModel<Ticket>,
   userModel: IUserModel<User>, // 👈 Inject the user model, para los nuevos metodos
-  purchaseModel: IModel<Purchase>,
+  purchaseModel: IPurchaseModel<Purchase>, // 👈 Inject the user model, para los nuevos metodos
   djModel: IModel<Dj>
 ) => {
   
