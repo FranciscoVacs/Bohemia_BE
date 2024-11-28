@@ -5,6 +5,7 @@ import { TicketTypeController } from "./ticketType.controller.js";
 import type { Request, Response, NextFunction } from "express";
 import type { IPurchaseModel } from "../interfaces/purchase.interface.js";
 import { PDFGenerator } from "../services/pdfGenerator.js";
+import type { Ticket } from "../entities/ticket.entity.js";
 
 
 export class PurchaseController extends BaseController<Purchase> {
@@ -40,18 +41,28 @@ export class PurchaseController extends BaseController<Purchase> {
 
   getById = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const id = req.params.id;
-      const item = await this.model.getById(id);
-
-      const pdfBuffer = await PDFGenerator.generateTicketPDF(
-        item?.ticket[0],
-        item?.ticket_type,
-        item?.ticket_type.event,
-        item?.ticket_type.event.location,
-      );
-      res.contentType("application/pdf");
-      res.set('Content-Disposition', 'attachment; filename=ticket.pdf');
-      res.send(pdfBuffer);
+      const {purchaseId, ticketId} = req.params;
+      const item = await this.model.getById(purchaseId);
+      const parsedId = Number.parseInt(ticketId);
+      let pdfBuffer: Buffer | undefined;
+      for (const ticket of item?.ticket || []) {
+        if (ticket.id === parsedId) {
+          const ActualTicket:Ticket = ticket;
+          pdfBuffer = await PDFGenerator.generateTicketPDF(
+            ActualTicket,
+            item?.ticket_type,
+            item?.ticket_type.event,
+            item?.ticket_type.event.location,
+          );
+        }
+      }
+      if (pdfBuffer) {
+        res.contentType("application/pdf");
+        res.set('Content-Disposition', 'attachment; filename=ticket.pdf');
+        res.send(pdfBuffer);
+      } else {
+        res.status(404).send({ message: "Ticket not found" });
+      }
   } catch (error) {
     next(error);}
   };

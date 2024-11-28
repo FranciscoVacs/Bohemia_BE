@@ -2,8 +2,9 @@ import PDFDocument from 'pdfkit';
 import QRCode from 'qrcode';
 import type { Ticket } from '../entities/ticket.entity';
 import type { TicketType } from '../entities/ticketType.entity';
-import type{ Event } from '../entities/event.entity';
-import type{ Location } from '../entities/location.entity';
+import type { Event } from '../entities/event.entity';
+import type { Location } from '../entities/location.entity';
+import { format } from 'date-fns';
 
 export class PDFGenerator {
   static async generateTicketPDF(
@@ -34,8 +35,10 @@ export class PDFGenerator {
     location: Location
   ): Promise<Buffer> {
     return new Promise((resolve, reject) => {
-      // Existing PDF generation logic remains the same
-      const doc = new PDFDocument();
+      const doc = new PDFDocument({
+        size: [595.28, 841.89], // A4 size
+        margins: { top: 50, bottom: 50, left: 50, right: 50 }
+      });
       const buffers: Buffer[] = [];
 
       doc.on('data', (buffer) => buffers.push(buffer));
@@ -44,27 +47,41 @@ export class PDFGenerator {
         resolve(pdfBuffer);
       });
 
-      QRCode.toDataURL(`Ticket ID: ${ticket.id}`, async (err, qrCodeUrl) => {
+      // Generate QR Code using the ticket's existing qr_code
+      QRCode.toDataURL(ticket.qr_code, async (err, qrCodeUrl) => {
         if (err) {
           reject(err);
           return;
         }
 
-        doc.fontSize(25).text('Ticket Details', { align: 'center' });
+        // Set font
+        doc.font('Helvetica');
+
+        // Header
+        doc.fontSize(16)
+           .text(event.event_name, { align: 'center', underline: true });
+        
         doc.moveDown();
 
+        // Event Date and Time
         doc.fontSize(12)
-          .text(`Ticket ID: ${ticket.id}`)
-          .text(`Event: ${event.event_name}`)
-          .text(`Location: ${location.address}`)
-          .text(`Date: ${event.begin_datetime}`)
-          .text(`Ticket Type: ${ticket_type.ticketType_name}`);
+           .text(format(event.begin_datetime, 'dd/MM/yy HH:mm'), { align: 'center' });
 
-        doc.image(qrCodeUrl, {
-          fit: [200, 200],
-          align: 'center',
-          valign: 'center'
+        // QR Code
+        doc.image(qrCodeUrl, doc.page.width / 2 - 100, doc.y, {
+          width: 200,
+          height: 200,
+          align: 'center'
         });
+
+        doc.moveDown(2);
+
+        // Ticket Details
+        doc.fontSize(10)
+           .text(`ENTRADA - ${ticket_type.ticketType_name.toUpperCase()} - ${ticket_type.price}`, { align: 'center' })
+           .text(`${ticket.qr_code}`, { align: 'center' })
+           .text(`${format(event.begin_datetime, 'dd/MM/yy HH:mm')}`, { align: 'center' })
+           .text(`${location.location_name.toUpperCase()}`, { align: 'center' });
 
         doc.end();
       });

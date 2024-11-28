@@ -29,7 +29,7 @@ export class TicketType extends BaseEntity {
     @ManyToOne(() => Event, { nullable: false ,deleteRule: 'CASCADE'})
     event!: Rel<Event>;
 
-    @OneToMany(() => Purchase, purchase => purchase.ticket_type)
+    @OneToMany(() => Purchase, purchase => purchase.ticket_type, {orphanRemoval: false})
     purchase = new Collection<Purchase>(this);
 
     @BeforeCreate()
