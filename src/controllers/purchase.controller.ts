@@ -6,6 +6,7 @@ import type { Request, Response, NextFunction } from "express";
 import type { IPurchaseModel } from "../interfaces/purchase.interface.js";
 import { PDFGenerator } from "../services/pdfGenerator.js";
 
+
 export class PurchaseController extends BaseController<Purchase> {
   constructor(protected model: IPurchaseModel<Purchase>) {
     super(model);
@@ -42,8 +43,8 @@ export class PurchaseController extends BaseController<Purchase> {
       const id = req.params.id;
       const item = await this.model.getById(id);
 
-      const pdfBuffer = PDFGenerator.generateTicketPDF(
-        item?.ticket,
+      const pdfBuffer = await PDFGenerator.generateTicketPDF(
+        item?.ticket[0],
         item?.ticket_type,
         item?.ticket_type.event,
         item?.ticket_type.event.location,
@@ -51,8 +52,7 @@ export class PurchaseController extends BaseController<Purchase> {
       res.contentType("application/pdf");
       res.set('Content-Disposition', 'attachment; filename=ticket.pdf');
       res.send(pdfBuffer);
-    } catch (error) {
-      next(error);
-    }
+  } catch (error) {
+    next(error);}
   };
 }

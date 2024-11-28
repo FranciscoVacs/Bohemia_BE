@@ -6,39 +6,53 @@ import type{ Event } from '../entities/event.entity';
 import type{ Location } from '../entities/location.entity';
 
 export class PDFGenerator {
-  static generateTicketPDF(ticket: import("@mikro-orm/core").Collection<Ticket, object> | undefined, ticket_type: TicketType | undefined, event: Event | undefined, location: Location | undefined) {
-    throw new Error("Method not implemented.");
+  static async generateTicketPDF(
+    ticket: Ticket | undefined, 
+    ticket_type: TicketType | undefined, 
+    event: Event | undefined, 
+    location: Location | undefined
+  ): Promise<Buffer> {
+    // Check if all required parameters are defined
+    if (!ticket || !ticket_type || !event || !location) {
+      throw new Error('Missing required ticket information');
+    }
+
+    // Create an instance of PDFGenerator and call the instance method
+    const pdfGenerator = new PDFGenerator();
+    return await pdfGenerator.generateTicketPDF(
+      ticket, 
+      ticket_type, 
+      event, 
+      location
+    );
   }
+
   async generateTicketPDF(
-    ticket: Ticket, 
-    ticket_type: TicketType, 
-    event: Event, 
+    ticket: Ticket,
+    ticket_type: TicketType,
+    event: Event,
     location: Location
   ): Promise<Buffer> {
     return new Promise((resolve, reject) => {
-      // Create a new PDF document
+      // Existing PDF generation logic remains the same
       const doc = new PDFDocument();
       const buffers: Buffer[] = [];
 
-      // Collect the PDF data in buffers
       doc.on('data', (buffer) => buffers.push(buffer));
       doc.on('end', () => {
         const pdfBuffer = Buffer.concat(buffers);
         resolve(pdfBuffer);
       });
 
-      // Generate QR Code
       QRCode.toDataURL(`Ticket ID: ${ticket.id}`, async (err, qrCodeUrl) => {
         if (err) {
           reject(err);
           return;
         }
 
-        // PDF Content
         doc.fontSize(25).text('Ticket Details', { align: 'center' });
         doc.moveDown();
 
-        // Ticket Information
         doc.fontSize(12)
           .text(`Ticket ID: ${ticket.id}`)
           .text(`Event: ${event.event_name}`)
@@ -46,14 +60,12 @@ export class PDFGenerator {
           .text(`Date: ${event.begin_datetime}`)
           .text(`Ticket Type: ${ticket_type.ticketType_name}`);
 
-        // Add QR Code
         doc.image(qrCodeUrl, {
           fit: [200, 200],
           align: 'center',
           valign: 'center'
         });
 
-        // Finalize PDF
         doc.end();
       });
     });
