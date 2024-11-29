@@ -41,7 +41,7 @@ export class PDFGenerator {
     return new Promise((resolve, reject) => {
       const doc = new PDFDocument({
         size: [706, 252], 
-        margin: 29,
+        margin: 20,
       });
       const buffers: Buffer[] = [];
 
@@ -64,10 +64,7 @@ export class PDFGenerator {
         
 
         doc.fontSize(12)
-          .text(`TOT: - ${ticket.number_in_ticket_type}`,{ align: 'left' });
-
-        doc.fontSize(12)
-          .text(`COMPRA: - ${ticket.number_in_ticket_type} -/- ${purchase.ticket_numbers}`,{ align: 'right' });
+          .text(`Ticket: ${ticket.number_in_purchase} de ${purchase.ticket_numbers}`,{ align: 'right' });
 
         doc.moveDown(0.5);
 
@@ -78,7 +75,11 @@ export class PDFGenerator {
         
         doc.moveDown();
 
-        // Event Date and Time
+        doc.fontSize(13)
+        doc.font('Helvetica-Bold')
+           .text('Fecha y Hora', { align: 'center'});
+
+        doc.moveDown(0.5);
         doc.fontSize(12)
            .text(format(event.begin_datetime, 'dd/MM/yy HH:mm'), { align: 'center' });
 
@@ -87,15 +88,21 @@ export class PDFGenerator {
         doc.fontSize(10)
            .text(`${location.location_name}`, { align: 'center' })
            .text(`${location.address}`, { align: 'center' })
-           .text(`ENTRADA - ${ticket_type.ticketType_name.toUpperCase()} - ${ticket_type.price}`, { align: 'center' })
-           .text(`${ticket.qr_code}`, { align: 'right' })
-           .text(`${format(event.begin_datetime, 'dd/MM/yy HH:mm')}`, { align: 'center' })
-           .text(`${location.location_name.toUpperCase()}`, { align: 'center' });
+           .text(`ENTRADA - ${ticket_type.ticketType_name.toUpperCase()} - $${ticket_type.price}`, { align: 'center' });
+           
+
 
         // QR Code
-        doc.image(qrCodeUrl, 100, 100, {fit: [100, 100],align: 'right', valign: 'center'});
+       // Coordenadas más altas para evitar el salto de página
+        const qrCodeX = 50; // Posición X de la imagen
+        const qrCodeY = 90; // Posición Y más alta para la imagen
 
-    
+        // QR Code
+        doc.image(qrCodeUrl, qrCodeX, qrCodeY, { fit: [100, 100] }); // Imagen QR posicionada más arriba
+
+        doc.moveDown(0.5);
+        doc.text(ticket.qr_code,65,50, { align: 'left', width: 100, });
+            
 
         doc.end();
       });
