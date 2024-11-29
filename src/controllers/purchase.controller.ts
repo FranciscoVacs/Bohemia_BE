@@ -39,6 +39,16 @@ export class PurchaseController extends BaseController<Purchase> {
     }
   };
 
+  getTickets = async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { id } = req.params;
+      const item = await this.model.getById(id);
+      return res.status(200).send(item);
+    } catch (error) {
+      next(error);
+    }
+  }
+
   getById = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const {purchaseId, ticketId} = req.params;

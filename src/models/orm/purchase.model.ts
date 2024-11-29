@@ -70,4 +70,11 @@ export class PurchaseModel extends BaseModel<Purchase> {
       ],
     });
   }
+
+  async getTickets(id: string): Promise<Purchase | undefined> {
+    const parsedId = Number.parseInt(id);
+    return await this.em.findOneOrFail(Purchase, parsedId, {
+      populate: ["ticket"],
+    });
+  }
 }

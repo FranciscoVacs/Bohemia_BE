@@ -18,6 +18,7 @@ export const createPurchaseRouter = ({
   const purchaseController = new PurchaseController(purchaseModel);
 
   purchaseRouter.get("/", purchaseController.getAll);
+  purchaseRouter.get("/:id", purchaseController.getTickets);
   purchaseRouter.get("/:purchaseId/ticket/:ticketId",/*schemaValidator(UpdatePurchaseSchema)*/ purchaseController.getById);
   purchaseRouter.post("/",   /*schemaValidator(CreatePurchaseSchema),*/ purchaseController.create);
   purchaseRouter.patch("/:id",     schemaValidator(UpdatePurchaseSchema), purchaseController.update);
