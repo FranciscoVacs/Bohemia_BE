@@ -45,11 +45,11 @@ export class PurchaseModel extends BaseModel<Purchase> {
     } as Purchase);
 
     //crear los tickets
-    for (let i = 0; i < ticket_quantity; i++) {
+    for (let i = 1; i <= ticket_quantity; i++) {
       console.log("AAAAAAAAAAAAAAA",i,ticketType.max_quantity,ticketType.available_tickets)
       this.em.create(Ticket, {
         qr_code: uuid(),
-        number_in_purchase: i++,
+        number_in_purchase: i,
         number_in_ticket_type:
           ticketType.max_quantity - ticketType.available_tickets,
         purchase: purchseActual,
