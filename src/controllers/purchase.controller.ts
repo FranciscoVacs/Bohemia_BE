@@ -62,6 +62,7 @@ export class PurchaseController extends BaseController<Purchase> {
             ActualTicket,
             item?.ticket_type,
             item?.ticket_type.event,
+            item,
             item?.ticket_type.event.location,
           );
         }

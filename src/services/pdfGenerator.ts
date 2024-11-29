@@ -5,23 +5,28 @@ import type { TicketType } from '../entities/ticketType.entity';
 import type { Event } from '../entities/event.entity';
 import type { Location } from '../entities/location.entity';
 import { format } from 'date-fns';
+import type { Purchase } from '../entities/purchase.entity.js';
 
 export class PDFGenerator {
   static async generateTicketPDF(
     ticket: Ticket | undefined, 
     ticket_type: TicketType | undefined, 
-    event: Event | undefined, 
+    event: Event | undefined,
+    purchase: Purchase | undefined, 
     location: Location | undefined
   ): Promise<Buffer> {
-    if (!ticket || !ticket_type || !event || !location) {
+    // Check if all required parameters are defined
+    if (!ticket || !ticket_type || !event || !purchase || !location) {
       throw new Error('Missing required ticket information');
     }
 
+    // Create an instance of PDFGenerator and call the instance method
     const pdfGenerator = new PDFGenerator();
     return await pdfGenerator.generateTicketPDF(
       ticket, 
       ticket_type, 
-      event, 
+      event,
+      purchase, 
       location
     );
   }
@@ -30,12 +35,13 @@ export class PDFGenerator {
     ticket: Ticket,
     ticket_type: TicketType,
     event: Event,
+    purchase: Purchase,
     location: Location
   ): Promise<Buffer> {
     return new Promise((resolve, reject) => {
       const doc = new PDFDocument({
-        size: [595.28, 841.89], // A4 size
-        margins: { top: 50, bottom: 50, left: 50, right: 50 }
+        size: [706, 252], 
+        margin: 29,
       });
       const buffers: Buffer[] = [];
 
@@ -45,49 +51,51 @@ export class PDFGenerator {
         resolve(pdfBuffer);
       });
 
+      // Generate QR Code using the ticket's existing qr_code
       QRCode.toDataURL(ticket.qr_code, async (err, qrCodeUrl) => {
         if (err) {
           reject(err);
           return;
         }
 
-        doc.font('Helvetica-Bold');
+        // Set font
+        doc.font('Helvetica');
 
-        // First line with event name and date
-        doc.fontSize(14)
-           .text('1717 17', { align: 'left' });
+        
 
         doc.fontSize(12)
-           .text(`${event.event_name.toUpperCase()} - ${format(event.begin_datetime, 'DD DE MMMM').toUpperCase()}!`, { align: 'left' });
+          .text(`TOT: - ${ticket.number_in_ticket_type}`,{ align: 'left' });
+
+        doc.fontSize(12)
+          .text(`COMPRA: - ${ticket.number_in_ticket_type} -/- ${purchase.ticket_numbers}`,{ align: 'right' });
+
+        doc.moveDown(0.5);
+
+        // Header
+        doc.fontSize(20)
+        doc.font('Helvetica-Bold')
+           .text(event.event_name, { align: 'center', underline: true });
+        
+        doc.moveDown();
+
+        // Event Date and Time
+        doc.fontSize(12)
+           .text(format(event.begin_datetime, 'dd/MM/yy HH:mm'), { align: 'center' });
+
+        doc.moveDown();
+
+        doc.fontSize(10)
+           .text(`${location.location_name}`, { align: 'center' })
+           .text(`${location.address}`, { align: 'center' })
+           .text(`ENTRADA - ${ticket_type.ticketType_name.toUpperCase()} - ${ticket_type.price}`, { align: 'center' })
+           .text(`${ticket.qr_code}`, { align: 'right' })
+           .text(`${format(event.begin_datetime, 'dd/MM/yy HH:mm')}`, { align: 'center' })
+           .text(`${location.location_name.toUpperCase()}`, { align: 'center' });
 
         // QR Code
-        doc.image(qrCodeUrl, doc.page.width - 200, 50, {
-          width: 150,
-          height: 150,
-          align: 'right'
-        });
+        doc.image(qrCodeUrl, 100, 100, {fit: [100, 100],align: 'right', valign: 'center'});
 
-        doc.moveDown();
-
-        // Ticket Details
-        doc.font('Helvetica')
-           .fontSize(10)
-           .text(`${ticket.qr_code}`, { align: 'left' })
-           .text(`${format(event.begin_datetime, 'DD/MM/YY')} ${format(event.begin_datetime, 'HH:mm')}`, { align: 'left' })
-           .text(`${location.location_name.toUpperCase()}`, { align: 'left' });
-
-        doc.moveDown();
-
-        // Ticket Type and Price
-        doc.font('Helvetica-Bold')
-           .fontSize(10)
-           .text(`ENTRADA - ${ticket_type.ticketType_name.toUpperCase()} ${ticket_type.price} - ${ticket_type.price}.00 + SC 0`, { align: 'left' });
-
-        // Additional details
-        doc.font('Helvetica')
-           .fontSize(8)
-           .text(`${format(new Date(), 'DD/MM/YY')} ${format(new Date(), 'HH:mm')}`, { align: 'left' })
-           .text('MIRKO_ADM', { align: 'left' });
+    
 
         doc.end();
       });
