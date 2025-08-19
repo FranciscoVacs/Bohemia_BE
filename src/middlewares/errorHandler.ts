@@ -6,16 +6,16 @@ export const errorHandler = (
   res: Response,
   next: NextFunction,
 ): void => {
-    
   let message: string;
-  let statusCode = 400;
+  let statusCode = 500; // Default to 500
 
   if (error instanceof Error) {
     message = error.message;
-    if (error.message.toLowerCase().includes('not found')) {
-      statusCode = 404; // No encontrado
-    } else {
-      statusCode = 500; // Error del servidor
+    if (error.message.toLowerCase().includes("not found")) {
+      statusCode = 404;
+    } else if (error.message.startsWith("Validation failed:")) {
+      statusCode = 400;
+      message = error.message.replace("Validation failed: ", "");
     }
   } else if (error && typeof error === "object" && "message" in error) {
     message = String(error.message);

@@ -33,8 +33,22 @@ export class EventController extends BaseController<Event> {
 
   update = async (req: Request, res: Response, next: NextFunction) => {
     try {
-      const id = req.params.id;
+      const { id } = req.params;
       const { body } = req;
+
+      // Handle the case where only finish_datetime is provided
+      if (body.finish_datetime && !body.begin_datetime) {
+        const existingEvent = await this.model.getById(id);
+        if (!existingEvent) {
+          // Let the default not found handler catch this
+          throw new Error("Event not found");
+        }
+        if (dayjs(body.finish_datetime).isBefore(existingEvent.begin_datetime)) {
+          throw new Error(
+            "Validation failed: Finish datetime must be after the event's begin datetime"
+          );
+        }
+      }
 
       // Agrega cover_photo solo si hay un nuevo archivo
       if (req.file) {

@@ -26,7 +26,9 @@ export class PurchaseModel extends BaseModel<Purchase> {
       { populate: ["event"] },
     );
     if (ticketType.available_tickets < ticket_quantity) {
-      throw new Error("Not enough tickets available for this purchase");
+      throw new Error(
+        "Validation failed: Not enough tickets available for this purchase"
+      );
     }
     const actualUser: User = await this.em.findOneOrFail(User, parsedUID);
     const new_stock_tickets = ticketType.available_tickets - ticket_quantity;
