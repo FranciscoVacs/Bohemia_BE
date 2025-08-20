@@ -26,6 +26,7 @@ Bohemia es una plataforma web para la gestión y venta de entradas para eventos 
 - 📸 **Galería de Fotos**: Álbumes de fotos para usuarios registrados
 - 🔐 **Autenticación JWT**: Sistema seguro de login y autorización
 - 📄 **Generación de PDFs**: Recibos y entradas en formato PDF
+- ⏰ **Eventos Futuros Inteligentes**: Filtrado automático de eventos por estado temporal
 
 ## 🏗️ Arquitectura del Sistema
 
@@ -169,7 +170,7 @@ Bohemia_BE/
 ├── 📁 src/
 │   ├── 📁 controllers/     # Controladores de la API
 │   ├── 📁 entities/        # Entidades de MikroORM
-│   ├── 📁 HTTP/            # Archivos de prueba HTTP
+│   ├── 📁 HTTP/            # Archivos HTTP de prueba
 │   ├── 📁 interfaces/      # Interfaces TypeScript
 │   ├── 📁 middlewares/     # Middlewares de Express
 │   ├── 📁 models/          # Modelos de datos
@@ -192,7 +193,8 @@ Bohemia_BE/
 - `POST /api/auth/login` - Login de usuarios
 
 ### Eventos
-- `GET /api/events` - Listar eventos
+- `GET /api/events` - Listar todos los eventos
+- `GET /api/events/future` - **NUEVO**: Solo eventos futuros y en curso
 - `POST /api/events` - Crear evento
 - `GET /api/events/:id` - Obtener evento por ID
 - `PUT /api/events/:id` - Actualizar evento
@@ -214,6 +216,55 @@ Bohemia_BE/
 - `GET /api/cities` - Listar ciudades
 - `GET /api/locations` - Listar locaciones
 - `POST /api/locations` - Crear locación
+
+## 🆕 Nueva Funcionalidad: Eventos Futuros Inteligentes
+
+### Endpoint Especializado
+```
+GET /api/events/future
+```
+
+### 🎯 Lógica de Filtrado Inteligente
+
+**Un evento aparece en "futuros" si NO ha terminado completamente:**
+
+- ✅ **Eventos que aún no empiezan** - Aparecen normalmente
+- ✅ **Eventos en curso** - Siguen apareciendo hasta que terminen
+- ❌ **Eventos terminados** - Desaparecen automáticamente
+
+### 📊 Ejemplos de Comportamiento
+
+#### Escenario 1: Evento Futuro
+- **Hora actual**: 10:00 AM
+- **Evento**: Empieza 8:00 PM, termina 6:00 AM del día siguiente
+- **Resultado**: ✅ **APARECE** en `/api/events/future`
+
+#### Escenario 2: Evento En Curso
+- **Hora actual**: 11:00 PM
+- **Evento**: Empezó 8:00 PM, termina 6:00 AM del día siguiente
+- **Resultado**: ✅ **APARECE** en `/api/events/future` (está en curso)
+
+#### Escenario 3: Evento Terminado
+- **Hora actual**: 7:00 AM del día siguiente
+- **Evento**: Empezó 8:00 PM, terminó 6:00 AM
+- **Resultado**: ❌ **NO APARECE** en `/api/events/future` (ya terminó)
+
+### 💡 Beneficios
+
+1. **Experiencia de Usuario Mejorada** - Los usuarios ven eventos hasta que terminen
+2. **Lógica Intuitiva** - Un evento "futuro" es uno que no ha terminado
+3. **API Pública** - No requiere autenticación para consultar eventos
+4. **Filtrado Automático** - Los eventos desaparecen automáticamente al terminar
+5. **Incluye Eventos en Curso** - Los usuarios pueden ver eventos que ya empezaron
+
+### 🔧 Implementación Técnica
+
+```typescript
+// Filtrado por fecha de finalización, no de inicio
+const futureEvents = allEvents.filter(event => 
+  new Date(event.finish_datetime) > now
+);
+```
 
 ## 🔐 Autenticación y Autorización
 
@@ -289,9 +340,10 @@ export class Event {
 ## 🚨 Reglas de Negocio
 
 ### Eventos
-- ✅ No se posponen por inconvenientes climáticos
+- ✅ No se pospondrá por inconvenientes climáticos ya que son en lugares cerrados
 - ✅ Capacidad máxima por locación
 - ✅ Edad mínima configurable
+- ✅ **NUEVO**: Validaciones robustas de fechas (futuras y lógicas)
 
 ### Entradas
 - ✅ Stock limitado por tanda
@@ -300,9 +352,15 @@ export class Event {
 - ✅ Generación automática de QR
 
 ### Compras
-- ✅ Sin reembolsos
+- ✅ Sin reembolsos de entradas
 - ✅ Validación de stock disponible
 - ✅ Generación de entradas tras confirmación de pago
+
+### Validaciones de Fechas
+- ✅ **Fecha de inicio** debe ser futura
+- ✅ **Fecha de fin** debe ser futura
+- ✅ **Fecha de fin** debe ser posterior a **fecha de inicio**
+- ✅ **No se pueden actualizar** eventos con fechas contradictorias
 
 ## 🔧 Configuración de Desarrollo
 
@@ -333,9 +391,14 @@ El proyecto utiliza `tsc-watch` para compilación automática en desarrollo:
 ### Implementaciones Pendientes
 - [ ] Sistema de roles de administrador
 - [ ] Gestión de álbumes de fotos
-- [ ] Validaciones de negocio completas
 - [ ] Tests unitarios y de integración
 - [ ] Documentación de API con Swagger
+
+### ✅ Implementaciones Completadas
+- [x] **Validaciones robustas de fechas** para eventos
+- [x] **API de eventos futuros** con lógica inteligente
+- [x] **Filtrado automático** por estado temporal
+- [x] **Validaciones en actualizaciones** para prevenir fechas contradictorias
 
 ## 🤝 Contribución
 
@@ -349,7 +412,10 @@ El proyecto utiliza `tsc-watch` para compilación automática en desarrollo:
 
 Este proyecto está bajo la Licencia ISC.
 
+## 👨‍💻 Autor
 
 **Bohemia Development Team**
+
+**¡Disfruta desarrollando con Bohemia! 🎉**
 
 

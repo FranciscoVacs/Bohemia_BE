@@ -16,10 +16,16 @@ export const createEventRouter = ({
   eventModel: IModel<Event>;
 }) => {
   const eventController = new EventController(eventModel);
-  eventRouter.get("/",  eventController.getAll);
+  
+  // Rutas públicas
+  eventRouter.get("/", eventController.getAll);
+  eventRouter.get("/future", eventController.getFutureEvents); // Nueva ruta para eventos futuros
   eventRouter.get("/:id", schemaValidator(UpdateEventSchema), eventController.getById);
-  eventRouter.post("/",verifyToken, isAdmin,  uploader, schemaValidator(CreateEventSchema), eventController.create);
-  eventRouter.patch("/:id",verifyToken, isAdmin,  uploader, schemaValidator(UpdateEventSchema), eventController.update);
+  
+  // Rutas protegidas (requieren autenticación y admin)
+  eventRouter.post("/", verifyToken, isAdmin, uploader, schemaValidator(CreateEventSchema), eventController.create);
+  eventRouter.patch("/:id", verifyToken, isAdmin, uploader, schemaValidator(UpdateEventSchema), eventController.update);
   eventRouter.delete("/:id", verifyToken, isAdmin, schemaValidator(UpdateEventSchema), eventController.delete);
+  
   return eventRouter;
 };
