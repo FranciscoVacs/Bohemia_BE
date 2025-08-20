@@ -4,7 +4,6 @@ import { RequestContext } from "@mikro-orm/core";
 import { corsMiddleware } from "./middlewares/cors.js";
 import { orm, syncSchema } from "./shared/db/orm.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
-import { errorLoggingMiddleware } from "./middlewares/errorLogger.js";
 import { createEventRouter } from "./routes/event.route.js";
 import { createLocationRouter } from "./routes/location.route.js";
 import { createCityRouter } from "./routes/city.route.js";
@@ -53,8 +52,7 @@ export const createApp = async (
   app.disable("x-powered-by");
   app.use('/public/uploads', express.static(path.join(__dirname, '../public/uploads')));
 
-  // Middleware de logging de errores (debe ir antes de las rutas)
-  app.use(errorLoggingMiddleware);
+
 
   app.use((req, res, next) => {
     RequestContext.create(orm.em, next);

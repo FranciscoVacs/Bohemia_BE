@@ -41,7 +41,6 @@ export const ERROR_CONFIG = {
     INTERNAL_SERVER: 'Internal server error',
     DATABASE: 'Database operation failed',
   },
-  
   // Configuración de rate limiting para errores
   RATE_LIMITING: {
     // Máximo número de errores por IP por minuto

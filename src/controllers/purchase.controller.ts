@@ -6,6 +6,8 @@ import type { Request, Response, NextFunction } from "express";
 import type { IPurchaseModel } from "../interfaces/purchase.interface.js";
 import { PDFGenerator } from "../services/pdfGenerator.js";
 import type { Ticket } from "../entities/ticket.entity.js";
+import { throwError } from "../shared/errors/ErrorUtils.js";
+import { asyncHandler } from "../middlewares/asyncHandler.js";
 
 
 export class PurchaseController extends BaseController<Purchase> {
@@ -13,68 +15,57 @@ export class PurchaseController extends BaseController<Purchase> {
     super(model);
   }
 
-  create = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { ticketType_id, ticket_quantity, user_id } = req.body;
-      const item = await this.model.createProtocol(
-        ticketType_id,
-        ticket_quantity,
-        user_id,
-      );
-      const purchaseData = {
-        id: item?.id,
-        ticket_numbers: item?.ticket_numbers,
-        payment_status: item?.payment_status,
-        discount_applied: item?.discount_applied,
-        total_price: item?.total_price,
-        user_id: item?.user.id,
-        ticket_type_id: item?.ticket_type.id,
-      };
+  create = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const { ticketType_id, ticket_quantity, user_id } = req.body;
+    const item = await this.model.createProtocol(
+      ticketType_id,
+      ticket_quantity,
+      user_id,
+    );
+    const purchaseData = {
+      id: item?.id,
+      ticket_numbers: item?.ticket_numbers,
+      payment_status: item?.payment_status,
+      discount_applied: item?.discount_applied,
+      total_price: item?.total_price,
+      user_id: item?.user.id,
+      ticket_type_id: item?.ticket_type.id,
+    };
 
-      return res
-        .status(201)
-        .send({ message: "Item created", data: purchaseData });
-    } catch (error) {
-      next(error);
-    }
-  };
+    return res
+      .status(201)
+      .send({ message: "Item created", data: purchaseData });
+  });
 
-  getTickets = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { id } = req.params;
-      const item = await this.model.getById(id);
-      return res.status(200).send(item);
-    } catch (error) {
-      next(error);
-    }
-  }
+  getTickets = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const { id } = req.params;
+    const item = await this.model.getById(id);
+    return res.status(200).send(item);
+  });
 
-  getById = async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const {purchaseId, ticketId} = req.params;
-      const item = await this.model.getById(purchaseId);
-      const parsedId = Number.parseInt(ticketId);
-      let pdfBuffer: Buffer | undefined;
-      for (const ticket of item?.ticket || []) {
-        if (ticket.id === parsedId) {
-          const ActualTicket:Ticket = ticket;
-          pdfBuffer = await PDFGenerator.generateTicketPDF(
-            ActualTicket,
-            item?.ticket_type,
-            item?.ticket_type.event,
-            item,
-            item?.ticket_type.event.location,
-          );
-        }
+  getById = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const {purchaseId, ticketId} = req.params;
+    const item = await this.model.getById(purchaseId);
+    const parsedId = Number.parseInt(ticketId);
+    let pdfBuffer: Buffer | undefined;
+    for (const ticket of item?.ticket || []) {
+      if (ticket.id === parsedId) {
+        const ActualTicket:Ticket = ticket;
+        pdfBuffer = await PDFGenerator.generateTicketPDF(
+          ActualTicket,
+          item?.ticket_type,
+          item?.ticket_type.event,
+          item,
+          item?.ticket_type.event.location,
+        );
       }
-      if (pdfBuffer) {
-        res.contentType("application/pdf");
-        res.set('Content-Disposition', 'attachment; filename=ticket.pdf');
-        res.send(pdfBuffer);
-      } else {
-        res.status(404).send({ message: "Ticket not found" });
-      }
-  } catch (error) {
-    next(error);}
-  };
+    }
+    if (pdfBuffer) {
+      res.contentType("application/pdf");
+      res.set('Content-Disposition', 'attachment; filename=ticket.pdf');
+      res.send(pdfBuffer);
+    } else {
+      throwError.notFound("Ticket not found");
+    }
+  });
 }

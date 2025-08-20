@@ -37,7 +37,4 @@ export enum PaymentStatus {
     APPROVED = "Approved",
     REJECTED = "Rejected",
 }
-function Hidden(): (target: Purchase, propertyKey: "user") => void {
-    throw new Error("Function not implemented.");
-}
 

@@ -1,5 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
-import jsonwebtoken from "jsonwebtoken";   
+import jsonwebtoken from "jsonwebtoken";
+import { throwError } from "../shared/errors/ErrorUtils.js";   
 
 interface JWTPayload {
     id: number | undefined;
@@ -22,30 +23,28 @@ export const generateToken = (id:number|undefined,email : string, isAdmin: boole
 };
 
 export const verifyToken = (req: Request, res: Response, next: NextFunction) => {
-    
     const token = req.header('Authorization')?.replace('Bearer ', '');
 
     if(!token) {
-        const message = "Required token";
-        return res.status(401).send({message});
+        throwError.custom("Required token", 401);
+        return;
     }
 
     try{
-        const decoded = jsonwebtoken.verify(token, process.env.JWT_TOKEN_SECRET || 'tokentest') as JWTPayload;
+        const secretKey = process.env.JWT_TOKEN_SECRET || 'tokentest';
+        const decoded = jsonwebtoken.verify(token, secretKey) as unknown as JWTPayload;
         req.user = decoded;
         console.log(decoded);
         next();
     }
     catch(error) {
-      const message = "Unauthorized";
-      return res.status(401).send({message});
+        throwError.custom("Unauthorized", 401);
     }
 };
 
 export const isAdmin = (req: Request, res: Response, next: NextFunction) => {
     if (!req.user?.isAdmin) {
-      const message = "Access denied: Admin only";
-      return res.status(403).send({ message });
+      throwError.custom("Access denied: Admin only", 403);
     }
     next();
   };
@@ -53,8 +52,7 @@ export const isAdmin = (req: Request, res: Response, next: NextFunction) => {
   
 export const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
     if (!req.user) {
-      const message = "Access denied: Authentication required";
-      return res.status(401).send({ message});
+      throwError.custom("Access denied: Authentication required", 401);
     }
     next();
   };

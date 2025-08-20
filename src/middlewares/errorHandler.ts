@@ -1,7 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
 import { AppError } from "../shared/errors/AppError.js";
 import { ZodError } from "zod";
-import { errorLogger } from "./errorLogger.js";
 import { ERROR_CONFIG } from "../shared/errors/ErrorConfig.js";
 
 export const errorHandler = (
@@ -28,9 +27,6 @@ export const errorHandler = (
       field: issue.path.join('.'),
       message: issue.message
     }));
-    
-    // Log del error de validación
-    errorLogger.logWarning(`Validation error: ${message}`, req, { details });
     
     res.status(statusCode).json({
       message,
@@ -92,8 +88,7 @@ export const errorHandler = (
     isOperational = false;
   }
 
-  // Log del error usando el sistema centralizado
-  errorLogger.logError(error, req, statusCode, isOperational);
+
 
   // Respuesta al cliente
   const errorResponse: any = {
