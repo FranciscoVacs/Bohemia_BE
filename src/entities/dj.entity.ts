@@ -3,17 +3,15 @@ import { BaseEntity } from "../shared/db/baseEntity.entity.js"
 import { Event } from "./event.entity.js";
 @Entity()
 export class Dj extends BaseEntity {
+    @Property({ length: 100, fieldName: 'dj_name' })
+    djName!: string;
 
-    @Property({length:100})
-    dj_name!: string;
+    @Property({ length: 100, fieldName: 'dj_surname' })
+    djSurname!: string;
 
-    @Property({length:100})
-    dj_surname!: string;
+    @Property({ fieldName: 'dj_apodo' })
+    djApodo!: string;
 
-    @Property()
-    dj_apodo!: string;
-
-    @OneToMany(()=>Event, event=>event.dj , {cascade:[Cascade.ALL]})
+    @OneToMany(() => Event, event => event.dj, { cascade: [Cascade.ALL] })
     event = new Collection<Event>(this);
-    
 }

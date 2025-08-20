@@ -8,28 +8,27 @@ import { TicketType } from "./ticketType.entity.js";
 
 @Entity()
 export class Purchase extends BaseEntity {
-
-    @Property()
-    ticket_numbers!: number;
+    @Property({ fieldName: 'ticket_numbers' })
+    ticketNumbers!: number;
 
     @Enum(() => PaymentStatus)
-    payment_status!: PaymentStatus;
+    @Property({ fieldName: 'payment_status' })
+    paymentStatus!: PaymentStatus;
 
-    @Property({default: 0})
-    discount_applied!: number;
+    @Property({ default: 0, fieldName: 'discount_applied' })
+    discountApplied!: number;
 
-    @Property({default: 0})
-    total_price!: number;
+    @Property({ default: 0, fieldName: 'total_price' })
+    totalPrice!: number;
 
     @ManyToOne(() => User, { nullable: false })
     user!: Rel<User>;
     
-    @ManyToOne(() => TicketType, { nullable: false })
-    ticket_type!: Rel<TicketType>;
+    @ManyToOne(() => TicketType, { nullable: false, fieldName: 'ticket_type_id' })
+    ticketType!: Rel<TicketType>;
 
     @OneToMany(() => Ticket, (ticket) => ticket.purchase, { cascade: [Cascade.ALL] })
     ticket = new Collection<Ticket>(this);
-
 }
 
 export enum PaymentStatus {

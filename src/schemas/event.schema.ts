@@ -23,8 +23,8 @@ const isValidDateTimeFormat = (dateString: string) => {
 
 export const CreateEventSchema = z.object({
   body: z.object({
-    event_name: z.string().max(100, "El nombre del evento no puede exceder 100 caracteres"),
-    begin_datetime: z
+    eventName: z.string().max(100, "El nombre del evento no puede exceder 100 caracteres"),
+    beginDatetime: z
       .string()
       .refine(isValidDateTimeFormat, {
         message: "Formato de fecha inválido. Formato esperado: 'YYYY-MM-DD HH:MM:SS'",
@@ -32,7 +32,7 @@ export const CreateEventSchema = z.object({
       .refine(isFutureDate, {
         message: "La fecha y hora de comienzo debe ser futura",
       }),
-    finish_datetime: z
+    finishDatetime: z
       .string()
       .refine(isValidDateTimeFormat, {
         message: "Formato de fecha inválido. Formato esperado: 'YYYY-MM-DD HH:MM:SS'",
@@ -40,15 +40,15 @@ export const CreateEventSchema = z.object({
       .refine(isFutureDate, {
         message: "La fecha y hora de finalización debe ser futura",
       }),
-    event_description: z.string().max(100, "La descripción del evento no puede exceder 100 caracteres"),
-    min_age: z.coerce.number().int().positive("La edad mínima debe ser un número entero positivo"),
+    eventDescription: z.string().max(100, "La descripción del evento no puede exceder 100 caracteres"),
+    minAge: z.coerce.number().int().positive("La edad mínima debe ser un número entero positivo"),
     location: z.coerce.number().int().positive("La ubicación debe ser un ID válido"),
     dj: z.coerce.number().int().positive("El DJ debe ser un ID válido"),
   }).refine(
-    (data) => isFinishAfterBegin(data.finish_datetime, data.begin_datetime),
+    (data) => isFinishAfterBegin(data.finishDatetime, data.beginDatetime),
     {
       message: "La fecha y hora de finalización debe ser posterior a la de comienzo",
-      path: ["finish_datetime"], // Indica qué campo tiene el error
+      path: ["finishDatetime"], // Indica qué campo tiene el error
     }
   ),
 });
@@ -56,8 +56,8 @@ export const CreateEventSchema = z.object({
 export const UpdateEventSchema = z.object({
   body: z
     .object({
-      event_name: z.string().max(100, "El nombre del evento no puede exceder 100 caracteres").optional(),
-      begin_datetime: z
+      eventName: z.string().max(100, "El nombre del evento no puede exceder 100 caracteres").optional(),
+      beginDatetime: z
         .string()
         .refine(isValidDateTimeFormat, {
           message: "Formato de fecha inválido. Formato esperado: 'YYYY-MM-DD HH:MM:SS'",
@@ -66,7 +66,7 @@ export const UpdateEventSchema = z.object({
           message: "La fecha y hora de comienzo debe ser futura",
         })
         .optional(),
-      finish_datetime: z
+      finishDatetime: z
         .string()
         .refine(isValidDateTimeFormat, {
           message: "Formato de fecha inválido. Formato esperado: 'YYYY-MM-DD HH:MM:SS'",
@@ -75,23 +75,23 @@ export const UpdateEventSchema = z.object({
           message: "La fecha y hora de finalización debe ser futura",
         })
         .optional(),
-      event_description: z.string().max(100, "La descripción del evento no puede exceder 100 caracteres").optional(),
-      min_age: z.coerce.number().int().positive("La edad mínima debe ser un número entero positivo").optional(),
+      eventDescription: z.string().max(100, "La descripción del evento no puede exceder 100 caracteres").optional(),
+      minAge: z.coerce.number().int().positive("La edad mínima debe ser un número entero positivo").optional(),
       location: z.coerce.number().int().positive("La ubicación debe ser un ID válido").optional(),
       dj: z.coerce.number().int().positive("El DJ debe ser un ID válido").optional(),
     })
     .refine(
       (data) => {
         // Si ambas fechas están presentes, validar que finish > begin
-        if (data.begin_datetime && data.finish_datetime) {
-          return isFinishAfterBegin(data.finish_datetime, data.begin_datetime);
+        if (data.beginDatetime && data.finishDatetime) {
+          return isFinishAfterBegin(data.finishDatetime, data.beginDatetime);
         }
         // Si solo una fecha está presente, la validación se hará en el controlador
         return true;
       },
       {
         message: "La fecha y hora de finalización debe ser posterior a la de comienzo",
-        path: ["finish_datetime"],
+        path: ["finishDatetime"],
       }
     ),
   params: z.object({

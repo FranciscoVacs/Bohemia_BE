@@ -16,20 +16,20 @@ export class PurchaseController extends BaseController<Purchase> {
   }
 
   create = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const { ticketType_id, ticket_quantity, user_id } = req.body;
+    const { ticketTypeId, ticketQuantity, userId } = req.body;
     const item = await this.model.createProtocol(
-      ticketType_id,
-      ticket_quantity,
-      user_id,
+      ticketTypeId,
+      ticketQuantity,
+      userId,
     );
     const purchaseData = {
       id: item?.id,
-      ticket_numbers: item?.ticket_numbers,
-      payment_status: item?.payment_status,
-      discount_applied: item?.discount_applied,
-      total_price: item?.total_price,
-      user_id: item?.user.id,
-      ticket_type_id: item?.ticket_type.id,
+      ticketNumbers: item?.ticketNumbers,
+      paymentStatus: item?.paymentStatus,
+      discountApplied: item?.discountApplied,
+      totalPrice: item?.totalPrice,
+      userId: item?.user.id,
+      ticketTypeId: item?.ticketType.id,
     };
 
     return res
@@ -53,10 +53,10 @@ export class PurchaseController extends BaseController<Purchase> {
         const ActualTicket:Ticket = ticket;
         pdfBuffer = await PDFGenerator.generateTicketPDF(
           ActualTicket,
-          item?.ticket_type,
-          item?.ticket_type.event,
+          item?.ticketType,
+          item?.ticketType.event,
           item,
-          item?.ticket_type.event.location,
+          item?.ticketType.event.location,
         );
       }
     }

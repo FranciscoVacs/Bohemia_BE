@@ -4,27 +4,25 @@ import { Purchase } from "./purchase.entity.js";
 
 @Entity()
 export class User extends BaseEntity {
-
-
-    @Property({length:100})
+    @Property({ length: 100 })
     @Unique()
     email!: string;
 
-    @Property({length:100})
-    user_name!: string;
+    @Property({ length: 100, fieldName: 'user_name' })
+    userName!: string;
 
-    @Property({length:100})
-    user_surname!: string;
+    @Property({ length: 100, fieldName: 'user_surname' })
+    userSurname!: string;
 
-    @Property({length:100})
+    @Property({ length: 100 })
     password!: string;
 
-    @Property()
-    birth_date!: Date;
+    @Property({ fieldName: 'birth_date' })
+    birthDate!: Date;
 
-    @Property({default: false})
+    @Property({ default: false, fieldName: 'is_admin' })
     isAdmin!: boolean;
 
-    @OneToMany(()=> Purchase, purchase=>purchase.user, {cascade:[Cascade.ALL]})
+    @OneToMany(() => Purchase, purchase => purchase.user, { cascade: [Cascade.ALL] })
     purchase = new Collection<Purchase>(this);
 }

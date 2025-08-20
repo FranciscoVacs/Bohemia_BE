@@ -12,17 +12,17 @@ export class EventController extends BaseController<Event> {
   }
 
   create = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const { event_name, begin_datetime, finish_datetime, event_description, min_age, location, dj } = req.body;
+    const { eventName, beginDatetime, finishDatetime, eventDescription, minAge, location, dj } = req.body;
     const fileName = req.file?.filename;
     const basePath = `${req.protocol}://${req.hostname}:${process.env.PORT}/public/uploads/`;
     
     const event = await this.model.create({
-      event_name,
-      begin_datetime,
-      finish_datetime,
-      event_description,
-      min_age,
-      cover_photo: `${basePath}${fileName}` || "",
+      eventName,
+      beginDatetime,
+      finishDatetime,
+      eventDescription,
+      minAge,
+      coverPhoto: `${basePath}${fileName}` || "",
       location,
       dj,
     } as RequiredEntityData<Event>);
@@ -38,11 +38,11 @@ export class EventController extends BaseController<Event> {
     const currentEvent = await this.model.getById(id);
     assertResourceExists(currentEvent, `Event with id ${id}`);
 
-    // Agrega cover_photo solo si hay un nuevo archivo
+    // Agrega coverPhoto solo si hay un nuevo archivo
     if (req.file) {
       const fileName = req.file.filename;
       const basePath = `${req.protocol}://${req.hostname}:${process.env.PORT}/public/uploads/`;
-      body.cover_photo = `${basePath}${fileName}`;
+      body.coverPhoto = `${basePath}${fileName}`;
     }
 
     await this.model.update(id, body);
@@ -63,10 +63,10 @@ export class EventController extends BaseController<Event> {
       });
     }
 
-    // Un evento es "futuro" si NO ha terminado (finish_datetime > now)
+    // Un evento es "futuro" si NO ha terminado (finishDatetime > now)
     // Esto incluye eventos que ya comenzaron pero no han terminado
     const futureEvents = allEvents.filter(event => 
-      new Date(event.finish_datetime) > now
+      new Date(event.finishDatetime) > now
     );
 
     return res.status(200).send({

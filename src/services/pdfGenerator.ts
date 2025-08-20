@@ -52,8 +52,8 @@ export class PDFGenerator {
         resolve(pdfBuffer);
       });
 
-      // Generate QR Code using the ticket's existing qr_code
-      QRCode.toDataURL(ticket.qr_code, async (err, qrCodeUrl) => {
+      // Generate QR Code using the ticket's existing qrCode
+      QRCode.toDataURL(ticket.qrCode, async (err, qrCodeUrl) => {
         if (err) {
           reject(err);
           return;
@@ -65,14 +65,14 @@ export class PDFGenerator {
         
 
         doc.fontSize(12)
-          .text(`Ticket: ${ticket.number_in_purchase} de ${purchase.ticket_numbers}`,{ align: 'right' });
+          .text(`Ticket: ${ticket.numberInPurchase} de ${purchase.ticketNumbers}`,{ align: 'right' });
 
         doc.moveDown(0.5);
 
         // Header
         doc.fontSize(20)
         doc.font('Helvetica-Bold')
-           .text(event.event_name, { align: 'center', underline: true });
+           .text(event.eventName, { align: 'center', underline: true });
         
         doc.moveDown();
 
@@ -82,14 +82,14 @@ export class PDFGenerator {
 
         doc.moveDown(0.5);
         doc.fontSize(12)
-           .text(format(event.begin_datetime, 'dd/MM/yy HH:mm'), { align: 'center' });
+           .text(format(event.beginDatetime, 'dd/MM/yy HH:mm'), { align: 'center' });
 
         doc.moveDown();
 
         doc.fontSize(10)
-           .text(`${location.location_name}`, { align: 'center' })
+           .text(`${location.locationName}`, { align: 'center' })
            .text(`${location.address}`, { align: 'center' })
-           .text(`ENTRADA - ${ticket_type.ticketType_name.toUpperCase()} - $${ticket_type.price}`, { align: 'center' });
+           .text(`ENTRADA - ${ticket_type.ticketTypeName.toUpperCase()} - $${ticket_type.price}`, { align: 'center' });
            
 
 
@@ -102,7 +102,7 @@ export class PDFGenerator {
         doc.image(qrCodeUrl, qrCodeX, qrCodeY, { fit: [100, 100] }); // Imagen QR posicionada más arriba
 
         doc.moveDown(0.5);
-        doc.text(ticket.qr_code,65,50, { align: 'left', width: 100, });
+        doc.text(ticket.qrCode,65,50, { align: 'left', width: 100, });
             
 
         doc.end();

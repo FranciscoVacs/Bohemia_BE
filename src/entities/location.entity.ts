@@ -6,20 +6,19 @@ import { City } from "./city.entity.js";
 
 @Entity()
 export class Location extends BaseEntity {
+    @Property({ length: 100, fieldName: 'location_name' })
+    locationName!: string;
 
-    @Property({length:100})
-    location_name!: string;
-
-    @Property({length:100})
+    @Property({ length: 100 })
     @Unique()
     address!: string;
 
-    @Property()
-    max_capacity!: number;
+    @Property({ fieldName: 'max_capacity' })
+    maxCapacity!: number;
 
     @ManyToOne(() => City, { nullable: false })
     city!: Rel<City>;
 
-    @OneToMany(()=>Event, event=>event.location, {cascade:[Cascade.ALL]})
+    @OneToMany(() => Event, event => event.location, { cascade: [Cascade.ALL] })
     event = new Collection<Event>(this);
 }

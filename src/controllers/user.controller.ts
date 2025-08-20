@@ -14,7 +14,7 @@ export class UserController extends BaseController<User> {
   }
 
   register = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const {email, user_name, user_surname, password, birth_date} = req.body;
+    const {email, userName, userSurname, password, birthDate} = req.body;
     const userExists = await this.model.getByEmail(email);
 
     if (userExists !== null) {
@@ -25,10 +25,10 @@ export class UserController extends BaseController<User> {
 
     const newUser = await this.model.create({
       email,
-      user_name,
-      user_surname,
+      userName,
+      userSurname,
       password: cryptedPass,
-      birth_date,
+      birthDate,
     } as RequiredEntityData<User>);
 
     const token = generateToken(newUser?.id, email, false);

@@ -17,7 +17,7 @@ export class TicketController extends BaseController<Ticket> {
     const itemInput = req.body;
     const newTicket = await this.model.create({
       ...itemInput,
-      qr_code: newCode,
+      qrCode: newCode,
     } as RequiredEntityData<Ticket>);
     return res.status(201).send({ message: "Item created", data: newTicket });
   });

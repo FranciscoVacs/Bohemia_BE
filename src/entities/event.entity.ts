@@ -7,26 +7,26 @@ import { Dj } from "./dj.entity.js";
 
 @Entity()
 export class Event extends BaseEntity {
-  @Property({ length: 100 })
-  event_name!: string;
+  @Property({ length: 100, fieldName: 'event_name' })
+  eventName!: string;
 
-  @Property()
-  begin_datetime!: Date;
+  @Property({ fieldName: 'begin_datetime' })
+  beginDatetime!: Date;
 
-  @Property()
-  finish_datetime!: Date;
+  @Property({ fieldName: 'finish_datetime' })
+  finishDatetime!: Date;
 
-  @Property({ length: 500 })
-  event_description!: string;
+  @Property({ length: 500, fieldName: 'event_description' })
+  eventDescription!: string;
 
-  @Property()
-  min_age!: number;
+  @Property({ fieldName: 'min_age' })
+  minAge!: number;
 
-  @Property()
-  cover_photo!: string;
+  @Property({ fieldName: 'cover_photo' })
+  coverPhoto!: string;
 
-  @Property({default: 0})
-  tickets_on_sale!: number;
+  @Property({ default: 0, fieldName: 'tickets_on_sale' })
+  ticketsOnSale!: number;
 
   @ManyToOne(() => Location, { nullable: false })
   location!: Rel<Location>;
@@ -34,6 +34,6 @@ export class Event extends BaseEntity {
   @ManyToOne(() => Dj, { nullable: false })
   dj!: Rel<Dj>;
 
-  @OneToMany(()=>TicketType, ticketType=>ticketType.event, {cascade:[Cascade.ALL], orphanRemoval: true})
+  @OneToMany(() => TicketType, ticketType => ticketType.event, { cascade: [Cascade.ALL], orphanRemoval: true })
   ticketType = new Collection<TicketType>(this);
 }

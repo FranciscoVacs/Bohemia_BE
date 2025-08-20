@@ -7,35 +7,32 @@ import { Purchase } from "./purchase.entity.js";
 
 @Entity()
 export class TicketType extends BaseEntity {
+    @Property({ fieldName: 'ticket_type_name' })
+    ticketTypeName!: string;
 
-    @Property()
-    ticketType_name!: string;
+    @Property({ fieldName: 'begin_datetime' })
+    beginDatetime!: Date;
 
-    @Property()
-    begin_datetime!: Date;
-
-    @Property()
-    finish_datetime!: Date;
+    @Property({ fieldName: 'finish_datetime' })
+    finishDatetime!: Date;
 
     @Property()
     price!: number;
 
-    @Property()
-    max_quantity!: number;
+    @Property({ fieldName: 'max_quantity' })
+    maxQuantity!: number;
 
-    @Property()
-    available_tickets!: number;
+    @Property({ fieldName: 'available_tickets' })
+    availableTickets!: number;
     
-    @ManyToOne(() => Event, { nullable: false ,deleteRule: 'CASCADE'})
+    @ManyToOne(() => Event, { nullable: false, deleteRule: 'CASCADE' })
     event!: Rel<Event>;
 
-    @OneToMany(() => Purchase, purchase => purchase.ticket_type, {orphanRemoval: false})
+    @OneToMany(() => Purchase, purchase => purchase.ticketType, { orphanRemoval: false })
     purchase = new Collection<Purchase>(this);
 
     @BeforeCreate()
     initializeAvailableQuantity() {
-         this.available_tickets= this.max_quantity;
+        this.availableTickets = this.maxQuantity;
     }
-
-
-  }
+}

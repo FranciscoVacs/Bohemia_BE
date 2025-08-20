@@ -4,18 +4,16 @@ import { Location } from "./location.entity.js";
 
 @Entity()
 export class City extends BaseEntity {
-
-    @Property({length:100})
+    @Property({ length: 100, fieldName: 'city_name' })
     @Unique()
-    city_name!: string;
+    cityName!: string;
 
-    @Property({length:100})
+    @Property({ length: 100 })
     province!: string;
 
-    @Property()
-    zip_code!: number;
+    @Property({ fieldName: 'zip_code' })
+    zipCode!: number;
 
-    @OneToMany(()=>Location, location=>location.city, {cascade:[Cascade.ALL]})
+    @OneToMany(() => Location, location => location.city, { cascade: [Cascade.ALL] })
     location = new Collection<Location>(this);
-    
 }

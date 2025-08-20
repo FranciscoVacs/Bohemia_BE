@@ -11,16 +11,15 @@ import { Purchase } from "./purchase.entity.js";
 
 @Entity()
 export class Ticket extends BaseEntity {
-    @Property({ length: 100 })
-    qr_code!: string;
+    @Property({ length: 100, fieldName: 'qr_code' })
+    qrCode!: string;
 
-    @Property()
-    number_in_purchase!: number;
+    @Property({ fieldName: 'number_in_purchase' })
+    numberInPurchase!: number;
 
-    @Property()
-    number_in_ticket_type!: number;
+    @Property({ fieldName: 'number_in_ticket_type' })
+    numberInTicketType!: number;
 
     @ManyToOne(() => Purchase, { nullable: false })
     purchase!: Rel<Purchase>;
-
 }

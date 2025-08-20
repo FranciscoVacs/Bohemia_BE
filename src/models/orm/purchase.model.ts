@@ -13,12 +13,12 @@ export class PurchaseModel extends BaseModel<Purchase> {
   }
 
   async createProtocol(
-    ticketType_id: string,
-    ticket_quantity: number,
-    user_id: string,
+    ticketTypeId: string,
+    ticketQuantity: number,
+    userId: string,
   ): Promise<Purchase | undefined> {
-    const parsedTTId = Number.parseInt(ticketType_id);
-    const parsedUID = Number.parseInt(user_id);
+    const parsedTTId = Number.parseInt(ticketTypeId);
+    const parsedUID = Number.parseInt(userId);
     
     const ticketType: TicketType = await this.em.findOneOrFail(
       TicketType,
@@ -28,49 +28,49 @@ export class PurchaseModel extends BaseModel<Purchase> {
     
     // Validar que hay suficientes tickets disponibles
     assertBusinessRule(
-      ticketType.available_tickets >= ticket_quantity,
+      ticketType.availableTickets >= ticketQuantity,
       "Not enough tickets available for this purchase"
     );
     
     const actualUser: User = await this.em.findOneOrFail(User, parsedUID);
-    const new_stock_tickets = ticketType.available_tickets - ticket_quantity;
-    console.log("new_stock_tickets", new_stock_tickets);
-    console.log("available_tickets", ticketType.available_tickets);
+    const newStockTickets = ticketType.availableTickets - ticketQuantity;
+    console.log("newStockTickets", newStockTickets);
+    console.log("availableTickets", ticketType.availableTickets);
 
-    this.em.assign(ticketType, { available_tickets: new_stock_tickets });
-    const total_price = ticketType.price * ticket_quantity;
-    const purchseActual = this.em.create(Purchase, {
-      ticket_numbers: ticket_quantity,
-      payment_status: "Approved",
-      discount_applied: 0,
+    this.em.assign(ticketType, { availableTickets: newStockTickets });
+    const totalPrice = ticketType.price * ticketQuantity;
+    const purchaseActual = this.em.create(Purchase, {
+      ticketNumbers: ticketQuantity,
+      paymentStatus: "Approved",
+      discountApplied: 0,
       user: actualUser,
-      ticket_type: ticketType,
-      total_price: total_price,
+      ticketType: ticketType,
+      totalPrice: totalPrice,
     } as Purchase);
 
     //crear los tickets
-    for (let i = 1; i <= ticket_quantity; i++) {
+    for (let i = 1; i <= ticketQuantity; i++) {
       this.em.create(Ticket, {
-        qr_code: uuid(),
-        number_in_purchase: i,
-        number_in_ticket_type:
-          ticketType.max_quantity - ticketType.available_tickets,
-        purchase: purchseActual,
+        qrCode: uuid(),
+        numberInPurchase: i,
+        numberInTicketType:
+          ticketType.maxQuantity - ticketType.availableTickets,
+        purchase: purchaseActual,
       } as Ticket);
     }
     await this.em.flush();
 
-    return purchseActual;
+    return purchaseActual;
   }
 
   async getById(id: string): Promise<Purchase | undefined> {
     const parsedId = Number.parseInt(id);
     return await this.em.findOneOrFail(Purchase, parsedId, {
       populate: [
-        "ticket.qr_code",
-        "ticket_type",
-        "ticket_type.event",
-        "ticket_type.event.location",
+        "ticket.qrCode",
+        "ticketType",
+        "ticketType.event",
+        "ticketType.event.location",
       ],
     });
   }
