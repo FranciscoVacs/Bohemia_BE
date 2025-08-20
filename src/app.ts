@@ -4,6 +4,7 @@ import { RequestContext } from "@mikro-orm/core";
 import { corsMiddleware } from "./middlewares/cors.js";
 import { orm, syncSchema } from "./shared/db/orm.js";
 import { errorHandler } from "./middlewares/errorHandler.js";
+import { errorLoggingMiddleware } from "./middlewares/errorLogger.js";
 import { createEventRouter } from "./routes/event.route.js";
 import { createLocationRouter } from "./routes/location.route.js";
 import { createCityRouter } from "./routes/city.route.js";
@@ -26,6 +27,7 @@ import { fileURLToPath } from 'node:url';
 import type { Dj } from "./entities/dj.entity.js";
 import { createDjRouter } from "./routes/dj.route.js";
 import type { IPurchaseModel } from "./interfaces/purchase.interface.js";
+import { InternalServerError } from "./shared/errors/AppError.js";
 
 
 export const createApp = async (
@@ -41,7 +43,7 @@ export const createApp = async (
   
   const envFound = dotenv.config();
   if (envFound.error) {
-    throw new Error("⚠️  Couldn't find .env file  ⚠️");
+    throw new InternalServerError("⚠️  Couldn't find .env file  ⚠️");
   }
   const __filename = fileURLToPath(import.meta.url);
   const __dirname = path.dirname(__filename);
@@ -51,11 +53,12 @@ export const createApp = async (
   app.disable("x-powered-by");
   app.use('/public/uploads', express.static(path.join(__dirname, '../public/uploads')));
 
+  // Middleware de logging de errores (debe ir antes de las rutas)
+  app.use(errorLoggingMiddleware);
 
   app.use((req, res, next) => {
     RequestContext.create(orm.em, next);
   });
-
 
   app.use("/api/event", createEventRouter({ eventModel }));
   app.use("/api/location", createLocationRouter({ locationModel }));
@@ -66,6 +69,7 @@ export const createApp = async (
   app.use("/api/purchase", createPurchaseRouter({ purchaseModel }));
   app.use("/api/dj", createDjRouter({ djModel }));
 
+  // Error handler global (debe ir al final)
   app.use(errorHandler);
 
   await syncSchema();

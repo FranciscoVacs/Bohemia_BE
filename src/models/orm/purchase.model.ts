@@ -1,12 +1,11 @@
+import type { EntityManager } from "@mikro-orm/mysql";
 import { Purchase } from "../../entities/purchase.entity.js";
-import { Ticket } from "../../entities/ticket.entity.js";
 import { TicketType } from "../../entities/ticketType.entity.js";
 import { User } from "../../entities/user.entity.js";
+import { Ticket } from "../../entities/ticket.entity.js";
 import { BaseModel } from "./base.Model.js";
-import type { EntityManager } from "@mikro-orm/mysql";
-import { createOrder } from "../../services/mercadoPago.js";
 import { v4 as uuid } from "uuid";
-import { populate } from "dotenv";
+import { throwError, assertResourceExists, assertBusinessRule } from "../../shared/errors/ErrorUtils.js";
 
 export class PurchaseModel extends BaseModel<Purchase> {
   constructor(em: EntityManager) {
@@ -20,14 +19,19 @@ export class PurchaseModel extends BaseModel<Purchase> {
   ): Promise<Purchase | undefined> {
     const parsedTTId = Number.parseInt(ticketType_id);
     const parsedUID = Number.parseInt(user_id);
+    
     const ticketType: TicketType = await this.em.findOneOrFail(
       TicketType,
       parsedTTId,
       { populate: ["event"] },
     );
-    if (ticketType.available_tickets < ticket_quantity) {
-      throw new Error("Not enough tickets available for this purchase");
-    }
+    
+    // Validar que hay suficientes tickets disponibles
+    assertBusinessRule(
+      ticketType.available_tickets >= ticket_quantity,
+      "Not enough tickets available for this purchase"
+    );
+    
     const actualUser: User = await this.em.findOneOrFail(User, parsedUID);
     const new_stock_tickets = ticketType.available_tickets - ticket_quantity;
     console.log("new_stock_tickets", new_stock_tickets);

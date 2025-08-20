@@ -6,6 +6,7 @@ import type { Event } from '../entities/event.entity';
 import type { Location } from '../entities/location.entity';
 import { format } from 'date-fns';
 import type { Purchase } from '../entities/purchase.entity.js';
+import { BadRequestError } from '../shared/errors/AppError.js';
 
 export class PDFGenerator {
   static async generateTicketPDF(
@@ -17,7 +18,7 @@ export class PDFGenerator {
   ): Promise<Buffer> {
     // Check if all required parameters are defined
     if (!ticket || !ticket_type || !event || !purchase || !location) {
-      throw new Error('Missing required ticket information');
+      throw new BadRequestError('Missing required ticket information');
     }
 
     // Create an instance of PDFGenerator and call the instance method

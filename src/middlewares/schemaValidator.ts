@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from "express";
 import { path } from "pdfkit";
 import { type AnyZodObject, ZodError } from "zod";
+import { ValidationError } from "../shared/errors/AppError.js";
 
 export const schemaValidator =
   (schema: AnyZodObject) =>
@@ -13,13 +14,7 @@ export const schemaValidator =
       });
       next();
     } catch (error) {
-      if (error instanceof ZodError) {
-        return res.status(400).send(
-          error.issues.map((issue) => ({
-            message: issue.message,
-            path: issue.path,
-          })),
-        );
-      }
-      return res.status(400).send({ message: "internal server error" });
-    }}
+      // Los errores de Zod se manejarán en el errorHandler global
+      next(error);
+    }
+  };
