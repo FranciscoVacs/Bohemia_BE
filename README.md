@@ -1,6 +1,6 @@
 # 🎉 Bohemia Backend
 
-**Sistema de gestión de eventos y venta de entradas para fiestas y eventos en Argentina**
+**Sistema de gestión de eventos y venta de entradas para la fiesta "Bohemia" en Argentina**
 
 [![Node.js](https://img.shields.io/badge/Node.js-20.12.12-green.svg)](https://nodejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.4.5-blue.svg)](https://www.typescriptlang.org/)
@@ -10,7 +10,7 @@
 
 ## 📋 Descripción del Proyecto
 
-Bohemia es una plataforma web para la gestión y venta de entradas para eventos y fiestas en diferentes provincias de Argentina. El sistema permite a los usuarios registrarse, explorar eventos, comprar entradas con diferentes métodos de pago, y recibir entradas con códigos QR.
+Bohemia es una plataforma web para la gestión y venta de entradas de fiestas en diferentes ciudades de Argentina. El sistema permite a los usuarios registrarse, explorar eventos, comprar entradas con diferentes métodos de pago, y recibir entradas con códigos QR.
 
 ### ✨ Características Principales
 
