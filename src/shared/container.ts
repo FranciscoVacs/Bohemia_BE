@@ -4,6 +4,7 @@ import { LocationModel } from '../models/orm/location.model.js';
 import { CityModel } from '../models/orm/city.model.js';
 import { UserModel } from '../models/orm/user.model.js';
 import { PurchaseModel } from '../models/orm/purchase.model.js';
+import { TicketTypeModel } from '../models/orm/ticketType.model.js';
 
 import { Event } from '../entities/event.entity.js';
 import { Location } from '../entities/location.entity.js';
@@ -19,6 +20,7 @@ import type { EntityManager } from '@mikro-orm/mysql';
 import type { IModel } from '../interfaces/model.interface.js';
 import type { IUserModel } from '../interfaces/user.interface.js';
 import type { IPurchaseModel } from '../interfaces/purchase.interface.js';
+import type { ITicketTypeModel } from '../interfaces/ticketType.interface.js';
 
 /**
  * Dependency Injection Container
@@ -78,14 +80,15 @@ export class Container {
     return this.models.get('purchaseModel');
   }
 
-  // ✅ BaseModel - Solo CRUD básico
-  getTicketTypeModel(): IModel<TicketType> {
+
+  getTicketTypeModel(): ITicketTypeModel<TicketType> {
     if (!this.models.has('ticketTypeModel')) {
-      this.models.set('ticketTypeModel', new BaseModel(this.getEntityManager(), TicketType)); // Solo CRUD básico
+      this.models.set('ticketTypeModel', new TicketTypeModel(this.getEntityManager())); // Custom getTotalMaxQuantityByEvent, getEventWithLocation  
     }
     return this.models.get('ticketTypeModel');
   }
 
+// ✅ BaseModel - Solo CRUD básico
   getTicketModel(): IModel<Ticket> {
     if (!this.models.has('ticketModel')) {
       this.models.set('ticketModel', new BaseModel(this.getEntityManager(), Ticket)); // Solo CRUD básico
