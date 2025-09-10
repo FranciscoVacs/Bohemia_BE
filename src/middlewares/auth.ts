@@ -49,6 +49,24 @@ export const isAdmin = (req: Request, res: Response, next: NextFunction) => {
     next();
   };
 
+export const requireOwnerOrAdmin = (req: Request, res: Response, next: NextFunction) => {
+  const userId = req.params.id;
+  const currentUserId = req.user?.id;
+  const isAdminUser = req.user?.isAdmin;
+
+  // Si es admin, puede hacer cualquier cosa
+  if (isAdminUser) {
+    return next();
+  }
+
+  // Si es el mismo usuario, puede editar sus datos
+  if (currentUserId && currentUserId.toString() === userId) {
+    return next();
+  }
+
+  // Si no es ni admin ni el propietario, denegar acceso
+  throwError.custom("Access denied: You can only modify your own account", 403);
+};
   
 export const isAuthenticated = (req: Request, res: Response, next: NextFunction) => {
     if (!req.user) {

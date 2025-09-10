@@ -5,7 +5,7 @@ import { CreateUserSchema, UpdateUserSchema } from "../schemas/user.schema.js";
 import type{ IModel } from "../interfaces/model.interface.js";
 import type { User } from "../entities/user.entity.js";
 import type { IUserModel } from "../interfaces/user.interface.js";
-import { isAdmin, verifyToken } from "../middlewares/auth.js";
+import { isAdmin, requireOwnerOrAdmin, verifyToken } from "../middlewares/auth.js";
 
 export const userRouter = Router();
 
@@ -22,8 +22,8 @@ export const createUserRouter = ({
   userRouter.post("/", schemaValidator(CreateUserSchema), userController.create);
   userRouter.post("/register", schemaValidator(CreateUserSchema), userController.register);
   userRouter.post("/login", schemaValidator(UpdateUserSchema), userController.login);
-  userRouter.patch("/:id", schemaValidator(UpdateUserSchema), userController.update);
-  userRouter.delete("/:id", schemaValidator(UpdateUserSchema), userController.delete);
+  userRouter.patch("/:id",verifyToken, requireOwnerOrAdmin,schemaValidator(UpdateUserSchema), userController.update);
+  userRouter.delete("/:id", verifyToken, requireOwnerOrAdmin, schemaValidator(UpdateUserSchema), userController.delete);
 
   return userRouter;
 };
