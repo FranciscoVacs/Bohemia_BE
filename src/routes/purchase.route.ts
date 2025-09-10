@@ -17,12 +17,17 @@ export const createPurchaseRouter = ({
 }) => {
   const purchaseController = new PurchaseController(purchaseModel);
 
+  // Rutas públicas
   purchaseRouter.get("/", purchaseController.getAll);
   purchaseRouter.get("/:id", purchaseController.getTickets);
-  purchaseRouter.get("/:purchaseId/ticket/:ticketId",/*schemaValidator(UpdatePurchaseSchema)*/ purchaseController.getById);
-  purchaseRouter.post("/",   /*schemaValidator(CreatePurchaseSchema),*/ purchaseController.create);
-  purchaseRouter.patch("/:id",     schemaValidator(UpdatePurchaseSchema), purchaseController.update);
-  purchaseRouter.delete("/:id",   schemaValidator(UpdatePurchaseSchema), purchaseController.delete);
+  
+  // Rutas para generar PDF de tickets
+  purchaseRouter.get("/:purchaseId/ticket/:ticketId", /*schemaValidator(UpdatePurchaseSchema)*/ purchaseController.getById);
+  
+  // Rutas de gestión (requieren autenticación)
+  purchaseRouter.post("/", /*schemaValidator(CreatePurchaseSchema),*/ purchaseController.create);
+  purchaseRouter.patch("/:id", schemaValidator(UpdatePurchaseSchema), purchaseController.update);
+  purchaseRouter.delete("/:id", schemaValidator(UpdatePurchaseSchema), purchaseController.delete);
 
   return purchaseRouter;
 };

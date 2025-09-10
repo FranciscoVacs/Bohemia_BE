@@ -15,11 +15,14 @@ export const createCityRouter = ({
 }) => {
   const cityController = new CityController(cityModel);
 
+  // Rutas públicas
   cityRouter.get("/", cityController.getAll);
   cityRouter.get("/:id", schemaValidator(UpdateCitySchema), cityController.getById);
-  cityRouter.post("/", verifyToken, isAdmin,  schemaValidator(CreateCitySchema), cityController.create);
-  cityRouter.patch("/:id", verifyToken, isAdmin,    schemaValidator(UpdateCitySchema), cityController.update);
-  cityRouter.delete("/:id",  verifyToken, isAdmin,   schemaValidator(UpdateCitySchema), cityController.delete);
+  
+  // Rutas administrativas (requieren autenticación y admin)
+  cityRouter.post("/", verifyToken, isAdmin, schemaValidator(CreateCitySchema), cityController.create);
+  cityRouter.patch("/:id", verifyToken, isAdmin, schemaValidator(UpdateCitySchema), cityController.update);
+  cityRouter.delete("/:id", verifyToken, isAdmin, schemaValidator(UpdateCitySchema), cityController.delete);
 
   return cityRouter;
 };

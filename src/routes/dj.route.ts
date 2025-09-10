@@ -15,11 +15,14 @@ export const createDjRouter = ({
 }) => {
   const djController = new DjController(djModel);
 
+  // Rutas públicas
   djRouter.get("/", djController.getAll);
   djRouter.get("/:id", schemaValidator(UpdateDjSchema), djController.getById);
-  djRouter.post("/",verifyToken, isAdmin, schemaValidator(CreateDjSchema), djController.create);
-  djRouter.patch("/:id", verifyToken, isAdmin,   schemaValidator(UpdateDjSchema), djController.update);
-  djRouter.delete("/:id", verifyToken, isAdmin,   schemaValidator(UpdateDjSchema), djController.delete);
+  
+  // Rutas administrativas (requieren autenticación y admin)
+  djRouter.post("/", verifyToken, isAdmin, schemaValidator(CreateDjSchema), djController.create);
+  djRouter.patch("/:id", verifyToken, isAdmin, schemaValidator(UpdateDjSchema), djController.update);
+  djRouter.delete("/:id", verifyToken, isAdmin, schemaValidator(UpdateDjSchema), djController.delete);
 
   return djRouter;
 };

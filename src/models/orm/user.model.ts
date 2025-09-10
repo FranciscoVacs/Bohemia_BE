@@ -15,9 +15,16 @@ export class UserModel extends BaseModel<User> implements IUserModel<User> {
     return user;
   }
 
-  async showTickets(id: string): Promise<User | null> {
+  async getUserPurchases(id: string) {
     const parsedId = Number.parseInt(id);
-    const user = await this.em.findOneOrFail(User, parsedId , {populate: ["purchase","purchase.ticketType","purchase.ticketType.event","purchase.ticket"]});
-    return user;
+    const user = await this.em.findOneOrFail(User, parsedId, {
+      populate: [
+        "purchase",
+        "purchase.ticketType",
+        "purchase.ticketType.event",
+        "purchase.ticket"
+      ]
+    });
+    return user.purchase.getItems();
   }
 }

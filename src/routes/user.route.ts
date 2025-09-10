@@ -14,15 +14,23 @@ export const createUserRouter = ({
 }: {
   userModel: IUserModel<User>; // 👈 Inject the user model, para los nuevos metodos
 }) => {
-  const userController = new UserController(userModel);   // 👈 Inject the user model, para los nuevos metodos
+  const userController = new UserController(userModel);
 
-  userRouter.get("/", verifyToken, isAdmin, userController.getAll);
-  userRouter.get("/:id", schemaValidator(UpdateUserSchema), userController.getById);
-  userRouter.get("/tickets/:id", schemaValidator(UpdateUserSchema), userController.showTickets);
-  userRouter.post("/", schemaValidator(CreateUserSchema), userController.create);
+  // Rutas públicas de autenticación (sin autenticación)
   userRouter.post("/register", schemaValidator(CreateUserSchema), userController.register);
   userRouter.post("/login", schemaValidator(UpdateUserSchema), userController.login);
-  userRouter.patch("/:id",verifyToken, requireOwnerOrAdmin,schemaValidator(UpdateUserSchema), userController.update);
+
+  // Rutas del usuario actual (requieren solo autenticación)
+  userRouter.get("/me", verifyToken, userController.getCurrentUser);
+  userRouter.get("/me/purchase", verifyToken, userController.getCurrentUserPurchases);
+  userRouter.patch("/me", verifyToken, schemaValidator(UpdateUserSchema), userController.updateCurrentUser);
+  userRouter.delete("/me", verifyToken, userController.deleteCurrentUser);
+
+  // Rutas administrativas (requieren autenticación + admin)
+  userRouter.get("/", verifyToken, isAdmin, userController.getAll);
+  userRouter.post("/", verifyToken, isAdmin, schemaValidator(CreateUserSchema), userController.create);
+  userRouter.get("/:id", verifyToken, requireOwnerOrAdmin, schemaValidator(UpdateUserSchema), userController.getById);
+  userRouter.patch("/:id", verifyToken, requireOwnerOrAdmin, schemaValidator(UpdateUserSchema), userController.update);
   userRouter.delete("/:id", verifyToken, requireOwnerOrAdmin, schemaValidator(UpdateUserSchema), userController.delete);
 
   return userRouter;

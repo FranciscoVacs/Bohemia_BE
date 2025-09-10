@@ -15,11 +15,14 @@ export const createLocationRouter = ({
 }) => {
   const locationController = new LocationController(locationModel);
 
+  // Rutas públicas
   locationRouter.get("/", locationController.getAll);
   locationRouter.get("/:id", schemaValidator(UpdateLocationSchema), locationController.getById);
-  locationRouter.post("/",  verifyToken, isAdmin, schemaValidator(CreateLocationSchema), locationController.create);
-  locationRouter.patch("/:id", verifyToken, isAdmin,  schemaValidator(UpdateLocationSchema), locationController.update);
-  locationRouter.delete("/:id", verifyToken, isAdmin,  schemaValidator(UpdateLocationSchema), locationController.delete);
+  
+  // Rutas administrativas (requieren autenticación y admin)
+  locationRouter.post("/", verifyToken, isAdmin, schemaValidator(CreateLocationSchema), locationController.create);
+  locationRouter.patch("/:id", verifyToken, isAdmin, schemaValidator(UpdateLocationSchema), locationController.update);
+  locationRouter.delete("/:id", verifyToken, isAdmin, schemaValidator(UpdateLocationSchema), locationController.delete);
 
   return locationRouter;
 };

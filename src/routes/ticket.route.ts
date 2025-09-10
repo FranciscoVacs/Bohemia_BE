@@ -15,11 +15,14 @@ export const createTicketRouter = ({
 }) => {
   const ticketController = new TicketController(ticketModel);
 
-  ticketRouter.get("/",  ticketController.getAll);
-  ticketRouter.get("/:id",  schemaValidator(UpdateTicketSchema), ticketController.getById);
-  ticketRouter.post("/",   schemaValidator(CreateTicketSchema), ticketController.create);
-  ticketRouter.patch("/:id",   schemaValidator(UpdateTicketSchema), ticketController.update);
-  ticketRouter.delete("/:id",   schemaValidator(UpdateTicketSchema), ticketController.delete);
+  // Rutas públicas
+  ticketRouter.get("/", ticketController.getAll);
+  ticketRouter.get("/:id", schemaValidator(UpdateTicketSchema), ticketController.getById);
+  
+  // Rutas administrativas (requieren autenticación y admin)
+  ticketRouter.post("/", verifyToken, isAdmin, schemaValidator(CreateTicketSchema), ticketController.create);
+  ticketRouter.patch("/:id", verifyToken, isAdmin, schemaValidator(UpdateTicketSchema), ticketController.update);
+  ticketRouter.delete("/:id", verifyToken, isAdmin, schemaValidator(UpdateTicketSchema), ticketController.delete);
 
   return ticketRouter;
 };

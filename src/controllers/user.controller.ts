@@ -14,7 +14,7 @@ export class UserController extends BaseController<User> {
   }
 
   register = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const {email, userName, userSurname, password, birthDate} = req.body;
+    const { email, userName, userSurname, password, birthDate } = req.body;
     const userExists = await this.model.getByEmail(email);
 
     if (userExists !== null) {
@@ -33,11 +33,11 @@ export class UserController extends BaseController<User> {
 
     const token = generateToken(newUser?.id, email, false);
 
-    return res.status(201).header('token',token).send({ message: "User created", data: newUser });
+    return res.status(201).header('token', token).send({ message: "User created", data: newUser });
   });
 
   login = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const {email, password} = req.body;
+    const { email, password } = req.body;
     const userExists = await this.model.getByEmail(email);
 
     const validUser = assertResourceExists(userExists, "User");
@@ -53,10 +53,29 @@ export class UserController extends BaseController<User> {
     return res.status(200).header('token', token).send({ message: "User logged in" });
   });
 
-  showTickets = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const id = req.params.id;
-    const userTickets = await this.model.showTickets(id);
-    return res.status(200).send({ data: userTickets });
+
+  getCurrentUser = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.user?.id;
+    const user = await this.model.getById(userId!.toString());
+    return res.status(200).send({ data: user });
+  });
+
+  getCurrentUserPurchases = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.user?.id;
+    const userPurchases = await this.model.getUserPurchases(userId!.toString());
+    return res.status(200).send({ data: userPurchases });
+  });
+
+  updateCurrentUser = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.user?.id;
+    const updatedUser = await this.model.update(userId!.toString(), req.body);
+    return res.status(200).send({ message: "User updated", data: updatedUser });
+  });
+
+  deleteCurrentUser = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.user?.id;
+    await this.model.delete(userId!.toString());
+    return res.status(200).send({ message: "Account deleted successfully" });
   });
 
 }
