@@ -46,6 +46,13 @@ export class PurchaseController extends BaseController<Purchase> {
   getById = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const {purchaseId, ticketId} = req.params;
     const item = await this.model.getById(purchaseId);
+    
+    // Verificar que el usuario es propietario de la compra o es admin
+    if (!req.user?.isAdmin && item?.user.id !== req.user?.id) {
+      throwError.custom("Access denied: You can only download your own tickets", 403);
+      return;
+    }
+    
     const parsedId = Number.parseInt(ticketId);
     let pdfBuffer: Buffer | undefined;
     for (const ticket of item?.ticket || []) {

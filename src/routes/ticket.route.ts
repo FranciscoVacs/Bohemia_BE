@@ -15,11 +15,9 @@ export const createTicketRouter = ({
 }) => {
   const ticketController = new TicketController(ticketModel);
 
-  // Rutas públicas
-  ticketRouter.get("/", ticketController.getAll);
-  ticketRouter.get("/:id", schemaValidator(UpdateTicketSchema), ticketController.getById);
-  
-  // Rutas administrativas (requieren autenticación y admin)
+  // Rutas administrativas (solo admin puede gestionar tickets directamente)
+  ticketRouter.get("/", verifyToken, isAdmin, ticketController.getAll);
+  ticketRouter.get("/:id", verifyToken, isAdmin, schemaValidator(UpdateTicketSchema), ticketController.getById);
   ticketRouter.post("/", verifyToken, isAdmin, schemaValidator(CreateTicketSchema), ticketController.create);
   ticketRouter.patch("/:id", verifyToken, isAdmin, schemaValidator(UpdateTicketSchema), ticketController.update);
   ticketRouter.delete("/:id", verifyToken, isAdmin, schemaValidator(UpdateTicketSchema), ticketController.delete);

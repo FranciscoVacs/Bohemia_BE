@@ -30,12 +30,4 @@ export const UpdateUserSchema = z.object({
       }).optional(),
       purchase: z.array(z.number()).optional(),
     }),
-  params: z.object({
-    id: z
-      .string()
-      .refine((val) => {
-        const num = Number.parseInt(val);
-        return !Number.isNaN(num) && num.toString() === val;
-      }).optional(),
-  }),
 });

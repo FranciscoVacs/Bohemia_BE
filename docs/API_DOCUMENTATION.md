@@ -3,30 +3,39 @@
 ## 🌟 Información General
 
 **Base URL:** `http://localhost:3000/api`
-**Versión:** 1.0
+**Versión:** 2.0
 **Autenticación:** JWT Bearer Token
+**Última actualización:** Septiembre 2025
 
-### Tipos de Permisos
+### 🔐 Tipos de Permisos
 - **🔓 Público:** No requiere autenticación
 - **🔒 Autenticado:** Requiere token JWT válido
 - **👑 Admin:** Requiere token JWT válido + permisos de administrador
+- **👤 Propietario:** Solo el propietario del recurso o admin
+
+### 🚀 Cambios Principales v2.0
+- **Endpoints `/me` para usuarios autenticados**
+- **Seguridad mejorada en todas las rutas**
+- **Estructura simplificada de compras/tickets**
+- **PDFs seguros con verificación de propiedad**
 
 ---
 
 ## 🔐 Autenticación
 
-### Registro de Usuario
-**POST** `/user`
+### Registrar Usuario
+**POST** `/user/register`
 - **Permisos:** 🔓 Público
 - **Propósito:** Crear una nueva cuenta de usuario
 - **Content-Type:** `application/json`
 
 ```json
 {
-  "name": "string",
+  "userName": "string",
+  "userSurname": "string",
   "email": "string",
   "password": "string",
-  "phone": "string"
+  "birthDate": "YYYY-MM-DD"
 }
 ```
 
@@ -44,63 +53,78 @@
 }
 ```
 
-### Registrar Usuario
-**POST** `/user/register`
-- **Permisos:** 🔓 Público
-- **Propósito:** Alias para registro de usuario
+---
+
+## 👤 Gestión del Usuario Actual (Endpoints /me)
+
+### Obtener Mi Información
+**GET** `/user/me`
+- **Permisos:** 🔒 Autenticado
+- **Propósito:** Obtener información del usuario autenticado
+- **Headers:** `Authorization: Bearer <token>`
+
+### Obtener Mis Compras
+**GET** `/user/me/purchases`
+- **Permisos:** 🔒 Autenticado
+- **Propósito:** Obtener lista de compras del usuario autenticado
+- **Respuesta:** Lista de compras con información básica
+
+### Ver Tickets de una Compra Mía
+**GET** `/user/me/purchases/:id/tickets`
+- **Permisos:** � Autenticado
+- **Propósito:** Obtener tickets de una compra específica del usuario
+- **Parámetros:** `id` (ID de compra)
+- **Verificación:** Solo compras que pertenecen al usuario autenticado
+
+### Actualizar Mi Información
+**PATCH** `/user/me`
+- **Permisos:** 🔒 Autenticado
+- **Propósito:** Modificar información del usuario autenticado
 - **Content-Type:** `application/json`
 
-```json
-{
-  "name": "string",
-  "email": "string",
-  "password": "string",
-  "phone": "string"
-}
-```
+### Eliminar Mi Cuenta
+**DELETE** `/user/me`
+- **Permisos:** 🔒 Autenticado
+- **Propósito:** Eliminar cuenta del usuario autenticado
 
 ---
 
-## 👥 Gestión de Usuarios
+## 👥 Gestión de Usuarios (Solo Admin)
 
-### Listar Usuarios
+### Listar Todos los Usuarios
 **GET** `/user`
 - **Permisos:** 🔒 Autenticado + 👑 Admin
 - **Propósito:** Obtener lista de todos los usuarios registrados
 
+### Crear Usuario Manualmente
+**POST** `/user`
+- **Permisos:** � Autenticado + 👑 Admin
+- **Propósito:** Crear usuario manualmente (como admin)
+- **Content-Type:** `application/json`
+
 ### Obtener Usuario por ID
 **GET** `/user/:id`
-- **Permisos:** 🔓 Público
-- **Propósito:** Obtener información de un usuario específico
+- **Permisos:** � Autenticado + 👑 Admin
+- **Propósito:** Obtener información de cualquier usuario (solo admin)
 - **Parámetros:** `id` (número)
 
-### Obtener Tickets de Usuario
-**GET** `/user/tickets/:id`
-- **Permisos:** 🔓 Público
-- **Propósito:** Ver todas las entradas compradas por un usuario
-- **Parámetros:** `id` (ID del usuario)
-
-### Actualizar Usuario
+### Actualizar Usuario por ID
 **PATCH** `/user/:id`
-- **Permisos:** 🔓 Público
-- **Propósito:** Modificar información de usuario
+- **Permisos:** � Autenticado + 👑 Admin
+- **Propósito:** Modificar información de cualquier usuario (solo admin)
 - **Parámetros:** `id` (número)
 - **Content-Type:** `application/json`
 
-### Eliminar Usuario
+### Eliminar Usuario por ID
 **DELETE** `/user/:id`
-- **Permisos:** 🔓 Público
-- **Propósito:** Eliminar cuenta de usuario
+- **Permisos:** � Autenticado + 👑 Admin
+- **Propósito:** Eliminar cualquier cuenta (solo admin)
 - **Parámetros:** `id` (número)
 
 ---
 
 ## 🎉 Gestión de Eventos
 
-### Listar Todos los Eventos
-**GET** `/event`
-- **Permisos:** 🔓 Público
-- **Propósito:** Obtener lista completa de eventos
 
 ### Listar Eventos Futuros
 **GET** `/event/future`
@@ -113,6 +137,11 @@
 - **Permisos:** 🔓 Público
 - **Propósito:** Obtener detalles de un evento específico
 - **Parámetros:** `id` (número)
+
+### Listar Todos los Eventos
+**GET** `/event`
+- **Permisos:** 🔒 Autenticado + 👑 Admin
+- **Propósito:** Obtener lista completa de eventos
 
 ### Crear Evento
 **POST** `/event`
@@ -194,31 +223,12 @@
 
 ## 🛒 Gestión de Compras
 
-### Listar Compras
-**GET** `/purchase`
-- **Permisos:** 🔓 Público
-- **Propósito:** Obtener lista de todas las compras
-
-### Obtener Tickets de Compra
-**GET** `/purchase/:id`
-- **Permisos:** 🔓 Público
-- **Propósito:** Obtener tickets asociados a una compra
-- **Parámetros:** `id` (ID de compra)
-
-### Descargar Ticket Individual (PDF)
-**GET** `/purchase/:purchaseId/ticket/:ticketId`
-- **Permisos:** 🔓 Público
-- **Propósito:** Generar y descargar PDF de un ticket específico
-- **Respuesta:** Archivo PDF
-- **Headers de Respuesta:** `Content-Type: application/pdf`, `Content-Disposition: attachment; filename=ticket.pdf`
-- **Parámetros:** `purchaseId`, `ticketId`
-
-### Crear Compra
+### Realizar Compra
 **POST** `/purchase`
-- **Permisos:** 🔓 Público
+- **Permisos:** � Autenticado
 - **Propósito:** Realizar una nueva compra de entradas
 - **Content-Type:** `application/json`
-- **⚠️ Estado:** Validación de esquema deshabilitada
+- **⚠️ Estado:** Validación de esquema deshabilitada temporalmente
 
 ```json
 {
@@ -228,50 +238,76 @@
 }
 ```
 
+### Descargar PDF de Ticket
+**GET** `/purchase/:purchaseId/ticket/:ticketId`
+- **Permisos:** � Autenticado + 👤 Propietario
+- **Propósito:** Generar y descargar PDF de un ticket específico
+- **Respuesta:** Archivo PDF
+- **Headers de Respuesta:** `Content-Type: application/pdf`, `Content-Disposition: attachment; filename=ticket.pdf`
+- **Parámetros:** `purchaseId`, `ticketId`
+- **Verificación:** Solo propietario de la compra o admin pueden descargar
+
+---
+
+## 🛒 Gestión de Compras (Solo Admin)
+
+### Listar Todas las Compras
+**GET** `/purchase`
+- **Permisos:** � Autenticado + 👑 Admin
+- **Propósito:** Obtener lista de todas las compras del sistema
+
+### Obtener Compra por ID
+**GET** `/purchase/:id`
+- **Permisos:** 🔒 Autenticado + 👑 Admin
+- **Propósito:** Obtener detalles y tickets de una compra específica
+- **Parámetros:** `id` (ID de compra)
+
 ### Actualizar Compra
 **PATCH** `/purchase/:id`
-- **Permisos:** 🔓 Público
-- **Propósito:** Modificar compra existente
+- **Permisos:** � Autenticado + 👑 Admin
+- **Propósito:** Modificar compra existente (solo admin)
 - **Parámetros:** `id` (número)
 
 ### Eliminar Compra
 **DELETE** `/purchase/:id`
-- **Permisos:** 🔓 Público
-- **Propósito:** Cancelar/eliminar compra
+- **Permisos:** � Autenticado + 👑 Admin
+- **Propósito:** Cancelar/eliminar compra (solo admin)
 - **Parámetros:** `id` (número)
 
 ---
 
-## 🎫 Gestión de Tickets
+## 🎫 Gestión de Tickets (Solo Admin)
 
-### Listar Tickets
+### Listar Todos los Tickets
 **GET** `/ticket`
-- **Permisos:** 🔓 Público
-- **Propósito:** Obtener lista de todos los tickets
+- **Permisos:** � Autenticado + 👑 Admin
+- **Propósito:** Obtener lista de todos los tickets del sistema
 
 ### Obtener Ticket por ID
 **GET** `/ticket/:id`
-- **Permisos:** 🔓 Público
+- **Permisos:** � Autenticado + 👑 Admin
 - **Propósito:** Obtener detalles de un ticket específico
 - **Parámetros:** `id` (número)
 
-### Crear Ticket
+### Crear Ticket Manualmente
 **POST** `/ticket`
-- **Permisos:** 🔓 Público
-- **Propósito:** Crear nuevo ticket manualmente
+- **Permisos:** � Autenticado + 👑 Admin
+- **Propósito:** Crear nuevo ticket manualmente (generalmente no necesario)
 - **Content-Type:** `application/json`
 
 ### Actualizar Ticket
 **PATCH** `/ticket/:id`
-- **Permisos:** 🔓 Público
+- **Permisos:** � Autenticado + 👑 Admin
 - **Propósito:** Modificar ticket existente
 - **Parámetros:** `id` (número)
 
 ### Eliminar Ticket
 **DELETE** `/ticket/:id`
-- **Permisos:** 🔓 Público
+- **Permisos:** � Autenticado + 👑 Admin
 - **Propósito:** Eliminar ticket
 - **Parámetros:** `id` (número)
+
+**📝 Nota:** Los usuarios regulares acceden a sus tickets a través de `/user/me/purchases/:id/tickets`
 
 ---
 
@@ -397,40 +433,147 @@
 - **Propósito:** Eliminar DJ del sistema
 - **Parámetros:** `id` (número)
 
+### Crear Tipo de Entrada
+**POST** `/ticketType`
+- **Permisos:** � Autenticado + 👑 Admin
+- **Propósito:** Crear nuevo tipo de entrada
+- **Content-Type:** `application/json`
+
+```json
+{
+  "ticket_type_name": "string",
+  "price": "number",
+  "max_quantity": "number",
+  "event": "number" // ID del evento
+}
+```
+
+### Actualizar Tipo de Entrada
+**PATCH** `/ticketType/:id`
+- **Permisos:** 🔒 Autenticado + 👑 Admin
+- **Propósito:** Modificar tipo de entrada existente
+- **Parámetros:** `id` (número)
+
+### Eliminar Tipo de Entrada
+**DELETE** `/ticketType/:id`
+- **Permisos:** 🔒 Autenticado + 👑 Admin
+- **Propósito:** Eliminar tipo de entrada
+- **Parámetros:** `id` (número)
+
 ---
 
-## 🚧 Funcionalidades Incompletas/En Desarrollo
+## 🔄 Flujos de Usuario Típicos
 
-### Validación de Esquemas Deshabilitada
-- **Endpoint:** `POST /purchase`
-- **Issue:** La validación `CreatePurchaseSchema` está comentada
-- **Estado:** 🔧 Pendiente de corrección
+### 📱 Usuario Regular
 
-### Validación de Esquemas Deshabilitada
-- **Endpoint:** `GET /purchase/:purchaseId/ticket/:ticketId`
-- **Issue:** La validación `UpdatePurchaseSchema` está comentada
-- **Estado:** 🔧 Pendiente de corrección
+1. **Registro/Login**
+   ```
+   POST /user/register → POST /user/login
+   ```
+
+2. **Ver eventos y comprar**
+   ```
+   GET /event → GET /event/future → POST /purchase
+   ```
+
+3. **Gestionar mi cuenta**
+   ```
+   GET /user/me → PATCH /user/me
+   ```
+
+4. **Ver mis compras**
+   ```
+   GET /user/me/purchases → GET /user/me/purchases/:id/tickets
+   ```
+
+5. **Descargar ticket**
+   ```
+   GET /purchase/:purchaseId/ticket/:ticketId
+   ```
+
+### 👑 Administrador
+
+1. **Gestión de contenido**
+   ```
+   POST /event → POST /ticketType → POST /location
+   ```
+
+2. **Gestión de usuarios**
+   ```
+   GET /user → GET /user/:id → PATCH /user/:id
+   ```
+
+3. **Gestión de compras**
+   ```
+   GET /purchase → GET /purchase/:id
+   ```
 
 ---
 
-## 📋 Notas Importantes
+## 🚨 Códigos de Error Comunes
+
+- **400 Bad Request:** Datos de entrada inválidos
+- **401 Unauthorized:** Token JWT faltante o inválido  
+- **403 Forbidden:** Sin permisos suficientes
+- **404 Not Found:** Recurso no encontrado
+- **409 Conflict:** Email ya existe (registro)
+- **500 Internal Server Error:** Error del servidor
+
+---
+
+## 📋 Notas de Seguridad
+
+### ✅ Implementado
+- **JWT Authentication** en todas las rutas protegidas
+- **Verificación de propiedad** en recursos de usuario
+- **Separación admin/usuario** en endpoints
+- **Validación de esquemas** con Zod
+- **Verificación de propietario** para descargas de PDF
+
+### 🔐 Headers Requeridos
+```
+Authorization: Bearer <jwt_token>
+Content-Type: application/json
+```
+
+### 📝 Endpoints sin validación temporal
+- `POST /purchase` (schema comentado)
+- `GET /purchase/:purchaseId/ticket/:ticketId` (schema comentado)
+
+---
+
+## 🚧 Funcionalidades Pendientes
+
+### Validación de Esquemas
+- **POST /purchase:** CreatePurchaseSchema comentado
+- **GET /purchase/:purchaseId/ticket/:ticketId:** UpdatePurchaseSchema comentado
+
+### Mejoras Sugeridas
+- Implementar rate limiting
+- Agregar logs de auditoría
+- Notificaciones por email automáticas
+- Sistema de roles más granular
+
+---
+
+## � Información Técnica
 
 ### Autenticación JWT
-- **Header requerido:** `Authorization: Bearer <token>`
+- **Header:** `Authorization: Bearer <token>`
 - **Expiración:** 1 hora
-- **Payload incluye:** `id`, `email`, `isAdmin`
+- **Payload:** `{id, email, isAdmin}`
 
 ### Subida de Archivos
-- **Eventos:** Soportan subida de imagen de portada
+- **Eventos:** Imagen de portada opcional
 - **Formato:** `multipart/form-data`
-- **Campo:** Imagen en el campo de archivo del formulario
+- **Almacenamiento:** `/public/uploads/`
 
 ### Generación de PDFs
-- Los tickets se pueden descargar como PDF individuales
-- Incluyen códigos QR para validación
-- Formato: `Content-Type: application/pdf`
+- **Biblioteca:** PDFKit + QRCode
+- **Incluye:** QR único, datos del evento, ticket info
+- **Seguridad:** Solo propietario o admin
 
-### Estructura de Respuestas
+### Estructura de Respuesta
 ```json
 {
   "message": "string",
@@ -438,8 +581,20 @@
 }
 ```
 
-### Códigos de Estado HTTP
-- **200:** Operación exitosa
+### Códigos HTTP
+- **200:** Éxito
+- **201:** Creado
+- **400:** Request inválido
+- **401:** No autenticado  
+- **403:** Sin permisos
+- **404:** No encontrado
+- **409:** Conflicto (email duplicado)
+- **500:** Error servidor
+
+---
+
+**🎯 Documentación actualizada - API v2.0 con seguridad mejorada**
+**📅 Última actualización: Septiembre 2025**
 - **201:** Recurso creado exitosamente
 - **400:** Error en los datos enviados
 - **401:** No autorizado (token inválido/faltante)

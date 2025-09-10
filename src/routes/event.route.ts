@@ -18,11 +18,11 @@ export const createEventRouter = ({
   const eventController = new EventController(eventModel);
   
   // Rutas públicas
-  eventRouter.get("/", eventController.getAll);
   eventRouter.get("/future", eventController.getFutureEvents); // Nueva ruta para eventos futuros
   eventRouter.get("/:id", schemaValidator(UpdateEventSchema), eventController.getById);
   
   // Rutas protegidas (requieren autenticación y admin)
+  eventRouter.get("/", verifyToken, isAdmin, eventController.getAll);
   eventRouter.post("/", verifyToken, isAdmin, uploader, schemaValidator(CreateEventSchema), eventController.create);
   eventRouter.patch("/:id", verifyToken, isAdmin, uploader, schemaValidator(UpdateEventSchema), eventController.update);
   eventRouter.delete("/:id", verifyToken, isAdmin, schemaValidator(UpdateEventSchema), eventController.delete);

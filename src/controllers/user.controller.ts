@@ -78,5 +78,21 @@ export class UserController extends BaseController<User> {
     return res.status(200).send({ message: "Account deleted successfully" });
   });
 
+  getCurrentUserPurchaseTickets = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const userId = req.user?.id;
+    const purchaseId = req.params.id;
+    
+    // Obtener la compra específica y verificar que pertenece al usuario
+    const userPurchases = await this.model.getUserPurchases(userId!.toString());
+    const purchase = userPurchases?.find(p => p.id?.toString() === purchaseId);
+    
+    if (!purchase) {
+      throwError.notFound("Purchase not found or doesn't belong to you");
+    }
+    
+    // Devolver solo los tickets de esta compra
+    return res.status(200).send({ data: (purchase as any).ticket || [] });
+  });
+
 }
 

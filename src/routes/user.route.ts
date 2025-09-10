@@ -5,7 +5,7 @@ import { CreateUserSchema, UpdateUserSchema } from "../schemas/user.schema.js";
 import type{ IModel } from "../interfaces/model.interface.js";
 import type { User } from "../entities/user.entity.js";
 import type { IUserModel } from "../interfaces/user.interface.js";
-import { isAdmin, requireOwnerOrAdmin, verifyToken } from "../middlewares/auth.js";
+import { isAdmin, verifyToken } from "../middlewares/auth.js";
 
 export const userRouter = Router();
 
@@ -22,16 +22,17 @@ export const createUserRouter = ({
 
   // Rutas del usuario actual (requieren solo autenticación)
   userRouter.get("/me", verifyToken, userController.getCurrentUser);
-  userRouter.get("/me/purchase", verifyToken, userController.getCurrentUserPurchases);
+  userRouter.get("/me/purchases", verifyToken, userController.getCurrentUserPurchases);
+  userRouter.get("/me/purchases/:id/tickets", verifyToken, userController.getCurrentUserPurchaseTickets);
   userRouter.patch("/me", verifyToken, schemaValidator(UpdateUserSchema), userController.updateCurrentUser);
   userRouter.delete("/me", verifyToken, userController.deleteCurrentUser);
 
-  // Rutas administrativas (requieren autenticación + admin)
+  // Rutas administrativas (solo admin puede gestionar otros usuarios)
   userRouter.get("/", verifyToken, isAdmin, userController.getAll);
   userRouter.post("/", verifyToken, isAdmin, schemaValidator(CreateUserSchema), userController.create);
-  userRouter.get("/:id", verifyToken, requireOwnerOrAdmin, schemaValidator(UpdateUserSchema), userController.getById);
-  userRouter.patch("/:id", verifyToken, requireOwnerOrAdmin, schemaValidator(UpdateUserSchema), userController.update);
-  userRouter.delete("/:id", verifyToken, requireOwnerOrAdmin, schemaValidator(UpdateUserSchema), userController.delete);
+  userRouter.get("/:id", verifyToken, isAdmin, schemaValidator(UpdateUserSchema), userController.getById);
+  userRouter.patch("/:id", verifyToken, isAdmin, schemaValidator(UpdateUserSchema), userController.update);
+  userRouter.delete("/:id", verifyToken, isAdmin, schemaValidator(UpdateUserSchema), userController.delete);
 
   return userRouter;
 };
