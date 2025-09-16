@@ -27,6 +27,7 @@ export class PurchaseController extends BaseController<Purchase> {
       ticketNumbers: item?.ticketNumbers,
       paymentStatus: item?.paymentStatus,
       discountApplied: item?.discountApplied,
+      serviceFee: item?.serviceFee,
       totalPrice: item?.totalPrice,
       userId: item?.user.id,
       ticketTypeId: item?.ticketType.id,

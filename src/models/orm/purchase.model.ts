@@ -38,11 +38,18 @@ export class PurchaseModel extends BaseModel<Purchase> {
     console.log("availableTickets", ticketType.availableTickets);
 
     this.em.assign(ticketType, { availableTickets: newStockTickets });
-    const totalPrice = ticketType.price * ticketQuantity;
+    
+    // Calcular pricing con cargo de servicio
+    const subtotal = ticketType.price * ticketQuantity;
+    const serviceFeePercentage = Number.parseFloat(process.env.SERVICE_FEE_PERCENTAGE || '0.1');
+    const serviceFee = subtotal * serviceFeePercentage;
+    const totalPrice = subtotal + serviceFee;
+    
     const purchaseActual = this.em.create(Purchase, {
       ticketNumbers: ticketQuantity,
       paymentStatus: "Approved",
       discountApplied: 0,
+      serviceFee: serviceFee,
       user: actualUser,
       ticketType: ticketType,
       totalPrice: totalPrice,

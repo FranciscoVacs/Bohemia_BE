@@ -3,6 +3,7 @@ import { z } from "zod";
 export const CreatePurchaseSchema = z.object({
   body: z.object({
     discountApplied: z.number().optional(),
+    serviceFee: z.number().optional(),
     ticketQuantity: z.number().int().positive(),
     totalPrice: z.number().optional(),
     userId: z.number().int().positive(),
@@ -15,6 +16,7 @@ export const UpdatePurchaseSchema = z.object({
   body: z
     .object({
       discountApplied: z.number().optional(),
+      serviceFee: z.number().optional(),
       ticketQuantity: z.number().int().positive().optional(),
       totalPrice: z.number().optional(),
       userId: z.number().int().positive().optional(),

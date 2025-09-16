@@ -18,6 +18,9 @@ export class Purchase extends BaseEntity {
     @Property({ default: 0, fieldName: 'discount_applied' })
     discountApplied!: number;
 
+    @Property({ default: 0, fieldName: 'service_fee' })
+    serviceFee!: number;
+
     @Property({ default: 0, fieldName: 'total_price' })
     totalPrice!: number;
 
