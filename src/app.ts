@@ -18,6 +18,7 @@ import dotenv from "dotenv";
 import path from "node:path";
 import { fileURLToPath } from 'node:url';
 import type { Express } from "express";
+import { createGalleryRouter } from "./routes/gallery.route.js";
 
 /**
  * Clase principal de la aplicación
@@ -103,6 +104,10 @@ export class App {
     this.express.use("/api/dj", createDjRouter({ 
       djModel: this.container.getDjModel() 
     }));
+    this.express.use("/api/gallery", createGalleryRouter({ 
+    galleryModel: this.container.getGalleryModel(),
+    eventModel: this.container.getEventModel() 
+}));
   }
 
   /**

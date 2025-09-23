@@ -34,7 +34,6 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction) => 
         const secretKey = process.env.JWT_TOKEN_SECRET || 'tokentest';
         const decoded = jsonwebtoken.verify(token, secretKey) as unknown as JWTPayload;
         req.user = decoded;
-        console.log(decoded);
         next();
     }
     catch(error) {
