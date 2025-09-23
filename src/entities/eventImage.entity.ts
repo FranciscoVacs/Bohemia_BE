@@ -3,7 +3,7 @@ import { BaseEntity } from "../shared/db/baseEntity.entity.js";
 import { Event } from "./event.entity.js"; // Ajusta la ruta según tu estructura
 
 @Entity()
-export class Gallery extends BaseEntity {
+export class EventImage extends BaseEntity {
     @Property({ length: 255 })
     cloudinaryUrl!: string; // URL pública para mostrar la imagen
 

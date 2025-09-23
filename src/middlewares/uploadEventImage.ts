@@ -4,7 +4,7 @@ import cloudinary from "../config/cloudinaryConfig.js";
 import path from "node:path";
 import {Request} from "express";
 
-export const uploadGallery = (folderName: string) => {
+export const uploadEventImage = (folderName: string) => {
     const storage = new CloudinaryStorage({
         cloudinary: cloudinary,
         params: (req: Request, file: Express.Multer.File) => {
@@ -24,4 +24,4 @@ export const uploadGallery = (folderName: string) => {
     });
 };
 
-export default uploadGallery;
+export default uploadEventImage;
