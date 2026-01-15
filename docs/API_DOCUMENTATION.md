@@ -5,13 +5,68 @@
 **Base URL:** `http://localhost:3000/api`
 **Versión:** 2.1
 **Autenticación:** JWT Bearer Token
-**Última actualización:** Septiembre 2025
+**Última actualización:** Enero 2026
 
 ### 🔐 Tipos de Permisos
 - **🔓 Público:** No requiere autenticación
 - **🔒 Autenticado:** Requiere token JWT válido
 - **👑 Admin:** Requiere token JWT válido + permisos de administrador
 - **👤 Propietario:** Solo el propietario del recurso o admin
+
+### 📦 Estructura de Respuesta Estándar
+
+Todas las respuestas de la API siguen esta estructura:
+
+```json
+{
+  "message": "Descripción de la operación",
+  "data": { } // objeto o array con los datos
+}
+```
+
+**Ejemplos de respuestas:**
+
+```json
+// GET /api/event (lista)
+{
+  "message": "Find all items",
+  "data": [
+    {
+      "id": 1,
+      "eventName": "Fiesta Bohemia",
+      "beginDatetime": "2026-02-14T20:00:00.000Z",
+      ...
+    }
+  ]
+}
+
+// GET /api/event/:id (único)
+{
+  "message": "Item found",
+  "data": {
+    "id": 1,
+    "eventName": "Fiesta Bohemia",
+    ...
+  }
+}
+
+// POST (crear)
+{
+  "message": "Item created",
+  "data": { ... }
+}
+
+// PATCH (actualizar)
+{
+  "message": "Item updated",
+  "data": { ... }
+}
+
+// DELETE (eliminar)
+{
+  "message": "Item deleted"
+}
+```
 
 ### 🚀 Cambios Principales v2.1
 - **🖼️ Nuevos endpoints `/api/event-images` (reemplaza `/api/gallery`)**
@@ -32,13 +87,29 @@
 - **Propósito:** Crear una nueva cuenta de usuario
 - **Content-Type:** `application/json`
 
+**Request Body:**
 ```json
 {
   "userName": "string",
   "userSurname": "string",
   "email": "string",
-  "password": "string",
-  "birthDate": "YYYY-MM-DD"
+  "password": "string (mín 8 caracteres, mayúscula, minúscula y número)",
+  "birthDate": "YYYY-MM-DD HH:MM:SS"
+}
+```
+
+**Response:**
+```json
+{
+  "message": "User created",
+  "data": {
+    "id": 1,
+    "userName": "Juan",
+    "userSurname": "Pérez",
+    "email": "juan@email.com",
+    "birthDate": "1990-05-15 00:00:00",
+    "isAdmin": false
+  }
 }
 ```
 
@@ -47,14 +118,27 @@
 - **Permisos:** 🔓 Público
 - **Propósito:** Autenticar usuario y obtener token JWT
 - **Content-Type:** `application/json`
-- **Headers de Respuesta:** `token: Bearer <jwt_token>`
 
+**Request Body:**
 ```json
 {
   "email": "string",
   "password": "string"
 }
 ```
+
+**Response:**
+```json
+{
+  "message": "Login successful",
+  "data": {
+    "id": 1,
+    "email": "juan@email.com",
+    "isAdmin": false
+  }
+}
+```
+- **Headers de Respuesta:** `token: Bearer <jwt_token>`
 
 ---
 
@@ -63,32 +147,55 @@
 ### Obtener Mi Información
 **GET** `/user/me`
 - **Permisos:** 🔒 Autenticado
-- **Propósito:** Obtener información del usuario autenticado
 - **Headers:** `Authorization: Bearer <token>`
+
+**Response:**
+```json
+{
+  "message": "Item found",
+  "data": {
+    "id": 1,
+    "userName": "Juan",
+    "userSurname": "Pérez",
+    "email": "juan@email.com",
+    "birthDate": "1990-05-15T00:00:00.000Z",
+    "isAdmin": false
+  }
+}
+```
 
 ### Obtener Mis Compras
 **GET** `/user/me/purchases`
 - **Permisos:** 🔒 Autenticado
-- **Propósito:** Obtener lista de compras del usuario autenticado
-- **Respuesta:** Lista de compras con información básica
+
+**Response:**
+```json
+{
+  "message": "Purchases found",
+  "data": [
+    {
+      "id": 1,
+      "purchaseDate": "2026-01-15T10:30:00.000Z",
+      "ticketQuantity": 2,
+      "totalPrice": 5000
+    }
+  ]
+}
+```
 
 ### Ver Tickets de una Compra Mía
 **GET** `/user/me/purchases/:id/tickets`
-- **Permisos:** � Autenticado
-- **Propósito:** Obtener tickets de una compra específica del usuario
+- **Permisos:** 🔒 Autenticado
 - **Parámetros:** `id` (ID de compra)
-- **Verificación:** Solo compras que pertenecen al usuario autenticado
 
 ### Actualizar Mi Información
 **PATCH** `/user/me`
 - **Permisos:** 🔒 Autenticado
-- **Propósito:** Modificar información del usuario autenticado
 - **Content-Type:** `application/json`
 
 ### Eliminar Mi Cuenta
 **DELETE** `/user/me`
 - **Permisos:** 🔒 Autenticado
-- **Propósito:** Eliminar cuenta del usuario autenticado
 
 ---
 
@@ -97,129 +204,239 @@
 ### Listar Todos los Usuarios
 **GET** `/user`
 - **Permisos:** 🔒 Autenticado + 👑 Admin
-- **Propósito:** Obtener lista de todos los usuarios registrados
+
+**Response:**
+```json
+{
+  "message": "Find all items",
+  "data": [
+    {
+      "id": 1,
+      "userName": "Juan",
+      "userSurname": "Pérez",
+      "email": "juan@email.com",
+      "birthDate": "1990-05-15T00:00:00.000Z",
+      "isAdmin": false
+    }
+  ]
+}
+```
 
 ### Crear Usuario Manualmente
 **POST** `/user`
-- **Permisos:** � Autenticado + 👑 Admin
-- **Propósito:** Crear usuario manualmente (como admin)
+- **Permisos:** 🔒 Autenticado + 👑 Admin
 - **Content-Type:** `application/json`
 
 ### Obtener Usuario por ID
 **GET** `/user/:id`
-- **Permisos:** � Autenticado + 👑 Admin
-- **Propósito:** Obtener información de cualquier usuario (solo admin)
+- **Permisos:** 🔒 Autenticado + 👑 Admin
 - **Parámetros:** `id` (número)
 
 ### Actualizar Usuario por ID
 **PATCH** `/user/:id`
-- **Permisos:** � Autenticado + 👑 Admin
-- **Propósito:** Modificar información de cualquier usuario (solo admin)
+- **Permisos:** 🔒 Autenticado + 👑 Admin
 - **Parámetros:** `id` (número)
 - **Content-Type:** `application/json`
 
 ### Eliminar Usuario por ID
 **DELETE** `/user/:id`
-- **Permisos:** � Autenticado + 👑 Admin
-- **Propósito:** Eliminar cualquier cuenta (solo admin)
+- **Permisos:** 🔒 Autenticado + 👑 Admin
 - **Parámetros:** `id` (número)
 
 ---
 
 ## 🎉 Gestión de Eventos
 
-
 ### Listar Eventos Futuros
 **GET** `/event/future`
 - **Permisos:** 🔓 Público
 - **Propósito:** Obtener solo eventos que no han terminado (futuros y en curso)
-- **Nota:** ⭐ Funcionalidad especializada
+
+**Response:**
+```json
+{
+  "message": "Eventos futuros obtenidos exitosamente",
+  "data": [
+    {
+      "id": 1,
+      "eventName": "Fiesta Bohemia",
+      "beginDatetime": "2026-02-14T20:00:00.000Z",
+      "finishDatetime": "2026-02-15T04:00:00.000Z",
+      "eventDescription": "La mejor fiesta del año",
+      "minAge": 18,
+      "coverPhoto": "http://localhost:3000/public/uploads/1234_foto.jpg",
+      "ticketsOnSale": 100,
+      "location": { "id": 1, "locationName": "Club Bohemia", ... },
+      "dj": { "id": 1, "djName": "DJ", "djApodo": "Beats", ... }
+    }
+  ],
+  "count": 1,
+  "note": "Incluye eventos en curso y futuros (hasta que terminen)"
+}
+```
 
 ### Obtener Evento por ID
 **GET** `/event/:id`
 - **Permisos:** 🔓 Público
-- **Propósito:** Obtener detalles de un evento específico
 - **Parámetros:** `id` (número)
+
+**Response:**
+```json
+{
+  "message": "Item found",
+  "data": {
+    "id": 1,
+    "eventName": "Fiesta Bohemia",
+    "beginDatetime": "2026-02-14T20:00:00.000Z",
+    "finishDatetime": "2026-02-15T04:00:00.000Z",
+    "eventDescription": "La mejor fiesta del año",
+    "minAge": 18,
+    "coverPhoto": "http://localhost:3000/public/uploads/1234_foto.jpg",
+    "ticketsOnSale": 100,
+    "location": { ... },
+    "dj": { ... }
+  }
+}
+```
 
 ### Listar Todos los Eventos
 **GET** `/event`
 - **Permisos:** 🔒 Autenticado + 👑 Admin
-- **Propósito:** Obtener lista completa de eventos
 
 ### Crear Evento
 **POST** `/event`
 - **Permisos:** 🔒 Autenticado + 👑 Admin
-- **Propósito:** Crear un nuevo evento
 - **Content-Type:** `multipart/form-data`
-- **Archivo:** Imagen de portada (opcional)
+- **Archivo:** `cover_photo` (imagen jpg/jpeg/png, máx 5MB) - **REQUERIDO**
 
+**Request Body (form-data):**
+| Campo | Tipo | Descripción |
+|-------|------|-------------|
+| `eventName` | string | Nombre del evento (máx 100 caracteres) |
+| `beginDatetime` | string | Fecha inicio `YYYY-MM-DD HH:MM:SS` (debe ser futura) |
+| `finishDatetime` | string | Fecha fin `YYYY-MM-DD HH:MM:SS` (debe ser posterior a beginDatetime) |
+| `eventDescription` | string | Descripción del evento (máx 100 caracteres) |
+| `minAge` | number | Edad mínima requerida |
+| `location` | number | ID de la ubicación |
+| `dj` | number | ID del DJ |
+| `cover_photo` | file | Imagen de portada (jpg/jpeg/png) |
+
+**Response:**
 ```json
 {
-  "event_name": "string",
-  "begin_datetime": "YYYY-MM-DD HH:MM:SS",
-  "finish_datetime": "YYYY-MM-DD HH:MM:SS",
-  "event_description": "string",
-  "min_age": "number",
-  "location": "number", // ID de location
-  "dj": "number" // ID de DJ
+  "message": "Evento creado exitosamente",
+  "data": {
+    "id": 1,
+    "eventName": "Fiesta Bohemia",
+    "beginDatetime": "2026-02-14T20:00:00.000Z",
+    "finishDatetime": "2026-02-15T04:00:00.000Z",
+    "eventDescription": "La mejor fiesta del año",
+    "minAge": 18,
+    "coverPhoto": "http://localhost:3000/public/uploads/1705312345_foto.jpg",
+    "ticketsOnSale": 0,
+    "location": 1,
+    "dj": 1
+  }
 }
 ```
 
 ### Actualizar Evento
 **PATCH** `/event/:id`
 - **Permisos:** 🔒 Autenticado + 👑 Admin
-- **Propósito:** Modificar evento existente
 - **Content-Type:** `multipart/form-data`
-- **Archivo:** Nueva imagen de portada (opcional)
+- **Archivo:** `cover_photo` (opcional - nueva imagen de portada)
 - **Parámetros:** `id` (número)
 
 ### Eliminar Evento
 **DELETE** `/event/:id`
 - **Permisos:** 🔒 Autenticado + 👑 Admin
-- **Propósito:** Eliminar evento
 - **Parámetros:** `id` (número)
 
 ---
 
 ## 🎫 Gestión de Tipos de Entrada
 
-### Listar Tipos de Entrada
+### Listar Tipos de Entrada de un Evento
 **GET** `/event/:eventId/ticketType`
 - **Permisos:** 🔓 Público
-- **Propósito:** Obtener tipos de entrada para un evento
 - **Parámetros:** `eventId` (ID del evento)
+
+**Response:**
+```json
+{
+  "message": "Find all items",
+  "data": [
+    {
+      "id": 1,
+      "ticketTypeName": "General",
+      "beginDatetime": "2026-01-01T00:00:00.000Z",
+      "finishDatetime": "2026-02-14T18:00:00.000Z",
+      "price": 2500,
+      "maxQuantity": 100,
+      "availableTickets": 85,
+      "event": 1
+    },
+    {
+      "id": 2,
+      "ticketTypeName": "VIP",
+      "beginDatetime": "2026-01-01T00:00:00.000Z",
+      "finishDatetime": "2026-02-14T18:00:00.000Z",
+      "price": 5000,
+      "maxQuantity": 20,
+      "availableTickets": 15,
+      "event": 1
+    }
+  ]
+}
+```
 
 ### Obtener Tipo de Entrada por ID
 **GET** `/event/:eventId/ticketType/:id`
 - **Permisos:** 🔓 Público
-- **Propósito:** Obtener detalles de un tipo de entrada específico
 - **Parámetros:** `eventId`, `id`
 
 ### Crear Tipo de Entrada
 **POST** `/event/:eventId/ticketType`
 - **Permisos:** 🔒 Autenticado + 👑 Admin
-- **Propósito:** Crear nuevo tipo de entrada para un evento
 - **Content-Type:** `application/json`
 
+**Request Body:**
 ```json
 {
-  "ticket_type_name": "string",
-  "price": "number",
-  "max_quantity": "number",
-  "event": "number" // ID del evento
+  "ticketTypeName": "string (máx 100 caracteres)",
+  "beginDatetime": "YYYY-MM-DD HH:MM:SS",
+  "finishDatetime": "YYYY-MM-DD HH:MM:SS",
+  "price": "number (entero positivo)",
+  "maxQuantity": "number (entero positivo)",
+  "event": "number (ID del evento)"
+}
+```
+
+**Response:**
+```json
+{
+  "message": "Item created",
+  "data": {
+    "id": 1,
+    "ticketTypeName": "General",
+    "beginDatetime": "2026-01-01T00:00:00.000Z",
+    "finishDatetime": "2026-02-14T18:00:00.000Z",
+    "price": 2500,
+    "maxQuantity": 100,
+    "availableTickets": 100,
+    "event": 1
+  }
 }
 ```
 
 ### Actualizar Tipo de Entrada
 **PATCH** `/event/:eventId/ticketType/:id`
 - **Permisos:** 🔒 Autenticado + 👑 Admin
-- **Propósito:** Modificar tipo de entrada existente
 - **Parámetros:** `eventId`, `id`
 
 ### Eliminar Tipo de Entrada
 **DELETE** `/event/:eventId/ticketType/:id`
 - **Permisos:** 🔒 Autenticado + 👑 Admin
-- **Propósito:** Eliminar tipo de entrada
 - **Parámetros:** `eventId`, `id`
 
 ---
@@ -228,11 +445,11 @@
 
 ### Realizar Compra
 **POST** `/purchase`
-- **Permisos:** � Autenticado
-- **Propósito:** Realizar una nueva compra de entradas
+- **Permisos:** 🔒 Autenticado
 - **Content-Type:** `application/json`
 - **⚠️ Estado:** Validación de esquema deshabilitada temporalmente
 
+**Request Body:**
 ```json
 {
   "ticketTypeId": "number",
@@ -241,14 +458,29 @@
 }
 ```
 
+**Response:**
+```json
+{
+  "message": "Purchase created",
+  "data": {
+    "id": 1,
+    "purchaseDate": "2026-01-15T10:30:00.000Z",
+    "ticketQuantity": 2,
+    "totalPrice": 5000,
+    "ticketType": 1,
+    "user": 1
+  }
+}
+```
+
 ### Descargar PDF de Ticket
 **GET** `/purchase/:purchaseId/ticket/:ticketId`
-- **Permisos:** � Autenticado + 👤 Propietario
-- **Propósito:** Generar y descargar PDF de un ticket específico
-- **Respuesta:** Archivo PDF
-- **Headers de Respuesta:** `Content-Type: application/pdf`, `Content-Disposition: attachment; filename=ticket.pdf`
+- **Permisos:** 🔒 Autenticado + 👤 Propietario
 - **Parámetros:** `purchaseId`, `ticketId`
-- **Verificación:** Solo propietario de la compra o admin pueden descargar
+- **Respuesta:** Archivo PDF
+- **Headers de Respuesta:** 
+  - `Content-Type: application/pdf`
+  - `Content-Disposition: attachment; filename=ticket.pdf`
 
 ---
 
@@ -256,25 +488,38 @@
 
 ### Listar Todas las Compras
 **GET** `/purchase`
-- **Permisos:** � Autenticado + 👑 Admin
-- **Propósito:** Obtener lista de todas las compras del sistema
+- **Permisos:** 🔒 Autenticado + 👑 Admin
+
+**Response:**
+```json
+{
+  "message": "Find all items",
+  "data": [
+    {
+      "id": 1,
+      "purchaseDate": "2026-01-15T10:30:00.000Z",
+      "ticketQuantity": 2,
+      "totalPrice": 5000,
+      "ticketType": { ... },
+      "user": { ... }
+    }
+  ]
+}
+```
 
 ### Obtener Compra por ID
 **GET** `/purchase/:id`
 - **Permisos:** 🔒 Autenticado + 👑 Admin
-- **Propósito:** Obtener detalles y tickets de una compra específica
 - **Parámetros:** `id` (ID de compra)
 
 ### Actualizar Compra
 **PATCH** `/purchase/:id`
-- **Permisos:** � Autenticado + 👑 Admin
-- **Propósito:** Modificar compra existente (solo admin)
+- **Permisos:** 🔒 Autenticado + 👑 Admin
 - **Parámetros:** `id` (número)
 
 ### Eliminar Compra
 **DELETE** `/purchase/:id`
-- **Permisos:** � Autenticado + 👑 Admin
-- **Propósito:** Cancelar/eliminar compra (solo admin)
+- **Permisos:** 🔒 Autenticado + 👑 Admin
 - **Parámetros:** `id` (número)
 
 ---
@@ -283,31 +528,26 @@
 
 ### Listar Todos los Tickets
 **GET** `/ticket`
-- **Permisos:** � Autenticado + 👑 Admin
-- **Propósito:** Obtener lista de todos los tickets del sistema
+- **Permisos:** 🔒 Autenticado + 👑 Admin
 
 ### Obtener Ticket por ID
 **GET** `/ticket/:id`
-- **Permisos:** � Autenticado + 👑 Admin
-- **Propósito:** Obtener detalles de un ticket específico
+- **Permisos:** 🔒 Autenticado + 👑 Admin
 - **Parámetros:** `id` (número)
 
 ### Crear Ticket Manualmente
 **POST** `/ticket`
-- **Permisos:** � Autenticado + 👑 Admin
-- **Propósito:** Crear nuevo ticket manualmente (generalmente no necesario)
+- **Permisos:** 🔒 Autenticado + 👑 Admin
 - **Content-Type:** `application/json`
 
 ### Actualizar Ticket
 **PATCH** `/ticket/:id`
-- **Permisos:** � Autenticado + 👑 Admin
-- **Propósito:** Modificar ticket existente
+- **Permisos:** 🔒 Autenticado + 👑 Admin
 - **Parámetros:** `id` (número)
 
 ### Eliminar Ticket
 **DELETE** `/ticket/:id`
-- **Permisos:** � Autenticado + 👑 Admin
-- **Propósito:** Eliminar ticket
+- **Permisos:** 🔒 Autenticado + 👑 Admin
 - **Parámetros:** `id` (número)
 
 **📝 Nota:** Los usuarios regulares acceden a sus tickets a través de `/user/me/purchases/:id/tickets`
@@ -319,39 +559,70 @@
 ### Listar Ubicaciones
 **GET** `/location`
 - **Permisos:** 🔓 Público
-- **Propósito:** Obtener lista de todas las locaciones
+
+**Response:**
+```json
+{
+  "message": "Find all items",
+  "data": [
+    {
+      "id": 1,
+      "locationName": "Club Bohemia",
+      "address": "Av. Corrientes 1234",
+      "maxCapacity": 500,
+      "city": {
+        "id": 1,
+        "cityName": "Buenos Aires",
+        "province": "Buenos Aires",
+        "zipCode": 1000
+      }
+    }
+  ]
+}
+```
 
 ### Obtener Ubicación por ID
 **GET** `/location/:id`
 - **Permisos:** 🔓 Público
-- **Propósito:** Obtener detalles de una ubicación específica
 - **Parámetros:** `id` (número)
 
 ### Crear Ubicación
 **POST** `/location`
 - **Permisos:** 🔒 Autenticado + 👑 Admin
-- **Propósito:** Crear nueva ubicación/venue
 - **Content-Type:** `application/json`
 
+**Request Body:**
 ```json
 {
-  "location_name": "string",
-  "address": "string",
-  "capacity": "number",
-  "city": "number" // ID de ciudad
+  "locationName": "string (máx 100 caracteres)",
+  "address": "string (máx 100 caracteres, único)",
+  "maxCapacity": "number (entero positivo)",
+  "city": "number (ID de ciudad)"
+}
+```
+
+**Response:**
+```json
+{
+  "message": "Item created",
+  "data": {
+    "id": 1,
+    "locationName": "Club Bohemia",
+    "address": "Av. Corrientes 1234",
+    "maxCapacity": 500,
+    "city": 1
+  }
 }
 ```
 
 ### Actualizar Ubicación
 **PATCH** `/location/:id`
 - **Permisos:** 🔒 Autenticado + 👑 Admin
-- **Propósito:** Modificar ubicación existente
 - **Parámetros:** `id` (número)
 
 ### Eliminar Ubicación
 **DELETE** `/location/:id`
 - **Permisos:** 🔒 Autenticado + 👑 Admin
-- **Propósito:** Eliminar ubicación
 - **Parámetros:** `id` (número)
 
 ---
@@ -361,38 +632,68 @@
 ### Listar Ciudades
 **GET** `/city`
 - **Permisos:** 🔓 Público
-- **Propósito:** Obtener lista de todas las ciudades
+
+**Response:**
+```json
+{
+  "message": "Find all items",
+  "data": [
+    {
+      "id": 1,
+      "cityName": "Buenos Aires",
+      "province": "Buenos Aires",
+      "zipCode": 1000
+    },
+    {
+      "id": 2,
+      "cityName": "Córdoba",
+      "province": "Córdoba",
+      "zipCode": 5000
+    }
+  ]
+}
+```
 
 ### Obtener Ciudad por ID
 **GET** `/city/:id`
 - **Permisos:** 🔓 Público
-- **Propósito:** Obtener detalles de una ciudad específica
 - **Parámetros:** `id` (número)
 
 ### Crear Ciudad
 **POST** `/city`
 - **Permisos:** 🔒 Autenticado + 👑 Admin
-- **Propósito:** Agregar nueva ciudad al sistema
 - **Content-Type:** `application/json`
 
+**Request Body:**
 ```json
 {
-  "city_name": "string",
-  "state": "string",
-  "country": "string"
+  "cityName": "string (máx 100 caracteres, único)",
+  "province": "string (máx 100 caracteres)",
+  "zipCode": "number (entero positivo)"
+}
+```
+
+**Response:**
+```json
+{
+  "message": "Item created",
+  "data": {
+    "id": 1,
+    "cityName": "Buenos Aires",
+    "province": "Buenos Aires",
+    "zipCode": 1000
+  }
 }
 ```
 
 ### Actualizar Ciudad
 **PATCH** `/city/:id`
 - **Permisos:** 🔒 Autenticado + 👑 Admin
-- **Propósito:** Modificar ciudad existente
 - **Parámetros:** `id` (número)
 
 ### Eliminar Ciudad
 **DELETE** `/city/:id`
 - **Permisos:** 🔒 Autenticado + 👑 Admin
-- **Propósito:** Eliminar ciudad
 - **Parámetros:** `id` (número)
 
 ---
@@ -402,66 +703,143 @@
 ### Listar DJs
 **GET** `/dj`
 - **Permisos:** 🔓 Público
-- **Propósito:** Obtener lista de todos los DJs
+
+**Response:**
+```json
+{
+  "message": "Find all items",
+  "data": [
+    {
+      "id": 1,
+      "djName": "Carlos",
+      "djSurname": "González",
+      "djApodo": "DJ Beats"
+    }
+  ]
+}
+```
 
 ### Obtener DJ por ID
 **GET** `/dj/:id`
 - **Permisos:** 🔓 Público
-- **Propósito:** Obtener detalles de un DJ específico
 - **Parámetros:** `id` (número)
 
 ### Crear DJ
 **POST** `/dj`
 - **Permisos:** 🔒 Autenticado + 👑 Admin
-- **Propósito:** Agregar nuevo DJ al sistema
 - **Content-Type:** `application/json`
 
+**Request Body:**
 ```json
 {
-  "dj_name": "string",
-  "genre": "string",
-  "description": "string"
+  "djName": "string (máx 100 caracteres)",
+  "djSurname": "string (máx 100 caracteres)",
+  "djApodo": "string"
+}
+```
+
+**Response:**
+```json
+{
+  "message": "Item created",
+  "data": {
+    "id": 1,
+    "djName": "Carlos",
+    "djSurname": "González",
+    "djApodo": "DJ Beats"
+  }
 }
 ```
 
 ### Actualizar DJ
 **PATCH** `/dj/:id`
 - **Permisos:** 🔒 Autenticado + 👑 Admin
-- **Propósito:** Modificar información de DJ
 - **Parámetros:** `id` (número)
 
 ### Eliminar DJ
 **DELETE** `/dj/:id`
 - **Permisos:** 🔒 Autenticado + 👑 Admin
-- **Propósito:** Eliminar DJ del sistema
 - **Parámetros:** `id` (número)
 
-### Crear Tipo de Entrada
-**POST** `/ticketType`
-- **Permisos:** � Autenticado + 👑 Admin
-- **Propósito:** Crear nuevo tipo de entrada
-- **Content-Type:** `application/json`
+---
 
+## 🖼️ Event Images (Imágenes de Eventos)
+**Base URL:** `/api/event-images`
+
+### Obtener Imágenes por Evento
+**GET** `/event-images/:eventId`
+- **Permisos:** 🔒 Autenticado
+- **Parámetros:** `eventId` (number)
+
+**Response:**
 ```json
 {
-  "ticket_type_name": "string",
-  "price": "number",
-  "max_quantity": "number",
-  "event": "number" // ID del evento
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "cloudinaryUrl": "https://res.cloudinary.com/...",
+      "publicId": "events/evento-name/images-123456789",
+      "originalName": "foto1.jpg",
+      "createdAt": "2025-09-23T12:00:00.000Z",
+      "updatedAt": "2025-09-23T12:00:00.000Z",
+      "event": 1
+    }
+  ]
 }
 ```
 
-### Actualizar Tipo de Entrada
-**PATCH** `/ticketType/:id`
-- **Permisos:** 🔒 Autenticado + 👑 Admin
-- **Propósito:** Modificar tipo de entrada existente
-- **Parámetros:** `id` (número)
+### Obtener Imagen Específica
+**GET** `/event-images/:id`
+- **Permisos:** 🔒 Autenticado
 
-### Eliminar Tipo de Entrada
-**DELETE** `/ticketType/:id`
-- **Permisos:** 🔒 Autenticado + 👑 Admin
-- **Propósito:** Eliminar tipo de entrada
-- **Parámetros:** `id` (número)
+### Subir Imágenes a Evento
+**POST** `/event-images/upload/:eventId`
+- **Permisos:** 👑 Admin
+- **Content-Type:** `multipart/form-data`
+- **Body:** `images` (files[]) - Hasta 10 imágenes (máx. 15MB cada una)
+- **Almacenamiento:** Cloudinary en carpeta `events/{eventName}/`
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "5 images uploaded successfully",
+  "data": [...]
+}
+```
+
+### Listar Todas las Imágenes
+**GET** `/event-images/`
+- **Permisos:** 👑 Admin
+
+### Actualizar Imagen
+**PUT** `/event-images/:id`
+- **Permisos:** 👑 Admin
+
+**Request Body:**
+```json
+{
+  "originalName": "nuevo-nombre.jpg"
+}
+```
+
+### Eliminar Imagen Específica
+**DELETE** `/event-images/:id`
+- **Permisos:** 👑 Admin
+- **Acción:** Elimina de Cloudinary y base de datos
+
+### Eliminar Todas las Imágenes de un Evento
+**DELETE** `/event-images/event/:eventId`
+- **Permisos:** 👑 Admin
+
+**Response:**
+```json
+{
+  "success": true,
+  "message": "15 images deleted successfully"
+}
+```
 
 ---
 
@@ -476,7 +854,7 @@
 
 2. **Ver eventos y comprar**
    ```
-   GET /event → GET /event/future → POST /purchase
+   GET /event/future → GET /event/:eventId/ticketType → POST /purchase
    ```
 
 3. **Gestionar mi cuenta**
@@ -498,7 +876,7 @@
 
 1. **Gestión de contenido**
    ```
-   POST /event → POST /ticketType → POST /location
+   POST /city → POST /location → POST /dj → POST /event → POST /event/:eventId/ticketType
    ```
 
 2. **Gestión de usuarios**
@@ -513,14 +891,194 @@
 
 ---
 
-## 🚨 Códigos de Error Comunes
+## 🚨 Manejo de Errores
 
-- **400 Bad Request:** Datos de entrada inválidos
-- **401 Unauthorized:** Token JWT faltante o inválido  
-- **403 Forbidden:** Sin permisos suficientes
-- **404 Not Found:** Recurso no encontrado
-- **409 Conflict:** Email ya existe (registro)
-- **500 Internal Server Error:** Error del servidor
+### Estructura de Respuesta de Error
+
+Todas las respuestas de error siguen esta estructura:
+
+```json
+{
+  "message": "Descripción del error",
+  "statusCode": 400,
+  "timestamp": "2026-01-15T10:30:00.000Z",
+  "path": "/api/event",
+  "method": "POST"
+}
+```
+
+### Códigos de Estado HTTP
+
+| Código | Tipo | Descripción |
+|--------|------|-------------|
+| **400** | Bad Request | Datos de entrada inválidos o malformados |
+| **401** | Unauthorized | Token JWT faltante, inválido o expirado |
+| **403** | Forbidden | Sin permisos suficientes (ej: no es admin) |
+| **404** | Not Found | Recurso no encontrado |
+| **409** | Conflict | Conflicto de datos (ej: email duplicado) |
+| **500** | Internal Server Error | Error interno del servidor |
+
+---
+
+### Ejemplos de Errores por Tipo
+
+#### 🔴 Error de Validación (Zod) - 400
+Cuando los datos enviados no cumplen con el schema de validación:
+
+```json
+{
+  "message": "Validation error",
+  "statusCode": 400,
+  "details": [
+    {
+      "field": "body.eventName",
+      "message": "El nombre del evento no puede exceder 100 caracteres"
+    },
+    {
+      "field": "body.beginDatetime",
+      "message": "La fecha y hora de comienzo debe ser futura"
+    }
+  ],
+  "timestamp": "2026-01-15T10:30:00.000Z",
+  "path": "/api/event",
+  "method": "POST"
+}
+```
+
+#### 🔴 Error de Autenticación - 401
+Cuando no se proporciona token o es inválido:
+
+```json
+{
+  "message": "Required token",
+  "statusCode": 401,
+  "timestamp": "2026-01-15T10:30:00.000Z",
+  "path": "/api/event",
+  "method": "POST"
+}
+```
+
+```json
+{
+  "message": "Unauthorized",
+  "statusCode": 401,
+  "timestamp": "2026-01-15T10:30:00.000Z",
+  "path": "/api/event",
+  "method": "POST"
+}
+```
+
+#### 🔴 Error de Permisos - 403
+Cuando el usuario no tiene permisos de admin:
+
+```json
+{
+  "message": "Access denied: Admin only",
+  "statusCode": 403,
+  "timestamp": "2026-01-15T10:30:00.000Z",
+  "path": "/api/event",
+  "method": "POST"
+}
+```
+
+#### 🔴 Error de Recurso No Encontrado - 404
+Cuando se busca un recurso que no existe:
+
+```json
+{
+  "message": "Event with id 999 not found",
+  "statusCode": 404,
+  "timestamp": "2026-01-15T10:30:00.000Z",
+  "path": "/api/event/999",
+  "method": "GET"
+}
+```
+
+#### 🔴 Error de Conflicto - 409
+Cuando hay datos duplicados (ej: email ya registrado):
+
+```json
+{
+  "message": "Duplicate entry found",
+  "statusCode": 409,
+  "timestamp": "2026-01-15T10:30:00.000Z",
+  "path": "/api/user/register",
+  "method": "POST"
+}
+```
+
+#### 🔴 Error de Archivo - 400
+Cuando hay problemas con la subida de archivos:
+
+```json
+{
+  "message": "Please upload a file, jpg, jpeg or png",
+  "statusCode": 400,
+  "timestamp": "2026-01-15T10:30:00.000Z",
+  "path": "/api/event",
+  "method": "POST"
+}
+```
+
+```json
+{
+  "message": "Max file size 5MB",
+  "statusCode": 400,
+  "timestamp": "2026-01-15T10:30:00.000Z",
+  "path": "/api/event",
+  "method": "POST"
+}
+```
+
+#### 🔴 Error de Base de Datos - 400/409
+Cuando hay errores relacionados con la base de datos:
+
+```json
+{
+  "message": "Referenced record does not exist",
+  "statusCode": 400,
+  "timestamp": "2026-01-15T10:30:00.000Z",
+  "path": "/api/event",
+  "method": "POST"
+}
+```
+
+```json
+{
+  "message": "Cannot delete: record is referenced by other records",
+  "statusCode": 409,
+  "timestamp": "2026-01-15T10:30:00.000Z",
+  "path": "/api/location/1",
+  "method": "DELETE"
+}
+```
+
+#### 🔴 Error Interno del Servidor - 500
+Cuando ocurre un error inesperado:
+
+```json
+{
+  "message": "An error occurred",
+  "statusCode": 500,
+  "timestamp": "2026-01-15T10:30:00.000Z",
+  "path": "/api/event",
+  "method": "POST"
+}
+```
+
+---
+
+### Tipos de Errores Específicos
+
+| Clase de Error | Código | Uso |
+|----------------|--------|-----|
+| `ValidationError` | 400 | Datos de entrada inválidos |
+| `BadRequestError` | 400 | Solicitud mal formada |
+| `UnauthorizedError` | 401 | Sin autenticación |
+| `ForbiddenError` | 403 | Sin permisos |
+| `NotFoundError` | 404 | Recurso no existe |
+| `ConflictError` | 409 | Datos duplicados |
+| `InternalServerError` | 500 | Error del servidor |
 
 ---
 
@@ -534,110 +1092,49 @@
 - **Verificación de propietario** para descargas de PDF
 
 ### 🔐 Headers Requeridos
+
+**Para rutas autenticadas (JSON):**
 ```
 Authorization: Bearer <jwt_token>
 Content-Type: application/json
 ```
 
----
-
-## 🖼️ Event Images (Imágenes de Eventos)
-**Base URL:** `/api/event-images`
-
-### Obtener Imágenes por Evento
-**GET** `/event-images/:eventId`
-- **Permisos:** 🔒 Autenticado
-- **Propósito:** Obtener todas las imágenes de un evento específico
-- **Parámetros:**
-  - `eventId` (number): ID del evento
-- **Respuesta:**
-```json
-{
-  "success": true,
-  "data": [
-    {
-      "id": 1,
-      "cloudinaryUrl": "https://res.cloudinary.com/...",
-      "publicId": "events/evento-name/images-123456789",
-      "originalName": "foto1.jpg",
-      "createdAt": "2025-09-23T12:00:00.000Z",
-      "updatedAt": "2025-09-23T12:00:00.000Z",
-      "event": 1
-    }
-  ]
-}
+**Para rutas con archivos:**
 ```
-
-### Obtener Imagen Específica
-**GET** `/event-images/:id`
-- **Permisos:** 🔒 Autenticado
-- **Propósito:** Obtener detalles de una imagen específica
-
-### Subir Imágenes a Evento
-**POST** `/event-images/upload/:eventId`
-- **Permisos:** 👑 Admin
-- **Content-Type:** `multipart/form-data`
-- **Propósito:** Subir múltiples imágenes para un evento
-- **Body:** 
-  - `images` (files[]): Hasta 10 imágenes (máx. 15MB cada una)
-- **Almacenamiento:** Cloudinary en carpeta `events/{eventName}/`
-- **Respuesta:**
-```json
-{
-  "success": true,
-  "message": "5 images uploaded successfully",
-  "data": [...]
-}
-```
-
-### Listar Todas las Imágenes
-**GET** `/event-images/`
-- **Permisos:** 👑 Admin
-- **Propósito:** Obtener todas las imágenes del sistema
-
-### Actualizar Imagen
-**PUT** `/event-images/:id`
-- **Permisos:** 👑 Admin
-- **Propósito:** Actualizar metadatos de una imagen
-- **Body:**
-```json
-{
-  "originalName": "nuevo-nombre.jpg"
-}
-```
-
-### Eliminar Imagen Específica
-**DELETE** `/event-images/:id`
-- **Permisos:** 👑 Admin
-- **Propósito:** Eliminar una imagen específica
-- **Acción:** Elimina de Cloudinary y base de datos
-
-### Eliminar Todas las Imágenes de un Evento
-**DELETE** `/event-images/event/:eventId`
-- **Permisos:** 👑 Admin
-- **Propósito:** Eliminar todas las imágenes asociadas a un evento
-- **Acción:** Elimina de Cloudinary y base de datos
-- **Respuesta:**
-```json
-{
-  "success": true,
-  "message": "15 images deleted successfully"
-}
+Authorization: Bearer <jwt_token>
+Content-Type: multipart/form-data
 ```
 
 ---
 
-### 📝 Endpoints sin validación temporal
+## 🔧 Información Técnica
+
+### Autenticación JWT
+- **Header:** `Authorization: Bearer <token>`
+- **Expiración:** 1 hora
+- **Payload:** `{id, email, isAdmin}`
+
+### Subida de Archivos (Eventos)
+- **Campo:** `cover_photo`
+- **Formato:** `multipart/form-data`
+- **Almacenamiento:** `/public/uploads/`
+- **Tipos permitidos:** jpg, jpeg, png
+- **Tamaño máximo:** 5MB
+
+### Generación de PDFs
+- **Biblioteca:** PDFKit + QRCode
+- **Incluye:** QR único, datos del evento, ticket info
+- **Seguridad:** Solo propietario o admin
+
+---
+
+## 📝 Endpoints sin validación temporal
 - `POST /purchase` (schema comentado)
 - `GET /purchase/:purchaseId/ticket/:ticketId` (schema comentado)
 
 ---
 
 ## 🚧 Funcionalidades Pendientes
-
-### Validación de Esquemas
-- **POST /purchase:** CreatePurchaseSchema comentado
-- **GET /purchase/:purchaseId/ticket/:ticketId:** UpdatePurchaseSchema comentado
 
 ### Mejoras Sugeridas
 - Implementar rate limiting
@@ -647,76 +1144,5 @@ Content-Type: application/json
 
 ---
 
-## � Información Técnica
-
-### Autenticación JWT
-- **Header:** `Authorization: Bearer <token>`
-- **Expiración:** 1 hora
-- **Payload:** `{id, email, isAdmin}`
-
-### Subida de Archivos
-- **Eventos:** Imagen de portada opcional
-- **Formato:** `multipart/form-data`
-- **Almacenamiento:** `/public/uploads/`
-
-### Generación de PDFs
-- **Biblioteca:** PDFKit + QRCode
-- **Incluye:** QR único, datos del evento, ticket info
-- **Seguridad:** Solo propietario o admin
-
-### Estructura de Respuesta
-```json
-{
-  "message": "string",
-  "data": "object|array"
-}
-```
-
-### Códigos HTTP
-- **200:** Éxito
-- **201:** Creado
-- **400:** Request inválido
-- **401:** No autenticado  
-- **403:** Sin permisos
-- **404:** No encontrado
-- **409:** Conflicto (email duplicado)
-- **500:** Error servidor
-
----
-
-**🎯 Documentación actualizada - API v2.0 con seguridad mejorada**
-**📅 Última actualización: Septiembre 2025**
-- **201:** Recurso creado exitosamente
-- **400:** Error en los datos enviados
-- **401:** No autorizado (token inválido/faltante)
-- **403:** Prohibido (sin permisos suficientes)
-- **404:** Recurso no encontrado
-- **500:** Error interno del servidor
-
----
-
-## 🔄 Flujos de Trabajo Comunes
-
-### 1. Crear un Evento Completo
-1. `POST /dj` - Crear DJ (admin)
-2. `POST /city` - Crear ciudad (admin)
-3. `POST /location` - Crear ubicación (admin)
-4. `POST /event` - Crear evento (admin)
-5. `POST /event/:eventId/ticketType` - Crear tipos de entrada (admin)
-
-### 2. Realizar una Compra
-1. `GET /event/future` - Ver eventos disponibles
-2. `GET /event/:eventId/ticketType` - Ver tipos de entrada
-3. `POST /user/register` o `POST /user/login` - Autenticarse
-4. `POST /purchase` - Realizar compra
-5. `GET /purchase/:purchaseId/ticket/:ticketId` - Descargar ticket PDF
-
-### 3. Gestión de Usuario
-1. `POST /user/register` - Crear cuenta
-2. `POST /user/login` - Iniciar sesión (obtener token)
-3. `GET /user/tickets/:id` - Ver mis entradas
-4. `PATCH /user/:id` - Actualizar perfil
-
----
-
-*Última actualización: Septiembre 2025*
+**🎯 Documentación actualizada - API v2.1**
+**📅 Última actualización: Enero 2026**
