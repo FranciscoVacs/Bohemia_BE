@@ -31,7 +31,7 @@ export const uploader = (req: Request, res: Response, next: NextFunction) => {
     storage,
     limits: { fileSize: maxSize },
     fileFilter,
-  }).single("cover_photo")(req, res, (err) =>{
+  }).single("coverPhoto")(req, res, (err) =>{
 
     if(err instanceof multer.MulterError){
       throwError.badRequest("Max file size 5MB");

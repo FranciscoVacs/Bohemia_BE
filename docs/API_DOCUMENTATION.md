@@ -3,7 +3,7 @@
 ## 🌟 Información General
 
 **Base URL:** `http://localhost:3000/api`
-**Versión:** 2.0
+**Versión:** 2.1
 **Autenticación:** JWT Bearer Token
 **Última actualización:** Septiembre 2025
 
@@ -13,7 +13,10 @@
 - **👑 Admin:** Requiere token JWT válido + permisos de administrador
 - **👤 Propietario:** Solo el propietario del recurso o admin
 
-### 🚀 Cambios Principales v2.0
+### 🚀 Cambios Principales v2.1
+- **🖼️ Nuevos endpoints `/api/event-images` (reemplaza `/api/gallery`)**
+- **📸 Gestión completa de imágenes de eventos con Cloudinary**
+- **🗑️ Endpoints para eliminar imágenes individuales o por evento**
 - **Endpoints `/me` para usuarios autenticados**
 - **Seguridad mejorada en todas las rutas**
 - **Estructura simplificada de compras/tickets**
@@ -535,6 +538,94 @@
 Authorization: Bearer <jwt_token>
 Content-Type: application/json
 ```
+
+---
+
+## 🖼️ Event Images (Imágenes de Eventos)
+**Base URL:** `/api/event-images`
+
+### Obtener Imágenes por Evento
+**GET** `/event-images/:eventId`
+- **Permisos:** 🔒 Autenticado
+- **Propósito:** Obtener todas las imágenes de un evento específico
+- **Parámetros:**
+  - `eventId` (number): ID del evento
+- **Respuesta:**
+```json
+{
+  "success": true,
+  "data": [
+    {
+      "id": 1,
+      "cloudinaryUrl": "https://res.cloudinary.com/...",
+      "publicId": "events/evento-name/images-123456789",
+      "originalName": "foto1.jpg",
+      "createdAt": "2025-09-23T12:00:00.000Z",
+      "updatedAt": "2025-09-23T12:00:00.000Z",
+      "event": 1
+    }
+  ]
+}
+```
+
+### Obtener Imagen Específica
+**GET** `/event-images/:id`
+- **Permisos:** 🔒 Autenticado
+- **Propósito:** Obtener detalles de una imagen específica
+
+### Subir Imágenes a Evento
+**POST** `/event-images/upload/:eventId`
+- **Permisos:** 👑 Admin
+- **Content-Type:** `multipart/form-data`
+- **Propósito:** Subir múltiples imágenes para un evento
+- **Body:** 
+  - `images` (files[]): Hasta 10 imágenes (máx. 15MB cada una)
+- **Almacenamiento:** Cloudinary en carpeta `events/{eventName}/`
+- **Respuesta:**
+```json
+{
+  "success": true,
+  "message": "5 images uploaded successfully",
+  "data": [...]
+}
+```
+
+### Listar Todas las Imágenes
+**GET** `/event-images/`
+- **Permisos:** 👑 Admin
+- **Propósito:** Obtener todas las imágenes del sistema
+
+### Actualizar Imagen
+**PUT** `/event-images/:id`
+- **Permisos:** 👑 Admin
+- **Propósito:** Actualizar metadatos de una imagen
+- **Body:**
+```json
+{
+  "originalName": "nuevo-nombre.jpg"
+}
+```
+
+### Eliminar Imagen Específica
+**DELETE** `/event-images/:id`
+- **Permisos:** 👑 Admin
+- **Propósito:** Eliminar una imagen específica
+- **Acción:** Elimina de Cloudinary y base de datos
+
+### Eliminar Todas las Imágenes de un Evento
+**DELETE** `/event-images/event/:eventId`
+- **Permisos:** 👑 Admin
+- **Propósito:** Eliminar todas las imágenes asociadas a un evento
+- **Acción:** Elimina de Cloudinary y base de datos
+- **Respuesta:**
+```json
+{
+  "success": true,
+  "message": "15 images deleted successfully"
+}
+```
+
+---
 
 ### 📝 Endpoints sin validación temporal
 - `POST /purchase` (schema comentado)
