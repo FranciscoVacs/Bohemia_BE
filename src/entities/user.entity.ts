@@ -1,4 +1,4 @@
-import { Entity, OneToMany, Property,Cascade, Collection, Unique } from "@mikro-orm/core";
+import { Entity, OneToMany, Property, Cascade, Collection, Unique } from "@mikro-orm/core";
 import { BaseEntity } from "../shared/db/baseEntity.entity.js"
 import { Purchase } from "./purchase.entity.js";
 
@@ -14,7 +14,7 @@ export class User extends BaseEntity {
     @Property({ length: 100, fieldName: 'user_surname' })
     userSurname!: string;
 
-    @Property({ length: 100 })
+    @Property({ length: 100, hidden: true })
     password!: string;
 
     @Property({ fieldName: 'birth_date' })

@@ -7,9 +7,17 @@ export class EventModel extends BaseModel<Event> {
     super(em, Event);
   }
 
+  async getAll(): Promise<Event[] | undefined> {
+    return await this.em.find(Event, {}, {
+      populate: ["location", "location.city", "dj"]
+    });
+  }
+
   async getById(id: string): Promise<Event | undefined> {
     const parsedId = Number.parseInt(id);
-    const item =  await this.em.findOneOrFail(Event, parsedId, {populate: ["location","location.city" ,"ticketType"]});
+    const item = await this.em.findOneOrFail(Event, parsedId, {
+      populate: ["location", "location.city", "ticketType", "dj"]
+    });
     return item;
   }
 
