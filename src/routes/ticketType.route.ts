@@ -15,11 +15,12 @@ export const createTicketTypeRouter = ({
 }) => {
   const ticketTypeController = new TicketTypeController(ticketTypeModel);
 
-  // Rutas públicas
-  ticketTypeRouter.get("/", ticketTypeController.getAll);
-  ticketTypeRouter.get("/:id", schemaValidator(UpdateTicketTypeSchema), ticketTypeController.getById);
-  
+  // Todas las rutas de ticketType son administrativas
+  // Para obtener ticketTypes públicos, usar GET /events/:id/ticketTypes
+
   // Rutas administrativas (requieren autenticación y admin)
+  ticketTypeRouter.get("/", verifyToken, isAdmin, ticketTypeController.getAll);
+  ticketTypeRouter.get("/:id", verifyToken, isAdmin, schemaValidator(UpdateTicketTypeSchema), ticketTypeController.getById);
   ticketTypeRouter.post("/", verifyToken, isAdmin, schemaValidator(CreateTicketTypeSchema), ticketTypeController.create);
   ticketTypeRouter.patch("/:id", verifyToken, isAdmin, schemaValidator(UpdateTicketTypeSchema), ticketTypeController.update);
   ticketTypeRouter.delete("/:id", verifyToken, isAdmin, schemaValidator(UpdateTicketTypeSchema), ticketTypeController.delete);

@@ -5,12 +5,32 @@ import { BaseController } from "./base.controller.js";
 import type { RequiredEntityData } from "@mikro-orm/core";
 import { throwError, assertResourceExists } from "../shared/errors/ErrorUtils.js";
 import { asyncHandler } from "../middlewares/asyncHandler.js";
-import { toFutureEventDTO } from "../dto/event.dto.js";
+import { toFutureEventDTO, toAdminEventDTO, toPublicEventDTO, toPublicTicketTypesDTO } from "../dto/event.dto.js";
 
 export class EventController extends BaseController<Event> {
   constructor(protected model: IModel<Event>) {
     super(model);
   }
+
+  // Método para admin: obtener todos los eventos con métricas calculadas
+  getAllForAdmin = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const allEvents = await this.model.getAll();
+
+    if (!allEvents || allEvents.length === 0) {
+      return res.status(200).send({
+        message: "No hay eventos",
+        data: [],
+      });
+    }
+
+    // Transformar a AdminEventDTO con campos calculados
+    const adminEvents = allEvents.map(event => toAdminEventDTO(event));
+
+    return res.status(200).send({
+      message: "Eventos obtenidos exitosamente",
+      data: adminEvents,
+    });
+  });
 
   create = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const { eventName, beginDatetime, finishDatetime, eventDescription, minAge, location, dj } = req.body;
@@ -85,6 +105,38 @@ export class EventController extends BaseController<Event> {
     return res.status(200).send({
       message: "Próximo evento obtenido exitosamente",
       data: nextEvent,
+    });
+  });
+
+  // Sobrescribir getById para usar DTO público
+  getById = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const id = req.params.id;
+    const event = await this.model.getById(id);
+
+    assertResourceExists(event, `Event with id ${id}`);
+
+    // Transformar a DTO público (sin exponer datos sensibles)
+    const publicEvent = toPublicEventDTO(event!);
+
+    return res.status(200).send({
+      message: "Evento obtenido exitosamente",
+      data: publicEvent,
+    });
+  });
+
+  // Endpoint para obtener ticketTypes de un evento específico
+  getTicketTypes = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const id = req.params.id;
+    const event = await this.model.getById(id);
+
+    assertResourceExists(event, `Event with id ${id}`);
+
+    // Transformar a DTO público de ticketTypes
+    const ticketTypes = toPublicTicketTypesDTO(event!);
+
+    return res.status(200).send({
+      message: "Tipos de tickets obtenidos exitosamente",
+      data: ticketTypes,
     });
   });
 }
