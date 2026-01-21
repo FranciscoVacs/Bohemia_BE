@@ -9,7 +9,7 @@ export class EventModel extends BaseModel<Event> {
 
   async getAll(): Promise<Event[] | undefined> {
     return await this.em.find(Event, {}, {
-      populate: ["location", "location.city", "dj"]
+      populate: ["location", "location.city", "dj", "ticketType"]
     });
   }
 

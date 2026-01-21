@@ -1,36 +1,88 @@
-###Recuperar todos los ticketTypeos
-GET http://localhost:3000/api/event/1/ticketType
+### Variables
+@baseUrl = http://localhost:3000/api
+@authToken = YOUR_ADMIN_TOKEN_HERE
 
+###Recuperar todos los ticketTypes (Admin)
+GET {{baseUrl}}/ticketType
+Authorization: Bearer {{authToken}}
 
-###Crear un ticketType
-# @name createTicketType
-POST http://localhost:3000/api/event/1/ticketType
+### Crear un ticketType con modo SCHEDULED (programado)
+# @name createScheduledTicketType
+POST {{baseUrl}}/ticketType
 Content-Type: application/json
+Authorization: Bearer {{authToken}}
 
 {
-    "ticketType_name": "ultravip",
-    "begin_datetime": "2021-10-10 20:00:00",
-    "finish_datetime": "2021-10-30 23:00:00",
+    "ticketTypeName": "Early Bird",
+    "beginDatetime": "2026-01-20 00:00:00",
+    "finishDatetime": "2026-02-15 23:59:59",
     "price": 3500,
-    "max_quantity":400,
-    "event": 5
+    "maxQuantity": 100,
+    "event": 1,
+    "saleMode": "scheduled"
 }
 
-###ID
-@id = {{createTicketType.response.body.data.id}}
-###Recuperar un ticketType por id
-GET http://localhost:3000/api/event/1/ticketType/{{id}}
-
-
-###Actualizar un ticketType
-PATCH http://localhost:3000/api/event/1/ticketType/{{id}}
+### Crear un ticketType con modo MANUAL
+# @name createManualTicketType
+POST {{baseUrl}}/ticketType
 Content-Type: application/json
+Authorization: Bearer {{authToken}}
 
 {
-    "SQL INJECTIN": "DROP TABLE ticketType",
-    "ticketType_name": "preventa 01"
+    "ticketTypeName": "VIP Manual",
+    "price": 5000,
+    "maxQuantity": 50,
+    "event": 1,
+    "saleMode": "manual",
+    "isManuallyActivated": false
 }
 
+### ID del ticket type creado
+@ticketTypeId = {{createManualTicketType.response.body.data.id}}
 
-###Eliminar un ticketType
-DELETE http://localhost:3000/api/event/1/ticketType/{{id}}
+### Obtener un ticketType por id
+GET {{baseUrl}}/ticketType/{{ticketTypeId}}
+Authorization: Bearer {{authToken}}
+
+### Activar venta manualmente (usando PATCH normal)
+PATCH {{baseUrl}}/ticketType/{{ticketTypeId}}
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+    "isManuallyActivated": true
+}
+
+### Desactivar venta manualmente
+PATCH {{baseUrl}}/ticketType/{{ticketTypeId}}
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+    "isManuallyActivated": false
+}
+
+### Cambiar de modo manual a scheduled
+PATCH {{baseUrl}}/ticketType/{{ticketTypeId}}
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+    "saleMode": "scheduled",
+    "beginDatetime": "2026-01-20 00:00:00",
+    "finishDatetime": "2026-03-01 23:59:59"
+}
+
+### Actualizar fechas de un ticketType scheduled
+PATCH {{baseUrl}}/ticketType/{{ticketTypeId}}
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+    "beginDatetime": "2026-01-25 00:00:00",
+    "finishDatetime": "2026-02-28 23:59:59"
+}
+
+### Eliminar un ticketType
+DELETE {{baseUrl}}/ticketType/{{ticketTypeId}}
+Authorization: Bearer {{authToken}}

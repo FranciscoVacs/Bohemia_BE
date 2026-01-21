@@ -1,14 +1,11 @@
 import { z } from "zod";
 
+// Schema simplificado: solo campos necesarios del cliente
+// userId se obtiene del token JWT, no del body
 export const CreatePurchaseSchema = z.object({
   body: z.object({
-    discountApplied: z.number().optional(),
-    serviceFee: z.number().optional(),
-    ticketQuantity: z.number().int().positive(),
-    totalPrice: z.number().optional(),
-    userId: z.number().int().positive(),
     ticketTypeId: z.number().int().positive(),
-    ticket: z.array(z.number()).optional(),
+    ticketQuantity: z.number().int().positive().min(1).max(10, "Maximum 10 tickets per purchase"),
   }),
 });
 

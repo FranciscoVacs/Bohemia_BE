@@ -16,11 +16,19 @@ export class PurchaseController extends BaseController<Purchase> {
   }
 
   create = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const { ticketTypeId, ticketQuantity, userId } = req.body;
+    const { ticketTypeId, ticketQuantity } = req.body;
+
+    // Obtener userId del token JWT (no del body por seguridad)
+    const userId = req.user?.id;
+    if (!userId) {
+      throwError.custom("User ID not found in token", 401);
+      return;
+    }
+
     const item = await this.model.createProtocol(
       ticketTypeId,
       ticketQuantity,
-      userId,
+      userId.toString(),
     );
     const purchaseData = {
       id: item?.id,
@@ -45,20 +53,20 @@ export class PurchaseController extends BaseController<Purchase> {
   });
 
   getById = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const {purchaseId, ticketId} = req.params;
+    const { purchaseId, ticketId } = req.params;
     const item = await this.model.getById(purchaseId);
-    
+
     // Verificar que el usuario es propietario de la compra o es admin
     if (!req.user?.isAdmin && item?.user.id !== req.user?.id) {
       throwError.custom("Access denied: You can only download your own tickets", 403);
       return;
     }
-    
+
     const parsedId = Number.parseInt(ticketId);
     let pdfBuffer: Buffer | undefined;
     for (const ticket of item?.ticket || []) {
       if (ticket.id === parsedId) {
-        const ActualTicket:Ticket = ticket;
+        const ActualTicket: Ticket = ticket;
         pdfBuffer = await PDFGenerator.generateTicketPDF(
           ActualTicket,
           item?.ticketType,

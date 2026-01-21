@@ -61,10 +61,11 @@ export function toFutureEventDTO(event: Event): FutureEventDTO {
 export interface PublicTicketTypeDTO {
   id: number;
   ticketTypeName: string;
-  beginDatetime: Date;
-  finishDatetime: Date;
+  beginDatetime?: Date;
+  finishDatetime?: Date;
   price: number;
   availableTickets: number;
+  isSaleActive: boolean;
 }
 
 export interface PublicEventDTO {
@@ -90,6 +91,7 @@ export function toPublicEventDTO(event: Event): PublicEventDTO {
     finishDatetime: tt.finishDatetime,
     price: tt.price,
     availableTickets: tt.availableTickets,
+    isSaleActive: tt.isSaleActive(),
   }));
 
   return {
@@ -122,6 +124,7 @@ export function toPublicTicketTypesDTO(event: Event): PublicTicketTypeDTO[] {
     finishDatetime: tt.finishDatetime,
     price: tt.price,
     availableTickets: tt.availableTickets,
+    isSaleActive: tt.isSaleActive(),
   }));
 }
 
@@ -132,11 +135,14 @@ export function toPublicTicketTypesDTO(event: Event): PublicTicketTypeDTO[] {
 export interface TicketTypeDTO {
   id: number;
   ticketTypeName: string;
-  beginDatetime: Date;
-  finishDatetime: Date;
+  beginDatetime?: Date;
+  finishDatetime?: Date;
   price: number;
   maxQuantity: number;
   availableTickets: number;
+  saleMode: string;
+  isManuallyActivated: boolean;
+  isSaleActive: boolean;
 }
 
 export interface AdminEventDTO {
@@ -181,6 +187,9 @@ export function toAdminEventDTO(event: Event): AdminEventDTO {
       price: tt.price,
       maxQuantity: tt.maxQuantity,
       availableTickets: tt.availableTickets,
+      saleMode: tt.saleMode,
+      isManuallyActivated: tt.isManuallyActivated,
+      isSaleActive: tt.isSaleActive(),
     };
   });
 

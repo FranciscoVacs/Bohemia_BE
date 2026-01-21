@@ -25,5 +25,6 @@ export const createTicketTypeRouter = ({
   ticketTypeRouter.patch("/:id", verifyToken, isAdmin, schemaValidator(UpdateTicketTypeSchema), ticketTypeController.update);
   ticketTypeRouter.delete("/:id", verifyToken, isAdmin, schemaValidator(UpdateTicketTypeSchema), ticketTypeController.delete);
 
+
   return ticketTypeRouter;
 };

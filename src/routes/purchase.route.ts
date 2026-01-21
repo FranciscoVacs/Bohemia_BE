@@ -21,7 +21,7 @@ export const createPurchaseRouter = ({
   purchaseRouter.get("/:purchaseId/ticket/:ticketId", verifyToken, /*schemaValidator(UpdatePurchaseSchema)*/ purchaseController.getById);
 
   // Rutas de creación (requieren autenticación)
-  purchaseRouter.post("/", verifyToken, /*schemaValidator(CreatePurchaseSchema),*/ purchaseController.create);
+  purchaseRouter.post("/", verifyToken, schemaValidator(CreatePurchaseSchema), purchaseController.create);
 
   // Rutas administrativas (solo admin puede ver/modificar todas las compras)
   purchaseRouter.get("/", verifyToken, isAdmin, purchaseController.getAll);

@@ -9,8 +9,8 @@ export const CreateUserSchema = z.object({
     userName: z.string().max(100),
     userSurname: z.string().max(100),
     password: z.string()
-    .min(8, "Minimum 8 characters")
-    .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, "Must contain uppercase, lowercase and number"),
+      .min(8, "Minimum 8 characters")
+      .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, "Must contain uppercase, lowercase and number"),
     birthDate: z.string().refine((val) => datetimeRegex.test(val), {
       message:
         "Invalid datetime format. Expected format: 'YYYY-MM-DD HH:MM:SS'",
@@ -25,7 +25,10 @@ export const UpdateUserSchema = z.object({
       email: z.string().email().optional(),
       userName: z.string().max(100).optional(),
       userSurname: z.string().max(100).optional(),
-      password: z.string().max(100).optional(),
+      password: z.string()
+        .min(8, "Minimum 8 characters")
+        .regex(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/, "Must contain uppercase, lowercase and number")
+        .optional(),
       birthDate: z.string().refine((val) => datetimeRegex.test(val), {
         message:
           "Invalid datetime format. Expected format: 'YYYY-MM-DD HH:MM:SS'",

@@ -19,32 +19,38 @@ export class PurchaseModel extends BaseModel<Purchase> {
   ): Promise<Purchase | undefined> {
     const parsedTTId = Number.parseInt(ticketTypeId);
     const parsedUID = Number.parseInt(userId);
-    
+
     const ticketType: TicketType = await this.em.findOneOrFail(
       TicketType,
       parsedTTId,
       { populate: ["event"] },
     );
-    
+
+    // Validar que la venta está activa
+    assertBusinessRule(
+      ticketType.isSaleActive(),
+      "Sales are not currently active for this ticket type"
+    );
+
     // Validar que hay suficientes tickets disponibles
     assertBusinessRule(
       ticketType.availableTickets >= ticketQuantity,
       "Not enough tickets available for this purchase"
     );
-    
+
     const actualUser: User = await this.em.findOneOrFail(User, parsedUID);
     const newStockTickets = ticketType.availableTickets - ticketQuantity;
     console.log("newStockTickets", newStockTickets);
     console.log("availableTickets", ticketType.availableTickets);
 
     this.em.assign(ticketType, { availableTickets: newStockTickets });
-    
+
     // Calcular pricing con cargo de servicio
     const subtotal = ticketType.price * ticketQuantity;
     const serviceFeePercentage = Number.parseFloat(process.env.SERVICE_FEE_PERCENTAGE || '0.1');
     const serviceFee = subtotal * serviceFeePercentage;
     const totalPrice = subtotal + serviceFee;
-    
+
     const purchaseActual = this.em.create(Purchase, {
       ticketNumbers: ticketQuantity,
       paymentStatus: "Approved",
