@@ -18,7 +18,7 @@ import dotenv from "dotenv";
 import path from "node:path";
 import { fileURLToPath } from 'node:url';
 import type { Express } from "express";
-import { createEventImageRouter } from "./routes/eventImage.route.js";
+import { createEventGalleryRouter } from "./routes/eventGallery.route.js";
 
 /**
  * Clase principal de la aplicación
@@ -58,7 +58,7 @@ export class App {
     this.express.use(express.json());
     this.express.use(corsMiddleware());
     this.express.disable("x-powered-by");
-    
+
     // Archivos estáticos
     this.express.use('/public/uploads', express.static(path.join(__dirname, '../public/uploads')));
 
@@ -73,41 +73,41 @@ export class App {
    */
   private configureRoutes(): void {
     // Rutas de la API - usando el container para obtener modelos
-    this.express.use("/api/event", createEventRouter({ 
-      eventModel: this.container.getEventModel() 
+    this.express.use("/api/event", createEventRouter({
+      eventModel: this.container.getEventModel()
     }));
-    
-    this.express.use("/api/location", createLocationRouter({ 
-      locationModel: this.container.getLocationModel() 
+
+    this.express.use("/api/location", createLocationRouter({
+      locationModel: this.container.getLocationModel()
     }));
-    
-    this.express.use("/api/city", createCityRouter({ 
-      cityModel: this.container.getCityModel() 
+
+    this.express.use("/api/city", createCityRouter({
+      cityModel: this.container.getCityModel()
     }));
-    
-    this.express.use("/api/event/:eventId/ticketType", createTicketTypeRouter({ 
-      ticketTypeModel: this.container.getTicketTypeModel() 
+
+    this.express.use("/api/event/:eventId/ticketType", createTicketTypeRouter({
+      ticketTypeModel: this.container.getTicketTypeModel()
     }));
-    
-    this.express.use("/api/ticket", createTicketRouter({ 
-      ticketModel: this.container.getTicketModel() 
+
+    this.express.use("/api/ticket", createTicketRouter({
+      ticketModel: this.container.getTicketModel()
     }));
-    
-    this.express.use("/api/user", createUserRouter({ 
-      userModel: this.container.getUserModel() 
+
+    this.express.use("/api/user", createUserRouter({
+      userModel: this.container.getUserModel()
     }));
-    
-    this.express.use("/api/purchase", createPurchaseRouter({ 
-      purchaseModel: this.container.getPurchaseModel() 
+
+    this.express.use("/api/purchase", createPurchaseRouter({
+      purchaseModel: this.container.getPurchaseModel()
     }));
-    
-    this.express.use("/api/dj", createDjRouter({ 
-      djModel: this.container.getDjModel() 
+
+    this.express.use("/api/dj", createDjRouter({
+      djModel: this.container.getDjModel()
     }));
-    
-    this.express.use("/api/event-images", createEventImageRouter({ 
-      eventImageModel: this.container.getEventImageModel(),
-      eventModel: this.container.getEventModel() 
+
+    this.express.use("/api/event-gallery", createEventGalleryRouter({
+      eventGalleryModel: this.container.getEventGalleryModel(),
+      eventModel: this.container.getEventModel()
     }));
   }
 
