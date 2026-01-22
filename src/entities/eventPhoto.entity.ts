@@ -1,9 +1,9 @@
 import { Entity, ManyToOne, Property, Rel } from "@mikro-orm/core";
 import { BaseEntity } from "../shared/db/baseEntity.entity.js";
-import { Event } from "./event.entity.js"; // Ajusta la ruta según tu estructura
+import { Event } from "./event.entity.js";
 
 @Entity()
-export class EventImage extends BaseEntity {
+export class EventPhoto extends BaseEntity {
     @Property({ length: 255 })
     cloudinaryUrl!: string; // URL pública para mostrar la imagen
 
@@ -11,7 +11,7 @@ export class EventImage extends BaseEntity {
     publicId!: string; // ID de Cloudinary para operaciones (eliminar, etc.)
 
     @Property({ length: 255 })
-    originalName!: string; 
+    originalName!: string;
 
     @ManyToOne(() => Event, { nullable: false, deleteRule: 'CASCADE' })
     event!: Rel<Event>;

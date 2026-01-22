@@ -19,10 +19,10 @@ export const createEventRouter = ({
 
   // Rutas públicas
   eventRouter.get("/future", eventController.getFutureEvents); // Nueva ruta para eventos futuros
-  
+
   // Rutas protegidas (requieren autenticación y admin)
   eventRouter.get("/admin", verifyToken, isAdmin, eventController.getAllForAdmin); // Con métricas calculadas
-  
+
   // Rutas públicas
   eventRouter.get("/:id", schemaValidator(UpdateEventSchema), eventController.getById);
   eventRouter.get("/:id/ticketTypes", schemaValidator(UpdateEventSchema), eventController.getTicketTypes); // Ticket types por evento
@@ -31,6 +31,7 @@ export const createEventRouter = ({
   eventRouter.get("/", verifyToken, isAdmin, eventController.getAll);
   eventRouter.post("/", verifyToken, isAdmin, uploader, schemaValidator(CreateEventSchema), eventController.create);
   eventRouter.patch("/:id", verifyToken, isAdmin, uploader, schemaValidator(UpdateEventSchema), eventController.update);
+  eventRouter.patch("/:id/gallery-status", verifyToken, isAdmin, eventController.updateGalleryStatus);
   eventRouter.delete("/:id", verifyToken, isAdmin, schemaValidator(UpdateEventSchema), eventController.delete);
 
   return eventRouter;

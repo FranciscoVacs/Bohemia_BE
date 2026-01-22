@@ -10,18 +10,19 @@ const __dirname = path.dirname(__filename); // get the name of the directory
 
 const storage = multer.diskStorage({
   destination: path.join(__dirname, "../../public/uploads"),
-  filename: (req: Request , file: Express.Multer.File, cb: (error:Error | null, destination:string) => void
-)=> {
+  filename: (req: Request, file: Express.Multer.File, cb: (error: Error | null, destination: string) => void
+  ) => {
     cb(null, `${Date.now()}_${file.originalname}`);
   }
 });
 
 const fileFilter = (req: Request, file: Express.Multer.File, cb: FileFilterCallback) => {
-  const  fileTypes = ["image/jpeg", "image/jpg", "image/png"];
-  if (fileTypes.some((fileType)=> fileType === file.mimetype)) {
-    return  cb(null, true);
+  const fileTypes = ["image/jpeg", "image/jpg", "image/png"];
+  if (fileTypes.some((fileType) => fileType === file.mimetype)) {
+    return cb(null, true);
   }
-  return cb(null, false);
+  // Error EXPLÍCITO en lugar de rechazo silencioso
+  return cb(new Error("Tipo de archivo no permitido. Solo se aceptan: jpg, jpeg, png") as any);
 }
 
 const maxSize = 1024 * 1024 * 5;
@@ -31,9 +32,9 @@ export const uploader = (req: Request, res: Response, next: NextFunction) => {
     storage,
     limits: { fileSize: maxSize },
     fileFilter,
-  }).single("coverPhoto")(req, res, (err) =>{
+  }).single("coverPhoto")(req, res, (err) => {
 
-    if(err instanceof multer.MulterError){
+    if (err instanceof multer.MulterError) {
       throwError.badRequest("Max file size 5MB");
     };
     if (err) {

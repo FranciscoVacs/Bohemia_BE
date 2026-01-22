@@ -28,6 +28,9 @@ export class Event extends BaseEntity {
   @Property({ default: 0, fieldName: 'tickets_on_sale' })
   ticketsOnSale!: number;
 
+  @Property({ default: 'ARCHIVED', fieldName: 'gallery_status' })
+  galleryStatus: 'PUBLISHED' | 'ARCHIVED' = 'ARCHIVED';
+
   @ManyToOne(() => Location, { nullable: false })
   location!: Rel<Location>;
 

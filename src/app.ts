@@ -18,7 +18,7 @@ import dotenv from "dotenv";
 import path from "node:path";
 import { fileURLToPath } from 'node:url';
 import type { Express } from "express";
-import { createEventGalleryRouter } from "./routes/eventGallery.route.js";
+import { createEventPhotoRouter } from "./routes/eventPhoto.route.js";
 
 /**
  * Clase principal de la aplicación
@@ -105,8 +105,8 @@ export class App {
       djModel: this.container.getDjModel()
     }));
 
-    this.express.use("/api/event-gallery", createEventGalleryRouter({
-      eventGalleryModel: this.container.getEventGalleryModel(),
+    this.express.use("/api/event-photos", createEventPhotoRouter({
+      eventPhotoModel: this.container.getEventPhotoModel(),
       eventModel: this.container.getEventModel()
     }));
   }

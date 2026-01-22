@@ -5,7 +5,7 @@ import { CityModel } from '../models/orm/city.model.js';
 import { UserModel } from '../models/orm/user.model.js';
 import { PurchaseModel } from '../models/orm/purchase.model.js';
 import { TicketTypeModel } from '../models/orm/ticketType.model.js';
-import { EventGalleryModel } from '../models/orm/eventGallery.model.js';
+import { EventPhotoModel } from '../models/orm/eventPhoto.model.js';
 
 import { Event } from '../entities/event.entity.js';
 import { Location } from '../entities/location.entity.js';
@@ -15,7 +15,7 @@ import { Ticket } from '../entities/ticket.entity.js';
 import { User } from '../entities/user.entity.js';
 import { Purchase } from '../entities/purchase.entity.js';
 import { Dj } from '../entities/dj.entity.js';
-import { EventGallery } from '../entities/eventGallery.entity.js';
+import { EventPhoto } from '../entities/eventPhoto.entity.js';
 
 import { orm } from './db/orm.js';
 import type { EntityManager } from '@mikro-orm/mysql';
@@ -23,7 +23,7 @@ import type { IModel } from '../interfaces/model.interface.js';
 import type { IUserModel } from '../interfaces/user.interface.js';
 import type { IPurchaseModel } from '../interfaces/purchase.interface.js';
 import type { ITicketTypeModel } from '../interfaces/ticketType.interface.js';
-import type { IEventGalleryModel } from '../interfaces/eventGallery.interface.js';
+import type { IEventPhotoModel } from '../interfaces/eventPhoto.interface.js';
 
 /**
  * Dependency Injection Container
@@ -91,11 +91,11 @@ export class Container {
     return this.models.get('ticketTypeModel');
   }
 
-  getEventGalleryModel(): IEventGalleryModel<EventGallery> {
-    if (!this.models.has('eventGalleryModel')) {
-      this.models.set('eventGalleryModel', new EventGalleryModel(this.getEntityManager()));
+  getEventPhotoModel(): IEventPhotoModel<EventPhoto> {
+    if (!this.models.has('eventPhotoModel')) {
+      this.models.set('eventPhotoModel', new EventPhotoModel(this.getEntityManager()));
     }
-    return this.models.get('eventGalleryModel');
+    return this.models.get('eventPhotoModel');
   }
 
   // ✅ BaseModel - Solo CRUD básico

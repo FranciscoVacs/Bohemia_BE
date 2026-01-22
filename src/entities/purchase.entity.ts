@@ -1,9 +1,8 @@
-import { Entity, OneToMany, ManyToOne, Property,Cascade, Collection, Unique, Enum } from "@mikro-orm/core";
-import type   { Rel } from "@mikro-orm/core";
+import { Entity, OneToMany, ManyToOne, Property, Cascade, Collection, Enum } from "@mikro-orm/core";
+import type { Rel } from "@mikro-orm/core";
 import { BaseEntity } from "../shared/db/baseEntity.entity.js"
 import { User } from "./user.entity.js";
 import { Ticket } from "./ticket.entity.js";
-import { Payment } from "mercadopago";
 import { TicketType } from "./ticketType.entity.js";
 
 @Entity()
@@ -26,7 +25,7 @@ export class Purchase extends BaseEntity {
 
     @ManyToOne(() => User, { nullable: false })
     user!: Rel<User>;
-    
+
     @ManyToOne(() => TicketType, { nullable: false, fieldName: 'ticket_type_id' })
     ticketType!: Rel<TicketType>;
 
@@ -35,8 +34,8 @@ export class Purchase extends BaseEntity {
 }
 
 export enum PaymentStatus {
-    PENDING = "Pending",
-    APPROVED = "Approved",
-    REJECTED = "Rejected",
+    PENDING = "pending",
+    APPROVED = "approved",
+    REJECTED = "rejected",
+    CANCELLED = "cancelled",
 }
-

@@ -55,6 +55,40 @@ export function toFutureEventDTO(event: Event): FutureEventDTO {
 }
 
 // ============================================
+// Gallery Event DTO (Para listado público de galerías)
+// ============================================
+
+export interface GalleryEventDTO {
+  id: number;
+  eventName: string;
+  beginDatetime: Date;
+  finishDatetime: Date;
+  coverPhoto: string;
+  location: LocationDTO;
+  dj: DjDTO;
+}
+
+export function toGalleryEventDTO(event: Event): GalleryEventDTO {
+  return {
+    id: event.id,
+    eventName: event.eventName,
+    beginDatetime: event.beginDatetime,
+    finishDatetime: event.finishDatetime,
+    coverPhoto: event.coverPhoto,
+    location: {
+      locationName: event.location.locationName,
+      address: event.location.address,
+      city: {
+        cityName: event.location.city.cityName,
+      }
+    },
+    dj: {
+      djApodo: event.dj.djApodo,
+    }
+  };
+}
+
+// ============================================
 // Public DTO (Para endpoints públicos con ID)
 // ============================================
 
@@ -160,6 +194,7 @@ export interface AdminEventDTO {
   isSoldOut: boolean;
   totalTicketsSold: number;
   totalRevenue: number;
+  galleryStatus: 'PUBLISHED' | 'ARCHIVED';
 }
 
 export function toAdminEventDTO(event: Event): AdminEventDTO {
@@ -220,5 +255,6 @@ export function toAdminEventDTO(event: Event): AdminEventDTO {
     isSoldOut,
     totalTicketsSold,
     totalRevenue,
+    galleryStatus: event.galleryStatus,
   };
 }

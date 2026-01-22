@@ -1,7 +1,5 @@
 import type { Purchase } from "../entities/purchase.entity.js";
 import { BaseController } from "./base.controller.js";
-import type { IModel } from "../interfaces/model.interface.js";
-import { TicketTypeController } from "./ticketType.controller.js";
 import type { Request, Response, NextFunction } from "express";
 import type { IPurchaseModel } from "../interfaces/purchase.interface.js";
 import { PDFGenerator } from "../services/pdfGenerator.js";
@@ -9,49 +7,53 @@ import type { Ticket } from "../entities/ticket.entity.js";
 import { throwError } from "../shared/errors/ErrorUtils.js";
 import { asyncHandler } from "../middlewares/asyncHandler.js";
 
-
 export class PurchaseController extends BaseController<Purchase> {
   constructor(protected model: IPurchaseModel<Purchase>) {
     super(model);
   }
 
-  create = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+  /**
+   * Crea una compra y genera los tickets inmediatamente
+   */
+  createPurchase = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const { ticketTypeId, ticketQuantity } = req.body;
 
-    // Obtener userId del token JWT (no del body por seguridad)
+    // Obtener userId del token JWT
     const userId = req.user?.id;
     if (!userId) {
       throwError.custom("User ID not found in token", 401);
       return;
     }
 
-    const item = await this.model.createProtocol(
-      ticketTypeId,
+    const purchase = await this.model.createPurchase(
+      ticketTypeId.toString(),
       ticketQuantity,
       userId.toString(),
     );
-    const purchaseData = {
-      id: item?.id,
-      ticketNumbers: item?.ticketNumbers,
-      paymentStatus: item?.paymentStatus,
-      discountApplied: item?.discountApplied,
-      serviceFee: item?.serviceFee,
-      totalPrice: item?.totalPrice,
-      userId: item?.user.id,
-      ticketTypeId: item?.ticketType.id,
-    };
 
-    return res
-      .status(201)
-      .send({ message: "Item created", data: purchaseData });
+    return res.status(201).send({
+      message: "Purchase created successfully",
+      data: {
+        purchaseId: purchase.id,
+        ticketNumbers: purchase.ticketNumbers,
+        totalPrice: purchase.totalPrice,
+        paymentStatus: purchase.paymentStatus,
+      }
+    });
   });
 
+  /**
+   * Obtiene los tickets de una compra
+   */
   getTickets = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
     const item = await this.model.getById(id);
     return res.status(200).send(item);
   });
 
+  /**
+   * Descarga el PDF de un ticket específico
+   */
   getById = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const { purchaseId, ticketId } = req.params;
     const item = await this.model.getById(purchaseId);

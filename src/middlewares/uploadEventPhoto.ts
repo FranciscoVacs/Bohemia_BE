@@ -1,14 +1,14 @@
 import multer from "multer";
-import {CloudinaryStorage} from "multer-storage-cloudinary";
+import { CloudinaryStorage } from "multer-storage-cloudinary";
 import cloudinary from "../config/cloudinaryConfig.js";
 import path from "node:path";
-import {Request} from "express";
+import { Request } from "express";
 
-export const uploadEventImage = (folderName: string) => {
+export const uploadEventPhoto = (folderName: string) => {
     const storage = new CloudinaryStorage({
         cloudinary: cloudinary,
         params: (req: Request, file: Express.Multer.File) => {
-            const folderPath = `${folderName.trim()}`; // Update the folder path here
+            const folderPath = `${folderName.trim()}`;
             const fileExtension = path.extname(file.originalname).substring(1);
             const publicId = `${file.fieldname}-${Date.now()}`;
             return {
@@ -18,10 +18,17 @@ export const uploadEventImage = (folderName: string) => {
             };
         },
     });
-    return multer({ 
+    return multer({
         storage: storage,
+        fileFilter: (req: Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
+            const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp'];
+            if (allowedTypes.includes(file.mimetype)) {
+                return cb(null, true);
+            }
+            return cb(new Error(`Tipo de archivo no permitido: ${file.mimetype}`));
+        },
         limits: { fileSize: 1024 * 1024 * 15 }, // 15MB limit
     });
 };
 
-export default uploadEventImage;
+export default uploadEventPhoto;

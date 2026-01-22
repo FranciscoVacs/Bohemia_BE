@@ -1,22 +1,25 @@
 import type { EntityManager } from "@mikro-orm/mysql";
-import { Purchase } from "../../entities/purchase.entity.js";
+import { Purchase, PaymentStatus } from "../../entities/purchase.entity.js";
 import { TicketType } from "../../entities/ticketType.entity.js";
 import { User } from "../../entities/user.entity.js";
 import { Ticket } from "../../entities/ticket.entity.js";
 import { BaseModel } from "./base.Model.js";
 import { v4 as uuid } from "uuid";
-import { throwError, assertResourceExists, assertBusinessRule } from "../../shared/errors/ErrorUtils.js";
+import { assertBusinessRule } from "../../shared/errors/ErrorUtils.js";
 
 export class PurchaseModel extends BaseModel<Purchase> {
   constructor(em: EntityManager) {
     super(em, Purchase);
   }
 
-  async createProtocol(
+  /**
+   * Crea una compra y genera los tickets inmediatamente
+   */
+  async createPurchase(
     ticketTypeId: string,
     ticketQuantity: number,
     userId: string,
-  ): Promise<Purchase | undefined> {
+  ): Promise<Purchase> {
     const parsedTTId = Number.parseInt(ticketTypeId);
     const parsedUID = Number.parseInt(userId);
 
@@ -39,11 +42,6 @@ export class PurchaseModel extends BaseModel<Purchase> {
     );
 
     const actualUser: User = await this.em.findOneOrFail(User, parsedUID);
-    const newStockTickets = ticketType.availableTickets - ticketQuantity;
-    console.log("newStockTickets", newStockTickets);
-    console.log("availableTickets", ticketType.availableTickets);
-
-    this.em.assign(ticketType, { availableTickets: newStockTickets });
 
     // Calcular pricing con cargo de servicio
     const subtotal = ticketType.price * ticketQuantity;
@@ -51,9 +49,13 @@ export class PurchaseModel extends BaseModel<Purchase> {
     const serviceFee = subtotal * serviceFeePercentage;
     const totalPrice = subtotal + serviceFee;
 
-    const purchaseActual = this.em.create(Purchase, {
+    // Reducir stock
+    ticketType.availableTickets -= ticketQuantity;
+
+    // Crear Purchase con estado APPROVED (compra directa)
+    const purchase = this.em.create(Purchase, {
       ticketNumbers: ticketQuantity,
-      paymentStatus: "Approved",
+      paymentStatus: PaymentStatus.APPROVED,
       discountApplied: 0,
       serviceFee: serviceFee,
       user: actualUser,
@@ -61,19 +63,18 @@ export class PurchaseModel extends BaseModel<Purchase> {
       totalPrice: totalPrice,
     } as Purchase);
 
-    //crear los tickets
+    // Crear los tickets inmediatamente
     for (let i = 1; i <= ticketQuantity; i++) {
       this.em.create(Ticket, {
         qrCode: uuid(),
         numberInPurchase: i,
-        numberInTicketType:
-          ticketType.maxQuantity - ticketType.availableTickets,
-        purchase: purchaseActual,
+        numberInTicketType: ticketType.maxQuantity - ticketType.availableTickets + i,
+        purchase: purchase,
       } as Ticket);
     }
-    await this.em.flush();
 
-    return purchaseActual;
+    await this.em.flush();
+    return purchase;
   }
 
   async getById(id: string): Promise<Purchase | undefined> {
