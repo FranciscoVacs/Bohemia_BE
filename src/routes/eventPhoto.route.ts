@@ -31,6 +31,10 @@ export const createEventPhotoRouter = ({
     // ================================
     // Rutas protegidas (requieren autenticación y admin)
     // ================================
+
+    // Obtener fotos de un evento específico (Admin - ignora status)
+    eventPhotoRouter.get("/gallery/admin/:eventId", verifyToken, isAdmin, eventPhotoController.getByEventIdAdmin);
+
     eventPhotoRouter.get("/", verifyToken, isAdmin, eventPhotoController.getAll);
 
     // Upload de fotos

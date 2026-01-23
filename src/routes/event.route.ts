@@ -22,6 +22,7 @@ export const createEventRouter = ({
 
   // Rutas protegidas (requieren autenticación y admin)
   eventRouter.get("/admin", verifyToken, isAdmin, eventController.getAllForAdmin); // Con métricas calculadas
+  eventRouter.get("/admin/:id", verifyToken, isAdmin, eventController.getByIdForAdmin); // Nuevo: detalle completo para admin
 
   // Rutas públicas
   eventRouter.get("/:id", schemaValidator(UpdateEventSchema), eventController.getById);

@@ -83,6 +83,22 @@ export class EventPhotoController extends BaseController<EventPhoto> {
         });
     });
 
+    // Obtener fotos de un evento específico (ADMIN - sin restricción de status)
+    getByEventIdAdmin = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+        const { eventId } = req.params;
+        const event = await this.eventModel.getById(eventId);
+
+        if (!event) {
+            throw new NotFoundError("Event not found");
+        }
+
+        const photos = await this.model.getByEventId(Number(eventId));
+        return res.status(200).send({
+            success: true,
+            data: photos
+        });
+    });
+
     // Obtener todos los eventos con galerías publicadas
     getEventsWithPublishedGalleries = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
         const allEvents = await this.eventModel.getAll();

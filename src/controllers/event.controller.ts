@@ -39,6 +39,22 @@ export class EventController extends BaseController<Event> {
     });
   });
 
+  // Método para admin: obtener un evento específico con todos los detalles (incluyendo galleryStatus)
+  getByIdForAdmin = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const id = req.params.id;
+    const event = await this.model.getById(id);
+
+    assertResourceExists(event, `Event with id ${id}`);
+
+    // Transformar a DTO admin
+    const adminEvent = toAdminEventDTO(event!);
+
+    return res.status(200).send({
+      message: "Evento obtenido exitosamente",
+      data: adminEvent,
+    });
+  });
+
   create = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const { eventName, beginDatetime, finishDatetime, eventDescription, minAge, location, dj } = req.body;
     const fileName = req.file?.filename;
