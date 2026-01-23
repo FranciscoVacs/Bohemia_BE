@@ -33,6 +33,7 @@ export const createEventRouter = ({
   eventRouter.post("/", verifyToken, isAdmin, uploader, schemaValidator(CreateEventSchema), eventController.create);
   eventRouter.patch("/:id", verifyToken, isAdmin, uploader, schemaValidator(UpdateEventSchema), eventController.update);
   eventRouter.patch("/:id/gallery-status", verifyToken, isAdmin, eventController.updateGalleryStatus);
+  eventRouter.patch("/:id/publish", verifyToken, isAdmin, eventController.publishEvent);
   eventRouter.delete("/:id", verifyToken, isAdmin, schemaValidator(UpdateEventSchema), eventController.delete);
 
   return eventRouter;

@@ -39,7 +39,7 @@ export class EventController extends BaseController<Event> {
     });
   });
 
-  // Método para admin: obtener un evento específico con todos los detalles (incluyendo galleryStatus)
+  // Método para admin: obtener un evento específico con todos los detalles (incluyendo isGalleryPublished)
   getByIdForAdmin = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const id = req.params.id;
     const event = await this.model.getById(id);
@@ -137,9 +137,9 @@ export class EventController extends BaseController<Event> {
       });
     }
 
-    // Filtrar eventos que no han terminado
+    // Filtrar eventos PUBLICADOS que no han terminado
     const futureEvents = allEvents.filter(event =>
-      new Date(event.finishDatetime) > now
+      event.isPublished && new Date(event.finishDatetime) > now
     );
 
     if (futureEvents.length === 0) {
@@ -163,12 +163,17 @@ export class EventController extends BaseController<Event> {
     });
   });
 
-  // Sobrescribir getById para usar DTO público
+  // Sobrescribir getById para usar DTO público (solo eventos publicados)
   getById = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const id = req.params.id;
     const event = await this.model.getById(id);
 
     assertResourceExists(event, `Event with id ${id}`);
+
+    // Solo mostrar si está publicado
+    if (!event!.isPublished) {
+      throwError.notFound(`Event with id ${id}`);
+    }
 
     // Transformar a DTO público (sin exponer datos sensibles)
     const publicEvent = toPublicEventDTO(event!);
@@ -197,20 +202,46 @@ export class EventController extends BaseController<Event> {
 
   updateGalleryStatus = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const id = req.params.id;
-    const { status } = req.body; // 'PUBLISHED' | 'ARCHIVED'
+    const { isGalleryPublished } = req.body;
 
-    if (!['PUBLISHED', 'ARCHIVED'].includes(status)) {
-      throwError.badRequest("Status inválido. Debe ser 'PUBLISHED' o 'ARCHIVED'");
+    if (typeof isGalleryPublished !== 'boolean') {
+      throwError.badRequest("isGalleryPublished debe ser un valor booleano (true o false)");
     }
 
     const event = await this.model.getById(id);
     assertResourceExists(event, `Event with id ${id}`);
 
-    await this.model.update(id, { galleryStatus: status });
+    await this.model.update(id, { isGalleryPublished });
 
     return res.status(200).send({
-      message: `Estado de galería actualizado a ${status}`,
-      data: { id, galleryStatus: status }
+      message: `Estado de galería actualizado`,
+      data: { id, isGalleryPublished }
+    });
+  });
+
+  // Publicar evento (requiere al menos un ticketType)
+  publishEvent = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const id = req.params.id;
+    const event = await this.model.getById(id);
+
+    assertResourceExists(event, `Event with id ${id}`);
+
+    // Verificar que tenga al menos un ticketType
+    const ticketTypes = event!.ticketType.getItems();
+    if (ticketTypes.length === 0) {
+      throwError.badRequest("No se puede publicar un evento sin tipos de tickets. Agregue al menos uno.");
+    }
+
+    // Verificar que no esté ya publicado
+    if (event!.isPublished) {
+      throwError.badRequest("El evento ya está publicado.");
+    }
+
+    await this.model.update(id, { isPublished: true });
+
+    return res.status(200).send({
+      message: "Evento publicado exitosamente",
+      data: { id, isPublished: true }
     });
   });
 }

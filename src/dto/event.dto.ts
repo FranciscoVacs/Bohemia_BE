@@ -194,7 +194,8 @@ export interface AdminEventDTO {
   isSoldOut: boolean;
   totalTicketsSold: number;
   totalRevenue: number;
-  galleryStatus: 'PUBLISHED' | 'ARCHIVED';
+  isGalleryPublished: boolean;
+  isPublished: boolean;
 }
 
 export function toAdminEventDTO(event: Event): AdminEventDTO {
@@ -255,6 +256,7 @@ export function toAdminEventDTO(event: Event): AdminEventDTO {
     isSoldOut,
     totalTicketsSold,
     totalRevenue,
-    galleryStatus: event.galleryStatus,
+    isGalleryPublished: event.isGalleryPublished,
+    isPublished: event.isPublished,
   };
 }

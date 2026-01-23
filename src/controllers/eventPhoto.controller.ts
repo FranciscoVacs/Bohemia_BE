@@ -72,7 +72,7 @@ export class EventPhotoController extends BaseController<EventPhoto> {
         }
 
         // Solo permitir acceso a galerías publicadas
-        if (event.galleryStatus !== 'PUBLISHED') {
+        if (!event.isGalleryPublished) {
             throw new NotFoundError("La galería de este evento no está disponible.");
         }
 
@@ -111,7 +111,7 @@ export class EventPhotoController extends BaseController<EventPhoto> {
             });
         }
 
-        const publishedEvents = allEvents.filter(event => event.galleryStatus === 'PUBLISHED');
+        const publishedEvents = allEvents.filter(event => event.isGalleryPublished);
 
         if (publishedEvents.length === 0) {
             return res.status(200).send({
