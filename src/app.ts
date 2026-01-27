@@ -72,9 +72,10 @@ export class App {
    * Configura todas las rutas de la API
    */
   private configureRoutes(): void {
-    // Rutas de la API - usando el container para obtener modelos
+// Rutas de la API - usando el container para obtener modelos
     this.express.use("/api/event", createEventRouter({
-      eventModel: this.container.getEventModel()
+      eventModel: this.container.getEventModel(),
+      getEntityManager: this.container.getEntityManager.bind(this.container)
     }));
 
     this.express.use("/api/location", createLocationRouter({

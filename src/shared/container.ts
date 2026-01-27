@@ -32,11 +32,11 @@ import type { IEventPhotoModel } from '../interfaces/eventPhoto.interface.js';
 export class Container {
   private models: Map<string, any> = new Map();
 
-  /**
+/**
    * Obtiene un EntityManager fork para cada solicitud
    * Esto es importante para el manejo de transacciones en MikroORM
    */
-  private getEntityManager(): EntityManager {
+  getEntityManager(): EntityManager {
     return orm.em.fork();
   }
 

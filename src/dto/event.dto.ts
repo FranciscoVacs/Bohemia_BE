@@ -9,12 +9,14 @@ export interface CityDTO {
 }
 
 export interface LocationDTO {
+  id?: number;
   locationName: string;
   address: string;
   city: CityDTO;
 }
 
 export interface DjDTO {
+  id?: number;
   djApodo: string;
 }
 
@@ -189,11 +191,27 @@ export interface AdminEventDTO {
   coverPhoto: string;
   location: LocationDTO;
   dj: DjDTO;
+  ticketTypes: TicketTypeDTO[];
   isGalleryPublished: boolean;
   isPublished: boolean;
 }
 
 export function toAdminEventDTO(event: Event): AdminEventDTO {
+  const ticketTypesArray = event.ticketType.getItems();
+
+  const ticketTypes: TicketTypeDTO[] = ticketTypesArray.map(tt => ({
+    id: tt.id,
+    ticketTypeName: tt.ticketTypeName,
+    beginDatetime: tt.beginDatetime,
+    finishDatetime: tt.finishDatetime,
+    price: tt.price,
+    maxQuantity: tt.maxQuantity,
+    availableTickets: tt.availableTickets,
+    saleMode: tt.saleMode,
+    isManuallyActivated: tt.isManuallyActivated,
+    isSaleActive: tt.isSaleActive(),
+  }));
+
   return {
     id: event.id,
     eventName: event.eventName,
@@ -203,6 +221,7 @@ export function toAdminEventDTO(event: Event): AdminEventDTO {
     minAge: event.minAge,
     coverPhoto: event.coverPhoto,
     location: {
+      id: event.location.id,
       locationName: event.location.locationName,
       address: event.location.address,
       city: {
@@ -210,8 +229,10 @@ export function toAdminEventDTO(event: Event): AdminEventDTO {
       }
     },
     dj: {
+      id: event.dj.id,
       djApodo: event.dj.djApodo,
     },
+    ticketTypes,
     isGalleryPublished: event.isGalleryPublished,
     isPublished: event.isPublished,
   };
