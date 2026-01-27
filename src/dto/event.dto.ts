@@ -189,51 +189,11 @@ export interface AdminEventDTO {
   coverPhoto: string;
   location: LocationDTO;
   dj: DjDTO;
-  ticketTypes: TicketTypeDTO[];
-  // Campos calculados
-  isSoldOut: boolean;
-  totalTicketsSold: number;
-  totalRevenue: number;
   isGalleryPublished: boolean;
   isPublished: boolean;
 }
 
 export function toAdminEventDTO(event: Event): AdminEventDTO {
-  // Calcular métricas desde los ticketTypes
-  const ticketTypesArray = event.ticketType.getItems();
-
-  let totalTicketsSold = 0;
-  let totalRevenue = 0;
-  let isSoldOut = true;
-
-  const ticketTypes: TicketTypeDTO[] = ticketTypesArray.map(tt => {
-    const sold = tt.maxQuantity - tt.availableTickets;
-    totalTicketsSold += sold;
-    totalRevenue += sold * tt.price;
-
-    if (tt.availableTickets > 0) {
-      isSoldOut = false;
-    }
-
-    return {
-      id: tt.id,
-      ticketTypeName: tt.ticketTypeName,
-      beginDatetime: tt.beginDatetime,
-      finishDatetime: tt.finishDatetime,
-      price: tt.price,
-      maxQuantity: tt.maxQuantity,
-      availableTickets: tt.availableTickets,
-      saleMode: tt.saleMode,
-      isManuallyActivated: tt.isManuallyActivated,
-      isSaleActive: tt.isSaleActive(),
-    };
-  });
-
-  // Si no hay ticketTypes, no está sold out
-  if (ticketTypesArray.length === 0) {
-    isSoldOut = false;
-  }
-
   return {
     id: event.id,
     eventName: event.eventName,
@@ -252,10 +212,6 @@ export function toAdminEventDTO(event: Event): AdminEventDTO {
     dj: {
       djApodo: event.dj.djApodo,
     },
-    ticketTypes,
-    isSoldOut,
-    totalTicketsSold,
-    totalRevenue,
     isGalleryPublished: event.isGalleryPublished,
     isPublished: event.isPublished,
   };

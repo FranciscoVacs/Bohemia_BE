@@ -245,15 +245,53 @@ Todas las respuestas de la API siguen esta estructura:
 
 ## 🎉 Gestión de Eventos
 
-### Listar Eventos Futuros
+### Obtener Próximo Evento
 **GET** `/event/future`
 - **Permisos:** 🔓 Público
-- **Propósito:** Obtener solo eventos que no han terminado (futuros y en curso)
+- **Propósito:** Obtener el próximo evento publicado que no ha terminado
+
+**Filtros aplicados:**
+- `isPublished` debe ser `true`
+- `finishDatetime` debe ser mayor a la fecha actual (incluye eventos en curso)
+
+**Response (con evento):**
+```json
+{
+  "message": "Próximo evento obtenido exitosamente",
+  "data": {
+    "eventName": "Fiesta Bohemia",
+    "beginDatetime": "2026-02-14T20:00:00.000Z",
+    "finishDatetime": "2026-02-15T04:00:00.000Z",
+    "eventDescription": "La mejor fiesta del año",
+    "minAge": 18,
+    "coverPhoto": "http://localhost:3000/public/uploads/1234_foto.jpg",
+    "location": {
+      "locationName": "Club Bohemia",
+      "address": "Av. Principal 123",
+      "city": { "cityName": "Buenos Aires" }
+    },
+    "dj": { "djApodo": "Beats" }
+  }
+}
+```
+
+**Response (sin eventos):**
+```json
+{
+  "message": "No hay eventos proximos",
+  "data": null
+}
+```
+
+### Listar Todos los Eventos (Admin)
+**GET** `/event/admin`
+- **Permisos:** 🔒 Autenticado + 👑 Admin
+- **Propósito:** Obtener todos los eventos con información básica para el panel de administración
 
 **Response:**
 ```json
 {
-  "message": "Eventos futuros obtenidos exitosamente",
+  "message": "Eventos obtenidos exitosamente",
   "data": [
     {
       "id": 1,
@@ -263,25 +301,29 @@ Todas las respuestas de la API siguen esta estructura:
       "eventDescription": "La mejor fiesta del año",
       "minAge": 18,
       "coverPhoto": "http://localhost:3000/public/uploads/1234_foto.jpg",
-      "ticketsOnSale": 100,
-      "location": { "id": 1, "locationName": "Club Bohemia", ... },
-      "dj": { "id": 1, "djName": "DJ", "djApodo": "Beats", ... }
+      "location": {
+        "locationName": "Club Bohemia",
+        "address": "Av. Principal 123",
+        "city": { "cityName": "Buenos Aires" }
+      },
+      "dj": { "djApodo": "Beats" },
+      "isGalleryPublished": false,
+      "isPublished": true
     }
-  ],
-  "count": 1,
-  "note": "Incluye eventos en curso y futuros (hasta que terminen)"
+  ]
 }
 ```
 
-### Obtener Evento por ID
-**GET** `/event/:id`
-- **Permisos:** 🔓 Público
+### Obtener Evento por ID (Admin)
+**GET** `/event/admin/:id`
+- **Permisos:** 🔒 Autenticado + 👑 Admin
 - **Parámetros:** `id` (número)
+- **Propósito:** Obtener detalle completo de un evento para administración
 
 **Response:**
 ```json
 {
-  "message": "Item found",
+  "message": "Evento obtenido exitosamente",
   "data": {
     "id": 1,
     "eventName": "Fiesta Bohemia",
@@ -290,19 +332,82 @@ Todas las respuestas de la API siguen esta estructura:
     "eventDescription": "La mejor fiesta del año",
     "minAge": 18,
     "coverPhoto": "http://localhost:3000/public/uploads/1234_foto.jpg",
-    "ticketsOnSale": 100,
-    "location": { ... },
-    "dj": { ... }
+    "location": {
+      "locationName": "Club Bohemia",
+      "address": "Av. Principal 123",
+      "city": { "cityName": "Buenos Aires" }
+    },
+    "dj": { "djApodo": "Beats" },
+    "isGalleryPublished": false,
+    "isPublished": true
   }
 }
 ```
 
-### Listar Todos los Eventos
-**GET** `/event`
-- **Permisos:** 🔒 Autenticado + 👑 Admin
+### Obtener Evento por ID (Público)
+**GET** `/event/:id`
+- **Permisos:** 🔓 Público
+- **Parámetros:** `id` (número)
+- **Nota:** Solo devuelve eventos con `isPublished: true`
+
+**Response:**
+```json
+{
+  "message": "Evento obtenido exitosamente",
+  "data": {
+    "id": 1,
+    "eventName": "Fiesta Bohemia",
+    "beginDatetime": "2026-02-14T20:00:00.000Z",
+    "finishDatetime": "2026-02-15T04:00:00.000Z",
+    "eventDescription": "La mejor fiesta del año",
+    "minAge": 18,
+    "coverPhoto": "http://localhost:3000/public/uploads/1234_foto.jpg",
+    "location": {
+      "locationName": "Club Bohemia",
+      "address": "Av. Principal 123",
+      "city": { "cityName": "Buenos Aires" }
+    },
+    "dj": { "djApodo": "Beats" },
+    "ticketTypes": [
+      {
+        "id": 1,
+        "ticketTypeName": "General",
+        "beginDatetime": "2026-01-01T00:00:00.000Z",
+        "finishDatetime": "2026-02-14T18:00:00.000Z",
+        "price": 2500,
+        "availableTickets": 85,
+        "isSaleActive": true
+      }
+    ]
+  }
+}
+```
+
+### Obtener Tipos de Tickets de un Evento
+**GET** `/event/:id/ticketTypes`
+- **Permisos:** 🔓 Público
+- **Parámetros:** `id` (número)
+
+**Response:**
+```json
+{
+  "message": "Tipos de tickets obtenidos exitosamente",
+  "data": [
+    {
+      "id": 1,
+      "ticketTypeName": "General",
+      "beginDatetime": "2026-01-01T00:00:00.000Z",
+      "finishDatetime": "2026-02-14T18:00:00.000Z",
+      "price": 2500,
+      "availableTickets": 85,
+      "isSaleActive": true
+    }
+  ]
+}
+```
 
 ### Crear Evento
-**POST** `/event`
+**POST** `/event/crear`
 - **Permisos:** 🔒 Autenticado + 👑 Admin
 - **Content-Type:** `multipart/form-data`
 - **Archivo:** `cover_photo` (imagen jpg/jpeg/png, máx 5MB) - **REQUERIDO**
@@ -354,27 +459,49 @@ Todas las respuestas de la API siguen esta estructura:
 **PATCH** `/event/:id/gallery-status`
 - **Permisos:** 🔒 Autenticado + 👑 Admin
 - **Parámetros:** `id` (número)
-- **Propósito:** Cambiar el estado de la galería entre PUBLISHED y ARCHIVED
+- **Propósito:** Cambiar si la galería de fotos del evento está publicada
 
 **Request Body:**
 ```json
 {
-  "galleryStatus": "PUBLISHED" // o "ARCHIVED"
+  "isGalleryPublished": true
 }
 ```
 
 **Response:**
 ```json
 {
-  "message": "Gallery status updated",
+  "message": "Estado de galería actualizado",
   "data": {
     "id": 1,
-    "galleryStatus": "PUBLISHED"
+    "isGalleryPublished": true
   }
 }
 ```
 
-> **Nota:** Por defecto, los eventos nuevos tienen `galleryStatus: ARCHIVED`. Solo las galerías con estado `PUBLISHED` son visibles para usuarios públicos.
+> **Nota:** Por defecto, los eventos nuevos tienen `isGalleryPublished: false`. Solo las galerías publicadas son visibles para usuarios públicos.
+
+### Publicar Evento
+**PATCH** `/event/:id/publish`
+- **Permisos:** 🔒 Autenticado + 👑 Admin
+- **Parámetros:** `id` (número)
+- **Propósito:** Publicar un evento para que sea visible públicamente
+- **Requisito:** El evento debe tener al menos un tipo de ticket creado
+
+**Response (éxito):**
+```json
+{
+  "message": "Evento publicado exitosamente",
+  "data": {
+    "id": 1,
+    "isPublished": true
+  }
+}
+```
+
+**Errores posibles:**
+- `400 Bad Request`: "No se puede publicar un evento sin tipos de tickets. Agregue al menos uno."
+- `400 Bad Request`: "El evento ya está publicado."
 
 ---
 

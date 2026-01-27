@@ -29,8 +29,7 @@ export const createEventRouter = ({
   eventRouter.get("/:id/ticketTypes", schemaValidator(UpdateEventSchema), eventController.getTicketTypes); // Ticket types por evento
 
   // Rutas protegidas (requieren autenticación y admin)
-  eventRouter.get("/", verifyToken, isAdmin, eventController.getAll);
-  eventRouter.post("/", verifyToken, isAdmin, uploader, schemaValidator(CreateEventSchema), eventController.create);
+  eventRouter.post("/crear", verifyToken, isAdmin, uploader, schemaValidator(CreateEventSchema), eventController.create);
   eventRouter.patch("/:id", verifyToken, isAdmin, uploader, schemaValidator(UpdateEventSchema), eventController.update);
   eventRouter.patch("/:id/gallery-status", verifyToken, isAdmin, eventController.updateGalleryStatus);
   eventRouter.patch("/:id/publish", verifyToken, isAdmin, eventController.publishEvent);
