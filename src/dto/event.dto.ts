@@ -21,6 +21,7 @@ export interface DjDTO {
 }
 
 export interface FutureEventDTO {
+  id: number;
   eventName: string;
   beginDatetime: Date;
   finishDatetime: Date;
@@ -37,6 +38,7 @@ export interface FutureEventDTO {
 
 export function toFutureEventDTO(event: Event): FutureEventDTO {
   return {
+    id: event.id,
     eventName: event.eventName,
     beginDatetime: event.beginDatetime,
     finishDatetime: event.finishDatetime,
