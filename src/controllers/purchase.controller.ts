@@ -6,12 +6,12 @@ import { PDFGenerator } from "../services/pdfGenerator.js";
 import type { Ticket } from "../entities/ticket.entity.js";
 import { throwError } from "../shared/errors/ErrorUtils.js";
 import { asyncHandler } from "../middlewares/asyncHandler.js";
+import { MercadoPagoConfig, Preference } from "mercadopago";
 
 export class PurchaseController extends BaseController<Purchase> {
   constructor(protected model: IPurchaseModel<Purchase>) {
     super(model);
   }
-
   /**
    * Crea una compra y genera los tickets inmediatamente
    */
@@ -86,4 +86,48 @@ export class PurchaseController extends BaseController<Purchase> {
       throwError.notFound("Ticket not found");
     }
   });
-}
+
+  createPreference = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const { ticketTypeName, ticketNumbers, price } = req.body;
+
+    // Validate required fields
+    if (!ticketTypeName || !ticketNumbers || !price) {
+      throwError.badRequest("ticketTypeName, ticketNumbers, and price are required");
+      return;
+    }
+
+    try {
+      // Initialize MercadoPago client with the new SDK
+      const client = new MercadoPagoConfig({
+        accessToken: process.env.MP_TEST_ACCESS_TOKEN!,
+      });
+
+      const preferenceClient = new Preference(client);
+
+      // Create preference
+      const preferenceResponse = await preferenceClient.create({
+        body: {
+          items: [
+            {
+              id: "ticket-001",
+              title: ticketTypeName,
+              quantity: parseInt(ticketNumbers),
+              unit_price: parseFloat(price),
+            }
+          ],
+          back_urls: {
+            success: `${process.env.FRONTEND_URL}/success`,
+            failure: `${process.env.FRONTEND_URL}/failure`,
+            pending: `${process.env.FRONTEND_URL}/pending`
+          },
+          auto_return: 'approved',
+        }
+      });
+      return res.status(201).json({ 
+        init_point: preferenceResponse.init_point 
+      });
+    } catch (error: any) {
+      console.error("MercadoPago error:", error);
+      throwError.badRequest(`MercadoPago error: ${error.message}`);
+    }
+  });}

@@ -19,6 +19,12 @@ export const createPurchaseRouter = ({
   // Rutas de compra
   // =====================
 
+
+  purchaseRouter.post("/create_preference", 
+    verifyToken,
+    purchaseController.createPreference);
+
+
   // Crear compra (genera tickets inmediatamente)
   purchaseRouter.post("/",
     verifyToken,
