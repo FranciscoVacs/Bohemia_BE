@@ -52,10 +52,10 @@ export class PurchaseModel extends BaseModel<Purchase> {
     // Reducir stock
     ticketType.availableTickets -= ticketQuantity;
 
-    // Crear Purchase con estado APPROVED (compra directa)
+    // Crear Purchase con estado PENDING 
     const purchase = this.em.create(Purchase, {
       ticketNumbers: ticketQuantity,
-      paymentStatus: PaymentStatus.APPROVED,
+      paymentStatus: PaymentStatus.PENDING,
       discountApplied: 0,
       serviceFee: serviceFee,
       user: actualUser,
@@ -94,5 +94,22 @@ export class PurchaseModel extends BaseModel<Purchase> {
     return await this.em.findOneOrFail(Purchase, parsedId, {
       populate: ["ticket"],
     });
+  }
+
+  async updatePaymentStatus(id: string, status: PaymentStatus): Promise<Purchase> {
+    const parsedId = Number.parseInt(id);
+    const purchase = await this.em.findOneOrFail(Purchase, parsedId, {
+      populate: ["ticketType"],
+    });
+
+    purchase.paymentStatus = status;
+
+    // Si el pago fue rechazado o cancelado, liberar los tickets
+    if (status === PaymentStatus.REJECTED || status === PaymentStatus.CANCELLED) {
+      purchase.ticketType.availableTickets += purchase.ticketNumbers;
+    }
+
+    await this.em.flush();
+    return purchase;
   }
 }

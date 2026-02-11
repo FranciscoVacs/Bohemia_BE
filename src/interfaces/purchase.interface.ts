@@ -1,5 +1,5 @@
 import type { IModel } from "./model.interface";
-import type { Purchase } from "../entities/purchase.entity";
+import type { PaymentStatus, Purchase } from "../entities/purchase.entity";
 
 export interface IPurchaseModel<T> extends IModel<T> {
   // Crear compra con tickets inmediatamente
@@ -8,4 +8,9 @@ export interface IPurchaseModel<T> extends IModel<T> {
     ticketQuantity: number,
     userId: string
   ): Promise<T>;
+
+    updatePaymentStatus(
+    purchaseId: string,
+    status: PaymentStatus,
+  ): Promise<void>;
 }

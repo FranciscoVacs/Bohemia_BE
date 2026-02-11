@@ -7,6 +7,8 @@ import type { Ticket } from "../entities/ticket.entity.js";
 import { throwError } from "../shared/errors/ErrorUtils.js";
 import { asyncHandler } from "../middlewares/asyncHandler.js";
 import { MercadoPagoConfig, Preference } from "mercadopago";
+import { mapMPStatus } from "../services/paymentStatusMapper.js";
+import { Console } from "console";
 
 export class PurchaseController extends BaseController<Purchase> {
   constructor(protected model: IPurchaseModel<Purchase>) {
@@ -34,7 +36,7 @@ export class PurchaseController extends BaseController<Purchase> {
     return res.status(201).send({
       message: "Purchase created successfully",
       data: {
-        purchaseId: purchase.id,
+        id: purchase.id,
         ticketNumbers: purchase.ticketNumbers,
         totalPrice: purchase.totalPrice,
         paymentStatus: purchase.paymentStatus,
@@ -88,11 +90,11 @@ export class PurchaseController extends BaseController<Purchase> {
   });
 
   createPreference = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-    const { ticketTypeName, ticketNumbers, price } = req.body;
+    const { id } = req.body;
 
     // Validate required fields
-    if (!ticketTypeName || !ticketNumbers || !price) {
-      throwError.badRequest("ticketTypeName, ticketNumbers, and price are required");
+    if (!id ) {
+      throwError.badRequest("id is required");
       return;
     }
 
@@ -103,16 +105,18 @@ export class PurchaseController extends BaseController<Purchase> {
       });
 
       const preferenceClient = new Preference(client);
-
+      const purchase = await this.model.getById(id);
       // Create preference
+
+      console.log("PURCHASEID", id);
       const preferenceResponse = await preferenceClient.create({
         body: {
           items: [
             {
-              id: "ticket-001",
-              title: ticketTypeName,
-              quantity: parseInt(ticketNumbers),
-              unit_price: parseFloat(price),
+              id: id,
+              title: purchase!.ticketType.ticketTypeName,
+              quantity: purchase!.ticketNumbers,
+              unit_price: purchase!.totalPrice / purchase!.ticketNumbers,
             }
           ],
           back_urls: {
@@ -121,6 +125,8 @@ export class PurchaseController extends BaseController<Purchase> {
             pending: `${process.env.FRONTEND_URL}/pending`
           },
           auto_return: 'approved',
+          external_reference: id.toString(),
+          notification_url: `${process.env.BACKEND_URL}/api/purchase/payments/webhook`
         }
       });
       return res.status(201).json({ 
@@ -130,4 +136,43 @@ export class PurchaseController extends BaseController<Purchase> {
       console.error("MercadoPago error:", error);
       throwError.badRequest(`MercadoPago error: ${error.message}`);
     }
-  });}
+  })
+  handlePaymentWebhook = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+
+    let paymentId: string | null = null;
+
+    if (req.body?.data?.id) {
+      paymentId = req.body.data.id;
+    }
+
+    if (req.body?.topic === "payment" && req.body.resource)
+      return req.body.resource;
+
+    console.log("PAYMENTID", paymentId);
+    if (!paymentId || isNaN(Number(paymentId))) {
+      console.log("Not a payment notification, ignoring");
+      return res.sendStatus(200);
+    }
+    
+    const response = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${process.env.MP_TEST_ACCESS_TOKEN}`
+      }
+    }
+  );
+
+  const payment = await response.json();
+
+//  console.log("STATUS:", payment.status);
+//  console.log("STATUS DETAIL:", payment.status_detail);
+//  console.log("purchase id:", payment.external_reference);
+  const status = mapMPStatus(payment.status);
+  console.log("PAYMENT", payment);  
+  console.log("REFERENCE:", payment.external_reference);
+  console.log("STATUS", status);
+  this.model.updatePaymentStatus(payment.external_reference, status);
+  res.sendStatus(200);} 
+  
+  ) 
+}
