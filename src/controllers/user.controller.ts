@@ -2,7 +2,7 @@ import type { User } from "../entities/user.entity.js";
 import type { IUserModel } from "../interfaces/user.interface.js";
 import { BaseController } from "./base.controller.js";
 import type { Request, Response, NextFunction } from "express";
-import bcrypt from "bcrypt";
+import bcrypt from "bcryptjs";
 import type { RequiredEntityData } from "@mikro-orm/core";
 import { generateToken } from "../middlewares/auth.js";
 import { throwError, assertResourceExists } from "../shared/errors/ErrorUtils.js";
