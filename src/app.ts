@@ -43,7 +43,7 @@ export class App {
   private loadEnvironment(): void {
     const envFound = dotenv.config();
     if (envFound.error) {
-      throw new InternalServerError("⚠️  Couldn't find .env file  ⚠️");
+      console.warn("⚠️  .env file not found — using environment variables from host");
     }
   }
 
