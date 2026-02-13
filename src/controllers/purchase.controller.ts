@@ -50,7 +50,10 @@ export class PurchaseController extends BaseController<Purchase> {
   getTickets = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
     const item = await this.model.getById(id);
-    return res.status(200).send(item);
+    return res.status(200).send({
+      message: "Purchase tickets retrieved successfully",
+      data: item
+    });
   });
 
   /**
@@ -181,7 +184,7 @@ export class PurchaseController extends BaseController<Purchase> {
     `https://api.mercadopago.com/v1/payments/${paymentId}`,
     {
       headers: {
-        Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN}`
+        Authorization: `Bearer ${process.env.MP_TEST_ACCESS_TOKEN}`
       }
     }
     );
@@ -191,5 +194,27 @@ export class PurchaseController extends BaseController<Purchase> {
     
     return await res.json();
   }
+
+    
+    verifyPurchaseId = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+      const { paymentId } = req.params;
+      if (!paymentId) {
+        return res.status(400).json({ error: 'Missing payment_id' });
+      }
+      
+      const payment = await this.getPaymentFromMP(paymentId);
+      console.log("MP PAYMENT:", payment);
+      if (payment.status !== 'approved') return res.status(400).json({ error: 'Payment not approved' });
+
+      const purchaseId = payment.external_reference;
+      const purchase = await this.model.getById(purchaseId);
+
+      if (!purchase) return res.status(404).json({ error: 'Purchase not found' });
+            
+      res.json({
+        success: true,
+        purchaseId,
+      });
+    })
 
 }
