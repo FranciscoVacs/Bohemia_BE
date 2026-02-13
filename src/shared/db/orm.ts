@@ -1,14 +1,23 @@
 import { MikroORM } from "@mikro-orm/core";
 import { MySqlDriver } from "@mikro-orm/mysql";
 import { SqlHighlighter } from "@mikro-orm/sql-highlighter";
+import dotenv from "dotenv";
+
+dotenv.config();
+
+const dbHost = process.env.DB_HOST ?? "localhost";
+const dbPort = process.env.DB_PORT ?? "3306";
+const dbName = process.env.DB_NAME ?? "bohemiadb";
+const dbUser = process.env.DB_USER ?? "root";
+const dbPassword = process.env.DB_PASSWORD ?? "root";
 
 export const orm = await MikroORM.init({
     entities : ["dist/**/*.entity.js"],
     entitiesTs : ["src/**/*.entity.ts"],
-    dbName: "bohemiadb",
+    dbName: dbName,
     driver: MySqlDriver,
-    clientUrl: "mysql://root:root@localhost:3306/bohemiadb",
-    debug: true,
+    clientUrl: `mysql://${dbUser}:${encodeURIComponent(dbPassword)}@${dbHost}:${dbPort}/${dbName}`,
+    debug: process.env.NODE_ENV !== "production",
     highlighter: new SqlHighlighter(),
     schemaGenerator: {
         disableForeignKeys:true,
