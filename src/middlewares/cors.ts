@@ -6,16 +6,17 @@ const ACCEPTED_ORIGINS = [
   "http://localhost:1234",
   "https://localhost:3000",
   "https://BohemiaPage.com",
+  "https://bohemia-fe.vercel.app",
 ];
 
 export const corsMiddleware = ({ acceptedOrigins = ACCEPTED_ORIGINS } = {}) =>
   cors({
-    origin: (origin, callback) => {origin: true
-//      if (typeof origin === "string" && acceptedOrigins.includes(origin)) {
-//        return callback(null, true);
-//      }
+    origin: (origin, callback) => {
+      if (!origin) {
+        return callback(null, true);
+      }
       if (
-        !origin ||
+        acceptedOrigins.includes(origin) ||
         origin.startsWith("http://localhost") ||
         origin.includes("ngrok-free.dev")
       ) {
