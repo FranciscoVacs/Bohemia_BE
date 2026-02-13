@@ -98,8 +98,12 @@ export const errorHandler = (
 
   // Log del error en consola (visible en Render logs)
   console.error(`[ERROR] ${req.method} ${req.url} → ${statusCode}: ${message}`);
+  console.error(`[ERROR BODY]`, JSON.stringify(req.body));
   if (error instanceof Error && error.stack) {
-    console.error(error.stack);
+    console.error(`[ERROR STACK]`, error.stack);
+  }
+  if (error instanceof ZodError) {
+    console.error(`[ZOD DETAILS]`, JSON.stringify(error.issues));
   }
 
   // Agregar campos opcionales según la configuración

@@ -54,6 +54,12 @@ export class App {
     const __filename = fileURLToPath(import.meta.url);
     const __dirname = path.dirname(__filename);
 
+    // Log de todas las requests entrantes
+    this.express.use((req, res, next) => {
+      console.log(`[REQUEST] ${req.method} ${req.url} | Origin: ${req.headers.origin ?? 'none'}`);
+      next();
+    });
+
     // Middleware básico
     this.express.use(express.json());
     this.express.use(corsMiddleware());
