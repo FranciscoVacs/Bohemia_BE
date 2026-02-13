@@ -120,11 +120,11 @@ export class PurchaseController extends BaseController<Purchase> {
             }
           ],
           back_urls: {
-            success: `${process.env.FRONTEND_URL}/success`,
+            success: `${process.env.FRONTEND_URL}/redirect`,
             failure: `${process.env.FRONTEND_URL}/failure`,
             pending: `${process.env.FRONTEND_URL}/pending`
           },
-          auto_return: 'approved',
+//          auto_return: 'approved',
           external_reference: id.toString(),
           notification_url: `${process.env.BACKEND_URL}/api/purchase/payments/webhook`
         }
@@ -174,5 +174,22 @@ export class PurchaseController extends BaseController<Purchase> {
   this.model.updatePaymentStatus(payment.external_reference, status);
   res.sendStatus(200);} 
   
-  ) 
+  )
+  
+  getPaymentFromMP = async function getPaymentFromMP(paymentId: string) {
+    const res = await fetch(
+    `https://api.mercadopago.com/v1/payments/${paymentId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${process.env.MP_ACCESS_TOKEN}`
+      }
+    }
+    );
+    if (!res.ok) {
+      throw new Error(`MP error: ${res.status}`);
+    }
+    
+    return await res.json();
+  }
+
 }
