@@ -7,12 +7,7 @@ import { throwError, assertResourceExists } from "../shared/errors/ErrorUtils.js
 import { asyncHandler } from "../middlewares/asyncHandler.js";
 import { toFutureEventDTO, toAdminEventDTO, toPublicEventDTO, toPublicTicketTypesDTO } from "../dto/event.dto.js";
 import sizeOf from "image-size";
-import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from 'node:url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+import cloudinary from "../config/cloudinaryConfig.js";
 
 export class EventController extends BaseController<Event> {
   constructor(protected model: IModel<Event>) {
@@ -57,8 +52,28 @@ export class EventController extends BaseController<Event> {
 
   create = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const { eventName, beginDatetime, finishDatetime, eventDescription, minAge, location, dj } = req.body;
-    const fileName = req.file?.filename;
-    const basePath = `${req.protocol}://${req.hostname}:${process.env.PORT}/public/uploads/`;
+
+    // Validar dimensiones antes de subir a Cloudinary
+    let coverPhotoUrl = "";
+    if (req.file) {
+      const dimensions = sizeOf(new Uint8Array(req.file.buffer));
+      if (dimensions.width !== 1000 || dimensions.height !== 800) {
+        throwError.badRequest("La imagen debe ser de 1000x800 píxeles exactos. Evento no creado.");
+      }
+
+      // Subir a Cloudinary
+      const result = await new Promise<any>((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { folder: "event-covers", public_id: `cover-${Date.now()}` },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+          }
+        );
+        stream.end(req.file!.buffer);
+      });
+      coverPhotoUrl = result.secure_url;
+    }
 
     const event = await this.model.create({
       eventName,
@@ -66,29 +81,10 @@ export class EventController extends BaseController<Event> {
       finishDatetime,
       eventDescription,
       minAge,
-      coverPhoto: `${basePath}${fileName}` || "",
+      coverPhoto: coverPhotoUrl,
       location,
       dj,
     } as RequiredEntityData<Event>);
-
-    // Validar dimensiones si hay archivo
-    if (req.file) {
-      try {
-        const dimensions = sizeOf(fs.readFileSync(req.file.path) as any);
-        if (dimensions.width !== 1000 || dimensions.height !== 800) {
-          // Borrar archivo y lanzar error
-          fs.unlinkSync(req.file.path);
-          if (event) await this.model.delete(event.id.toString()); // Revertir creación
-          throwError.badRequest("La imagen debe ser de 1000x800 píxeles exactos. Evento no creado.");
-        }
-      } catch (err: any) {
-        if (err.message.includes("1000x800")) throw err;
-        // Si falla lectura, intentamos limpiar
-        if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
-        if (event) await this.model.delete(event.id.toString());
-        throwError.badRequest("Error al validar imagen. Asegúrese de que sea válida.");
-      }
-    }
 
     return res.status(201).send({ message: "Evento creado exitosamente", data: event });
   });
@@ -103,22 +99,24 @@ export class EventController extends BaseController<Event> {
 
     // Agrega coverPhoto solo si hay un nuevo archivo
     if (req.file) {
-      const fileName = req.file.filename;
-      const basePath = `${req.protocol}://${req.hostname}:${process.env.PORT}/public/uploads/`;
-      body.coverPhoto = `${basePath}${fileName}`;
-
       // Validar dimensiones
-      try {
-        const dimensions = sizeOf(fs.readFileSync(req.file.path) as any);
-        if (dimensions.width !== 1000 || dimensions.height !== 800) {
-          fs.unlinkSync(req.file.path);
-          throwError.badRequest("La imagen debe ser de 1000x800 píxeles exactos.");
-        }
-      } catch (err: any) {
-        if (err.message.includes("1000x800")) throw err;
-        if (fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
-        throwError.badRequest("Error al validar imagen.");
+      const dimensions = sizeOf(new Uint8Array(req.file.buffer));
+      if (dimensions.width !== 1000 || dimensions.height !== 800) {
+        throwError.badRequest("La imagen debe ser de 1000x800 píxeles exactos.");
       }
+
+      // Subir a Cloudinary
+      const result = await new Promise<any>((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { folder: "event-covers", public_id: `cover-${Date.now()}` },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result);
+          }
+        );
+        stream.end(req.file!.buffer);
+      });
+      body.coverPhoto = result.secure_url;
     }
 
     await this.model.update(id, body);
