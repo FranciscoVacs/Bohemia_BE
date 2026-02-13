@@ -96,6 +96,12 @@ export const errorHandler = (
     statusCode
   };
 
+  // Log del error en consola (visible en Render logs)
+  console.error(`[ERROR] ${req.method} ${req.url} → ${statusCode}: ${message}`);
+  if (error instanceof Error && error.stack) {
+    console.error(error.stack);
+  }
+
   // Agregar campos opcionales según la configuración
   if (ERROR_CONFIG.RESPONSES.INCLUDE_TIMESTAMP) {
     errorResponse.timestamp = new Date().toISOString();
