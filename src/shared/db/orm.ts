@@ -16,7 +16,10 @@ export const orm = await MikroORM.init({
     entitiesTs : ["src/**/*.entity.ts"],
     dbName: dbName,
     driver: MySqlDriver,
-    clientUrl: `mysql://${dbUser}:${encodeURIComponent(dbPassword)}@${dbHost}:${dbPort}/${dbName}`,
+    host: dbHost,
+    port: parseInt(dbPort),
+    user: dbUser,
+    password: dbPassword,
     debug: process.env.NODE_ENV !== "production",
     highlighter: new SqlHighlighter(),
     schemaGenerator: {
