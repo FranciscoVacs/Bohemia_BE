@@ -50,7 +50,10 @@ export class PurchaseController extends BaseController<Purchase> {
   getTickets = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const { id } = req.params;
     const item = await this.model.getById(id);
-    return res.status(200).send(item);
+    return res.status(200).send({
+      message: "Purchase tickets retrieved successfully",
+      data: item
+    });
   });
 
   /**
@@ -120,11 +123,11 @@ export class PurchaseController extends BaseController<Purchase> {
             }
           ],
           back_urls: {
-            success: `${process.env.FRONTEND_URL}/success`,
+            success: `${process.env.FRONTEND_URL}/redirect`,
             failure: `${process.env.FRONTEND_URL}/failure`,
             pending: `${process.env.FRONTEND_URL}/pending`
           },
-          auto_return: 'approved',
+//          auto_return: 'approved',
           external_reference: id.toString(),
           notification_url: `${process.env.BACKEND_URL}/api/purchase/payments/webhook`
         }
@@ -174,5 +177,44 @@ export class PurchaseController extends BaseController<Purchase> {
   this.model.updatePaymentStatus(payment.external_reference, status);
   res.sendStatus(200);} 
   
-  ) 
+  )
+  
+  getPaymentFromMP = async function getPaymentFromMP(paymentId: string) {
+    const res = await fetch(
+    `https://api.mercadopago.com/v1/payments/${paymentId}`,
+    {
+      headers: {
+        Authorization: `Bearer ${process.env.MP_TEST_ACCESS_TOKEN}`
+      }
+    }
+    );
+    if (!res.ok) {
+      throw new Error(`MP error: ${res.status}`);
+    }
+    
+    return await res.json();
+  }
+
+    
+    verifyPurchaseId = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+      const { paymentId } = req.params;
+      if (!paymentId) {
+        return res.status(400).json({ error: 'Missing payment_id' });
+      }
+      
+      const payment = await this.getPaymentFromMP(paymentId);
+      console.log("MP PAYMENT:", payment);
+      if (payment.status !== 'approved') return res.status(400).json({ error: 'Payment not approved' });
+
+      const purchaseId = payment.external_reference;
+      const purchase = await this.model.getById(purchaseId);
+
+      if (!purchase) return res.status(404).json({ error: 'Purchase not found' });
+            
+      res.json({
+        success: true,
+        purchaseId,
+      });
+    })
+
 }

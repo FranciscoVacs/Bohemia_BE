@@ -20,11 +20,11 @@ export const createPurchaseRouter = ({
   // =====================
 
 
-  purchaseRouter.post("/create_preference", 
-    verifyToken,
-    purchaseController.createPreference);
+  purchaseRouter.post("/create_preference", verifyToken, purchaseController.createPreference);
 
-  purchaseRouter.post("/payments/webhook", purchaseController.handlePaymentWebhook);
+  purchaseRouter.post("/payments/webhook", verifyToken, purchaseController.handlePaymentWebhook);
+
+  purchaseRouter.get("/verify/:paymentId", verifyToken, purchaseController.verifyPurchaseId);
 
   // Crear compra (genera tickets inmediatamente)
   purchaseRouter.post("/",
