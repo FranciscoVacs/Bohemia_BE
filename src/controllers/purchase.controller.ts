@@ -127,7 +127,7 @@ export class PurchaseController extends BaseController<Purchase> {
             failure: `${process.env.FRONTEND_URL}/failure`,
             pending: `${process.env.FRONTEND_URL}/pending`
           },
-//          auto_return: 'approved',
+          auto_return: 'approved',
           external_reference: id.toString(),
           notification_url: `${process.env.BACKEND_URL}/api/purchase/payments/webhook`
         }
