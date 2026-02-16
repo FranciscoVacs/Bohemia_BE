@@ -25,8 +25,8 @@ export const createEventPhotoRouter = ({
     // Listar todos los eventos con galerías publicadas
     eventPhotoRouter.get("/galleries", eventPhotoController.getEventsWithPublishedGalleries);
 
-    // Obtener fotos de un evento específico (solo si galería publicada)
-    eventPhotoRouter.get("/gallery/:eventId", isAuthenticated, eventPhotoController.getByEventId);
+    // Obtener fotos de un evento específico (solo si galería publicada, requiere autenticación)
+    eventPhotoRouter.get("/gallery/:eventId", verifyToken, eventPhotoController.getByEventId);
 
     // ================================
     // Rutas protegidas (requieren autenticación y admin)
