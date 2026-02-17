@@ -1,6 +1,6 @@
 import { Ticket } from "../../entities/ticket.entity.js";
 import { User } from "../../entities/user.entity.js";
-import  type { IUserModel } from "../../interfaces/user.interface.js";
+import type { IUserModel } from "../../interfaces/user.interface.js";
 import { BaseModel } from "./base.Model.js";
 import type { EntityManager, RequiredEntityData } from "@mikro-orm/mysql";
 
@@ -22,6 +22,7 @@ export class UserModel extends BaseModel<User> implements IUserModel<User> {
         "purchase",
         "purchase.ticketType",
         "purchase.ticketType.event",
+        "purchase.ticketType.event.location",
         "purchase.ticket"
       ]
     });
