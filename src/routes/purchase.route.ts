@@ -39,12 +39,15 @@ export const createPurchaseRouter = ({
     purchaseController.getById
   );
 
+  // Obtener tickets de una compra
+  purchaseRouter.get("/:id", verifyToken, purchaseController.getTickets);
+
+
   // =====================
   // Rutas administrativas
   // =====================
 
   purchaseRouter.get("/", verifyToken, isAdmin, purchaseController.getAll);
-  purchaseRouter.get("/:id", verifyToken, isAdmin, purchaseController.getTickets);
   purchaseRouter.patch("/:id", verifyToken, isAdmin, schemaValidator(UpdatePurchaseSchema), purchaseController.update);
   purchaseRouter.delete("/:id", verifyToken, isAdmin, schemaValidator(UpdatePurchaseSchema), purchaseController.delete);
 

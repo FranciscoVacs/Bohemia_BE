@@ -77,7 +77,13 @@ export class UserController extends BaseController<User> {
 
   updateCurrentUser = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const userId = req.user?.id;
-    const updatedUser = await this.model.update(userId!.toString(), req.body);
+    const updateData = { ...req.body };
+
+    if (updateData.password) {
+      updateData.password = await bcrypt.hash(updateData.password, 10);
+    }
+
+    const updatedUser = await this.model.update(userId!.toString(), updateData);
     return res.status(200).send({ message: "User updated", data: updatedUser });
   });
 
