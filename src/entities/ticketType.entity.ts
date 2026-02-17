@@ -5,22 +5,18 @@ import { Event } from "./event.entity.js";
 import { Ticket } from "./ticket.entity.js";
 import { Purchase } from "./purchase.entity.js";
 
-// Enum para modo de venta
-export enum SaleMode {
-    MANUAL = 'manual',
-    SCHEDULED = 'scheduled'
+// Enum para estado del tipo de ticket en la cola
+export enum TicketTypeStatus {
+    PENDING = 'pending',
+    ACTIVE = 'active',
+    SOLD_OUT = 'sold_out',
+    CLOSED = 'closed'
 }
 
 @Entity()
 export class TicketType extends BaseEntity {
     @Property({ fieldName: 'ticket_type_name' })
     ticketTypeName!: string;
-
-    @Property({ fieldName: 'begin_datetime', nullable: true })
-    beginDatetime?: Date;
-
-    @Property({ fieldName: 'finish_datetime', nullable: true })
-    finishDatetime?: Date;
 
     @Property()
     price!: number;
@@ -31,11 +27,17 @@ export class TicketType extends BaseEntity {
     @Property({ fieldName: 'available_tickets' })
     availableTickets!: number;
 
-    @Enum({ items: () => SaleMode, fieldName: 'sale_mode' })
-    saleMode: SaleMode = SaleMode.SCHEDULED;
+    @Property({ fieldName: 'sort_order' })
+    sortOrder!: number;
 
-    @Property({ fieldName: 'is_manually_activated' })
-    isManuallyActivated: boolean = false;
+    @Enum({ items: () => TicketTypeStatus, fieldName: 'status' })
+    status: TicketTypeStatus = TicketTypeStatus.PENDING;
+
+    @Property({ fieldName: 'activated_at', nullable: true })
+    activatedAt?: Date;
+
+    @Property({ fieldName: 'closed_at', nullable: true })
+    closedAt?: Date;
 
     @ManyToOne(() => Event, { nullable: false, deleteRule: 'CASCADE' })
     event!: Rel<Event>;
@@ -49,23 +51,9 @@ export class TicketType extends BaseEntity {
     }
 
     /**
-     * Calcula si la venta está activa basándose en el modo de venta.
-     * - SCHEDULED: activo si estamos dentro del rango de fechas
-     * - MANUAL: activo si isManuallyActivated es true
-     * - Siempre inactivo si no hay tickets disponibles
+     * La venta está activa si el estado es ACTIVE y hay tickets disponibles.
      */
     isSaleActive(): boolean {
-        // Si no hay tickets disponibles, siempre inactivo
-        if (this.availableTickets <= 0) return false;
-
-        if (this.saleMode === SaleMode.MANUAL) {
-            return this.isManuallyActivated;
-        }
-
-        // Modo SCHEDULED
-        if (!this.beginDatetime || !this.finishDatetime) return false;
-
-        const now = new Date();
-        return now >= this.beginDatetime && now <= this.finishDatetime;
+        return this.status === TicketTypeStatus.ACTIVE && this.availableTickets > 0;
     }
 }

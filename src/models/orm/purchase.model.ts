@@ -1,6 +1,6 @@
 import type { EntityManager } from "@mikro-orm/mysql";
 import { Purchase, PaymentStatus } from "../../entities/purchase.entity.js";
-import { TicketType } from "../../entities/ticketType.entity.js";
+import { TicketType, TicketTypeStatus } from "../../entities/ticketType.entity.js";
 import { User } from "../../entities/user.entity.js";
 import { Ticket } from "../../entities/ticket.entity.js";
 import { BaseModel } from "./base.Model.js";
@@ -51,6 +51,24 @@ export class PurchaseModel extends BaseModel<Purchase> {
 
     // Reducir stock
     ticketType.availableTickets -= ticketQuantity;
+
+    // Auto-transición: si se agotó el stock, marcar como SOLD_OUT y activar el siguiente
+    if (ticketType.availableTickets <= 0) {
+      ticketType.status = TicketTypeStatus.SOLD_OUT;
+      ticketType.closedAt = new Date();
+
+      // Buscar el siguiente PENDING en la cola y activarlo
+      const nextPending = await this.em.findOne(
+        TicketType,
+        { event: ticketType.event.id, status: TicketTypeStatus.PENDING },
+        { orderBy: { sortOrder: 'ASC' } }
+      );
+
+      if (nextPending) {
+        nextPending.status = TicketTypeStatus.ACTIVE;
+        nextPending.activatedAt = new Date();
+      }
+    }
 
     // Crear Purchase con estado PENDING 
     const purchase = this.em.create(Purchase, {

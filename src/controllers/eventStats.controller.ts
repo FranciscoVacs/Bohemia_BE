@@ -88,12 +88,14 @@ export class EventStatsController {
     });
 
     // Calcular estadísticas por tipo de ticket
+    // Usamos las compras reales en vez de maxQuantity - availableTickets
+    // porque al cerrar manualmente un ticket type, availableTickets se pone
+    // en 0 y los sobrantes se transfieren al siguiente, inflando los "vendidos".
     const ticketTypes = event!.ticketType.getItems();
     const byTicketType: TicketTypeStats[] = ticketTypes.map(tt => {
-      const sold = tt.maxQuantity - tt.availableTickets;
-      const revenue = purchases
-        .filter(p => p.ticketType.id === tt.id)
-        .reduce((sum, p) => sum + p.totalPrice, 0);
+      const ttPurchases = purchases.filter(p => p.ticketType.id === tt.id);
+      const sold = ttPurchases.reduce((sum, p) => sum + p.ticketNumbers, 0);
+      const revenue = ttPurchases.reduce((sum, p) => sum + p.totalPrice, 0);
 
       return {
         id: tt.id,

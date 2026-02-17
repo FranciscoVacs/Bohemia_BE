@@ -25,8 +25,10 @@ export class EventController extends BaseController<Event> {
       });
     }
 
-    // Transformar a AdminEventDTO con campos calculados
-    const adminEvents = allEvents.map(event => toAdminEventDTO(event));
+    // Transformar a AdminEventDTO con campos calculados (solo eventos publicados)
+    const adminEvents = allEvents
+      .filter(event => event.isPublished)
+      .map(event => toAdminEventDTO(event));
 
     return res.status(200).send({
       message: "Eventos obtenidos exitosamente",

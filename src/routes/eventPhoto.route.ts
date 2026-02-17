@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { EventPhotoController } from "../controllers/eventPhoto.controller.js";
 import { schemaValidator } from "../middlewares/schemaValidator.js";
-import { UploadEventPhotoSchema, UpdateEventPhotoSchema } from "../schemas/eventPhoto.schema.js";
+import { UploadEventPhotoSchema, UpdateEventPhotoSchema, DeleteEventPhotoSchema } from "../schemas/eventPhoto.schema.js";
 import type { IEventPhotoModel } from "../interfaces/eventPhoto.interface.js";
 import type { EventPhoto } from "../entities/eventPhoto.entity.js";
 import { verifyToken, isAdmin, isAuthenticated } from "../middlewares/auth.js";
@@ -55,7 +55,7 @@ export const createEventPhotoRouter = ({
     eventPhotoRouter.delete("/:id",
         verifyToken,
         isAdmin,
-        schemaValidator(UploadEventPhotoSchema),
+        schemaValidator(DeleteEventPhotoSchema),
         eventPhotoController.delete
     );
 

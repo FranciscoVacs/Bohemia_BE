@@ -1,5 +1,5 @@
 import type { TicketType } from "../entities/ticketType.entity.js";
-import { SaleMode } from "../entities/ticketType.entity.js";
+import { TicketTypeStatus } from "../entities/ticketType.entity.js";
 import { BaseController } from "./base.controller.js";
 import type { Request, Response, NextFunction } from "express";
 import { asyncHandler } from "../middlewares/asyncHandler.js";
@@ -16,13 +16,10 @@ export class TicketTypeController extends BaseController<TicketType> {
   create = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
     const {
       ticketTypeName,
-      beginDatetime,
-      finishDatetime,
       price,
       maxQuantity,
       event,
-      saleMode = 'scheduled',
-      isManuallyActivated = false
+      sortOrder,
     } = req.body;
 
     // Obtener el evento con su location
@@ -44,22 +41,19 @@ export class TicketTypeController extends BaseController<TicketType> {
       );
     }
 
+    // Determinar estado inicial: ACTIVE si no hay uno activo, PENDING si ya hay
+    const hasActive = await this.model.hasActiveTicketType(event);
+    const initialStatus = hasActive ? TicketTypeStatus.PENDING : TicketTypeStatus.ACTIVE;
+
     const ticketTypeData = {
       ticketTypeName,
       price,
       maxQuantity,
       event,
-      saleMode: saleMode as SaleMode,
-      isManuallyActivated,
+      sortOrder,
+      status: initialStatus,
+      ...(initialStatus === TicketTypeStatus.ACTIVE ? { activatedAt: new Date() } : {}),
     } as RequiredEntityData<TicketType>;
-
-    // Solo agregar fechas si están definidas
-    if (beginDatetime) {
-      ticketTypeData.beginDatetime = new Date(beginDatetime);
-    }
-    if (finishDatetime) {
-      ticketTypeData.finishDatetime = new Date(finishDatetime);
-    }
 
     const ticketType = await this.model.create(ticketTypeData);
 
@@ -83,13 +77,10 @@ export class TicketTypeController extends BaseController<TicketType> {
     const existingTicketType = await this.model.getById(id);
     assertResourceExists(existingTicketType, `Ticket type with id ${id}`);
 
-    // Convertir fechas a Date si están presentes
-    if (updates.beginDatetime) {
-      updates.beginDatetime = new Date(updates.beginDatetime);
-    }
-    if (updates.finishDatetime) {
-      updates.finishDatetime = new Date(updates.finishDatetime);
-    }
+    // No permitir cambiar el status via update (usar close endpoint)
+    delete updates.status;
+    delete updates.activatedAt;
+    delete updates.closedAt;
 
     // Si se está actualizando maxQuantity, validar capacidad
     if (updates.maxQuantity !== undefined) {
@@ -118,6 +109,17 @@ export class TicketTypeController extends BaseController<TicketType> {
 
     await this.model.update(id, updates);
     return res.status(200).send({ message: "Ticket type actualizado exitosamente", data: updates });
+  });
+
+  close = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const id = req.params.id;
+
+    const closedTicketType = await this.model.closeTicketType(id);
+
+    return res.status(200).send({
+      message: "Ticket type cerrado exitosamente",
+      data: closedTicketType,
+    });
   });
 
 }

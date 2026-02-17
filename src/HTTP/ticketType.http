@@ -6,81 +6,76 @@
 GET {{baseUrl}}/ticketType
 Authorization: Bearer {{authToken}}
 
-### Crear un ticketType con modo SCHEDULED (programado)
-# @name createScheduledTicketType
+### Crear un ticketType (primer ticket type del evento se activa automáticamente)
+# @name createTicketType1
 POST {{baseUrl}}/ticketType
 Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
 {
     "ticketTypeName": "Early Bird",
-    "beginDatetime": "2026-01-20 00:00:00",
-    "finishDatetime": "2026-02-15 23:59:59",
     "price": 3500,
     "maxQuantity": 100,
     "event": 1,
-    "saleMode": "scheduled"
+    "sortOrder": 1
 }
 
-### Crear un ticketType con modo MANUAL
-# @name createManualTicketType
+### Crear un segundo ticketType (queda como PENDING en la cola)
+# @name createTicketType2
 POST {{baseUrl}}/ticketType
 Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
 {
-    "ticketTypeName": "VIP Manual",
+    "ticketTypeName": "General",
     "price": 5000,
+    "maxQuantity": 200,
+    "event": 1,
+    "sortOrder": 2
+}
+
+### Crear un tercer ticketType (queda como PENDING en la cola)
+# @name createTicketType3
+POST {{baseUrl}}/ticketType
+Content-Type: application/json
+Authorization: Bearer {{authToken}}
+
+{
+    "ticketTypeName": "VIP",
+    "price": 8000,
     "maxQuantity": 50,
     "event": 1,
-    "saleMode": "manual",
-    "isManuallyActivated": false
+    "sortOrder": 3
 }
 
 ### ID del ticket type creado
-@ticketTypeId = {{createManualTicketType.response.body.data.id}}
+@ticketTypeId = {{createTicketType1.response.body.data.id}}
 
 ### Obtener un ticketType por id
 GET {{baseUrl}}/ticketType/{{ticketTypeId}}
 Authorization: Bearer {{authToken}}
 
-### Activar venta manualmente (usando PATCH normal)
+### Cerrar el ticket type activo (transfiere tickets restantes al siguiente y lo activa)
+PATCH {{baseUrl}}/ticketType/{{ticketTypeId}}/close
+Authorization: Bearer {{authToken}}
+
+### Actualizar nombre y precio de un ticketType
 PATCH {{baseUrl}}/ticketType/{{ticketTypeId}}
 Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
 {
-    "isManuallyActivated": true
+    "ticketTypeName": "Early Bird Promo",
+    "price": 3000
 }
 
-### Desactivar venta manualmente
+### Actualizar sortOrder
 PATCH {{baseUrl}}/ticketType/{{ticketTypeId}}
 Content-Type: application/json
 Authorization: Bearer {{authToken}}
 
 {
-    "isManuallyActivated": false
-}
-
-### Cambiar de modo manual a scheduled
-PATCH {{baseUrl}}/ticketType/{{ticketTypeId}}
-Content-Type: application/json
-Authorization: Bearer {{authToken}}
-
-{
-    "saleMode": "scheduled",
-    "beginDatetime": "2026-01-20 00:00:00",
-    "finishDatetime": "2026-03-01 23:59:59"
-}
-
-### Actualizar fechas de un ticketType scheduled
-PATCH {{baseUrl}}/ticketType/{{ticketTypeId}}
-Content-Type: application/json
-Authorization: Bearer {{authToken}}
-
-{
-    "beginDatetime": "2026-01-25 00:00:00",
-    "finishDatetime": "2026-02-28 23:59:59"
+    "sortOrder": 5
 }
 
 ### Eliminar un ticketType

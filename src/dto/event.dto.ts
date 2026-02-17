@@ -99,8 +99,6 @@ export function toGalleryEventDTO(event: Event): GalleryEventDTO {
 export interface PublicTicketTypeDTO {
   id: number;
   ticketTypeName: string;
-  beginDatetime?: Date;
-  finishDatetime?: Date;
   price: number;
   availableTickets: number;
   isSaleActive: boolean;
@@ -125,8 +123,6 @@ export function toPublicEventDTO(event: Event): PublicEventDTO {
   const ticketTypes: PublicTicketTypeDTO[] = ticketTypesArray.map(tt => ({
     id: tt.id,
     ticketTypeName: tt.ticketTypeName,
-    beginDatetime: tt.beginDatetime,
-    finishDatetime: tt.finishDatetime,
     price: tt.price,
     availableTickets: tt.availableTickets,
     isSaleActive: tt.isSaleActive(),
@@ -158,8 +154,6 @@ export function toPublicTicketTypesDTO(event: Event): PublicTicketTypeDTO[] {
   return event.ticketType.getItems().map(tt => ({
     id: tt.id,
     ticketTypeName: tt.ticketTypeName,
-    beginDatetime: tt.beginDatetime,
-    finishDatetime: tt.finishDatetime,
     price: tt.price,
     availableTickets: tt.availableTickets,
     isSaleActive: tt.isSaleActive(),
@@ -173,13 +167,13 @@ export function toPublicTicketTypesDTO(event: Event): PublicTicketTypeDTO[] {
 export interface TicketTypeDTO {
   id: number;
   ticketTypeName: string;
-  beginDatetime?: Date;
-  finishDatetime?: Date;
   price: number;
   maxQuantity: number;
   availableTickets: number;
-  saleMode: string;
-  isManuallyActivated: boolean;
+  sortOrder: number;
+  status: string;
+  activatedAt?: Date;
+  closedAt?: Date;
   isSaleActive: boolean;
 }
 
@@ -204,13 +198,13 @@ export function toAdminEventDTO(event: Event): AdminEventDTO {
   const ticketTypes: TicketTypeDTO[] = ticketTypesArray.map(tt => ({
     id: tt.id,
     ticketTypeName: tt.ticketTypeName,
-    beginDatetime: tt.beginDatetime,
-    finishDatetime: tt.finishDatetime,
     price: tt.price,
     maxQuantity: tt.maxQuantity,
     availableTickets: tt.availableTickets,
-    saleMode: tt.saleMode,
-    isManuallyActivated: tt.isManuallyActivated,
+    sortOrder: tt.sortOrder,
+    status: tt.status,
+    activatedAt: tt.activatedAt,
+    closedAt: tt.closedAt,
     isSaleActive: tt.isSaleActive(),
   }));
 

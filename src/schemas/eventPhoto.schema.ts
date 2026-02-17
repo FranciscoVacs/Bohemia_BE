@@ -6,6 +6,12 @@ export const UploadEventPhotoSchema = z.object({
     }),
 });
 
+export const DeleteEventPhotoSchema = z.object({
+    params: z.object({
+        id: z.coerce.number().int().positive("El ID debe ser un número positivo"),
+    }),
+});
+
 export const UpdateEventPhotoSchema = z.object({
     body: z.object({
         cloudinaryUrl: z.string().url("La URL de Cloudinary debe ser válida").optional(),
