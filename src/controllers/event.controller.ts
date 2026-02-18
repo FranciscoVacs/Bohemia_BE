@@ -59,8 +59,8 @@ export class EventController extends BaseController<Event> {
     let coverPhotoUrl = "";
     if (req.file) {
       const dimensions = sizeOf(new Uint8Array(req.file.buffer));
-      if (dimensions.width !== 1000 || dimensions.height !== 800) {
-        throwError.badRequest("La imagen debe ser de 1000x800 píxeles exactos. Evento no creado.");
+      if (dimensions.width !== dimensions.height) {
+        throwError.badRequest("La imagen debe ser cuadrada (ancho igual a alto). Ej: 500x500, 1000x1000.");
       }
 
       // Subir a Cloudinary
@@ -103,8 +103,8 @@ export class EventController extends BaseController<Event> {
     if (req.file) {
       // Validar dimensiones
       const dimensions = sizeOf(new Uint8Array(req.file.buffer));
-      if (dimensions.width !== 1000 || dimensions.height !== 800) {
-        throwError.badRequest("La imagen debe ser de 1000x800 píxeles exactos.");
+      if (dimensions.width !== dimensions.height) {
+        throwError.badRequest("La imagen debe ser cuadrada (ancho igual a alto). Ej: 500x500, 1000x1000.");
       }
 
       // Subir a Cloudinary
