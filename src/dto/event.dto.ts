@@ -102,6 +102,7 @@ export interface PublicTicketTypeDTO {
   price: number;
   availableTickets: number;
   isSaleActive: boolean;
+  status: string;
 }
 
 export interface PublicEventDTO {
@@ -126,6 +127,7 @@ export function toPublicEventDTO(event: Event): PublicEventDTO {
     price: tt.price,
     availableTickets: tt.availableTickets,
     isSaleActive: tt.isSaleActive(),
+    status: tt.status,
   }));
 
   return {
@@ -157,6 +159,7 @@ export function toPublicTicketTypesDTO(event: Event): PublicTicketTypeDTO[] {
     price: tt.price,
     availableTickets: tt.availableTickets,
     isSaleActive: tt.isSaleActive(),
+    status: tt.status,
   }));
 }
 
