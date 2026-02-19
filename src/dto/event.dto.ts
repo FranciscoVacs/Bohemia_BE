@@ -13,6 +13,8 @@ export interface LocationDTO {
   locationName: string;
   address: string;
   city: CityDTO;
+  latitude?: number;
+  longitude?: number;
 }
 
 export interface DjDTO {
@@ -48,6 +50,8 @@ export function toFutureEventDTO(event: Event): FutureEventDTO {
     location: {
       locationName: event.location.locationName,
       address: event.location.address,
+      longitude: event.location.longitude,
+      latitude: event.location.latitude,
       city: {
         cityName: event.location.city.cityName,
       }
@@ -141,6 +145,8 @@ export function toPublicEventDTO(event: Event): PublicEventDTO {
     location: {
       locationName: event.location.locationName,
       address: event.location.address,
+      latitude: event.location.latitude,
+      longitude: event.location.longitude,
       city: {
         cityName: event.location.city.cityName,
       }
