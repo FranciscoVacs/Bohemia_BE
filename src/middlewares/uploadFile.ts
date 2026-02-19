@@ -14,7 +14,7 @@ const fileFilter = (req: Request, file: Express.Multer.File, cb: FileFilterCallb
   return cb(new Error("Tipo de archivo no permitido. Solo se aceptan: jpg, jpeg, png") as any);
 }
 
-const maxSize = 1024 * 1024 * 5;
+const maxSize = 1024 * 1024 * 10;
 
 export const uploader = (req: Request, res: Response, next: NextFunction) => {
   return multer({
@@ -24,7 +24,7 @@ export const uploader = (req: Request, res: Response, next: NextFunction) => {
   }).single("coverPhoto")(req, res, (err) => {
 
     if (err instanceof multer.MulterError) {
-      throwError.badRequest("Max file size 5MB");
+      throwError.badRequest("Max file size 10MB");
     };
     if (err) {
       throwError.badRequest(err.message);
