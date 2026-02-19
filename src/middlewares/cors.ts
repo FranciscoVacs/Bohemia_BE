@@ -7,6 +7,7 @@ const ACCEPTED_ORIGINS = [
   "https://localhost:3000",
   "https://BohemiaPage.com",
   "https://bohemia-fe.vercel.app",
+  "https://bohemia-socialclub.netlify.app",
 ];
 
 export const corsMiddleware = ({ acceptedOrigins = ACCEPTED_ORIGINS } = {}) =>
