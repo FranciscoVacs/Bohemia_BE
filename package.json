@@ -9,7 +9,8 @@
     "start:dev": "tsc-watch --noClear -p ./tsconfig.json --onSuccess \"node ./dist/server.js\"",
     "clean": "rimraf ./dist",
     "build": "tsc",
-    "rebuild": "npm run clean && npm run build"
+    "rebuild": "npm run clean && npm run build",
+    "test": "vitest"
   },
   "keywords": [],
   "author": "",
@@ -47,6 +48,7 @@
     "@types/uuid": "^10.0.0",
     "rimraf": "^6.0.1",
     "tsc-watch": "6.2.0",
-    "typescript": "5.4.5"
+    "typescript": "5.4.5",
+    "vitest": "^4.0.18"
   }
 }

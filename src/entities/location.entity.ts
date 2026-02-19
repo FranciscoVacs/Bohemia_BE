@@ -1,5 +1,5 @@
-import { Entity, OneToMany, ManyToOne, Property,Cascade, Collection, Unique } from "@mikro-orm/core";
-import type   { Rel } from "@mikro-orm/core";
+import { Entity, OneToMany, ManyToOne, Property, Cascade, Collection, Unique } from "@mikro-orm/core";
+import type { Rel } from "@mikro-orm/core";
 import { BaseEntity } from "../shared/db/baseEntity.entity.js"
 import { Event } from "./event.entity.js";
 import { City } from "./city.entity.js";
@@ -15,6 +15,12 @@ export class Location extends BaseEntity {
 
     @Property({ fieldName: 'max_capacity' })
     maxCapacity!: number;
+
+    @Property({ columnType: 'double', nullable: true })
+    latitude?: number;
+
+    @Property({ columnType: 'double', nullable: true })
+    longitude?: number;
 
     @ManyToOne(() => City, { nullable: false })
     city!: Rel<City>;
