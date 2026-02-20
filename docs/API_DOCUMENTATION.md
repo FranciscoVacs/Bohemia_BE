@@ -344,6 +344,62 @@ Todas las respuestas de la API siguen esta estructura:
 }
 ```
 
+### Obtener Estadísticas de Evento (Admin)
+**GET** `/event/:eventId/stats`
+- **Permisos:** 🔒 Autenticado + 👑 Admin
+- **Parámetros:** `eventId` (número)
+- **Query Params:** `limit` (opcional, número de transacciones recientes a mostrar, default: 10)
+- **Propósito:** Obtener métricas y estadísticas de ventas de un evento, incluyendo desglose por tipo de ticket y transacciones recientes.
+
+**Response:**
+```json
+{
+  "message": "Estadísticas obtenidas exitosamente",
+  "data": {
+    "eventId": 1,
+    "eventName": "Fiesta Bohemia",
+    "eventStatus": "upcoming",
+    "saleStatus": "active",
+    "lastUpdated": "2026-02-14T10:00:00.000Z",
+    "summary": {
+      "totalTicketsSold": 150,
+      "totalCapacity": 500,
+      "percentageSold": 30,
+      "totalRevenue": 375000,
+      "averageTicketPrice": 2500
+    },
+    "byTicketType": [
+      {
+        "id": 1,
+        "name": "General",
+        "sold": 100,
+        "capacity": 400,
+        "percentageSold": 25,
+        "revenue": 200000,
+        "price": 2000
+      }
+    ],
+    "recentTransactions": [
+      {
+        "id": 42,
+        "userName": "Juan Pérez",
+        "userInitials": "JP",
+        "ticketTypeName": "General",
+        "quantity": 2,
+        "totalPrice": 4000,
+        "createdAt": "2026-02-14T09:30:00.000Z"
+      }
+    ],
+    "lastSale": {
+      "userName": "Juan Pérez",
+      "ticketTypeName": "General",
+      "timeAgo": "Hace 30m",
+      "createdAt": "2026-02-14T09:30:00.000Z"
+    }
+  }
+}
+```
+
 ### Obtener Evento por ID (Público)
 **GET** `/event/:id`
 - **Permisos:** 🔓 Público
@@ -520,21 +576,22 @@ Todas las respuestas de la API siguen esta estructura:
     {
       "id": 1,
       "ticketTypeName": "General",
-      "beginDatetime": "2026-01-01T00:00:00.000Z",
-      "finishDatetime": "2026-02-14T18:00:00.000Z",
       "price": 2500,
       "maxQuantity": 100,
       "availableTickets": 85,
+      "sortOrder": 1,
+      "status": "active",
+      "activatedAt": "2026-01-01T00:00:00.000Z",
       "event": 1
     },
     {
       "id": 2,
       "ticketTypeName": "VIP",
-      "beginDatetime": "2026-01-01T00:00:00.000Z",
-      "finishDatetime": "2026-02-14T18:00:00.000Z",
       "price": 5000,
       "maxQuantity": 20,
       "availableTickets": 15,
+      "sortOrder": 2,
+      "status": "pending",
       "event": 1
     }
   ]
@@ -555,10 +612,9 @@ Todas las respuestas de la API siguen esta estructura:
 ```json
 {
   "ticketTypeName": "string (máx 100 caracteres)",
-  "beginDatetime": "YYYY-MM-DD HH:MM:SS",
-  "finishDatetime": "YYYY-MM-DD HH:MM:SS",
   "price": "number (entero positivo)",
   "maxQuantity": "number (entero positivo)",
+  "sortOrder": "number",
   "event": "number (ID del evento)"
 }
 ```
@@ -566,16 +622,22 @@ Todas las respuestas de la API siguen esta estructura:
 **Response:**
 ```json
 {
-  "message": "Item created",
+  "message": "Tipo de ticket creado exitosamente",
   "data": {
     "id": 1,
     "ticketTypeName": "General",
-    "beginDatetime": "2026-01-01T00:00:00.000Z",
-    "finishDatetime": "2026-02-14T18:00:00.000Z",
     "price": 2500,
     "maxQuantity": 100,
     "availableTickets": 100,
+    "sortOrder": 1,
+    "status": "active",
+    "activatedAt": "2026-01-01T00:00:00.000Z",
     "event": 1
+  },
+  "capacityInfo": {
+    "newTotalCapacity": 100,
+    "locationMaxCapacity": 500,
+    "remainingCapacity": 400
   }
 }
 ```
@@ -584,6 +646,13 @@ Todas las respuestas de la API siguen esta estructura:
 **PATCH** `/event/:eventId/ticketType/:id`
 - **Permisos:** 🔒 Autenticado + 👑 Admin
 - **Parámetros:** `eventId`, `id`
+- **Nota:** No se puede actualizar el `status` ni `activatedAt`/`closedAt` por este medio. Valida que la nueva suma de `maxQuantity` no supere la capacidad máxima de la ubicación.
+
+### Cerrar Tipo de Entrada
+**PATCH** `/event/:eventId/ticketType/:id/close`
+- **Permisos:** 🔒 Autenticado + 👑 Admin
+- **Parámetros:** `eventId`, `id`
+- **Propósito:** Cambia el estado del ticket a `closed` y establece `closedAt`.
 
 ### Eliminar Tipo de Entrada
 **DELETE** `/event/:eventId/ticketType/:id`
@@ -594,7 +663,43 @@ Todas las respuestas de la API siguen esta estructura:
 
 ## 🛒 Gestión de Compras
 
-### Realizar Compra
+### Crear Preferencia de MercadoPago
+**POST** `/purchase/create_preference`
+- **Permisos:** 🔒 Autenticado
+- **Content-Type:** `application/json`
+- **Propósito:** Genera la preferencia de pago en MercadoPago para iniciar la compra.
+
+**Request Body:**
+```json
+{
+  "ticketTypeId": "number",
+  "ticketQuantity": "number"
+}
+```
+
+**Response:**
+```json
+{
+  "message": "Preference created successfully",
+  "data": {
+    "id": "123456789-abcdefg-...",
+    "init_point": "https://www.mercadopago.com.ar/checkout/v1/redirect?pref_id=..."
+  }
+}
+```
+
+### Webhook de MercadoPago
+**POST** `/purchase/payments/webhook`
+- **Permisos:** 🔓 Público
+- **Propósito:** Recibir notificaciones del sistema de MercadoPago sobre actualizaciones en los estados de pago.
+
+### Verificar Compra (Frontend Callback)
+**GET** `/purchase/verify/:paymentId`
+- **Permisos:** 🔒 Autenticado
+- **Parámetros:** `paymentId` (ID del pago emitido por MercadoPago)
+- **Propósito:** Validar el estado del pago con la base de datos tras la redirección desde MercadoPago.
+
+### Realizar Compra (Directa)
 **POST** `/purchase`
 - **Permisos:** 🔒 Autenticado
 - **Content-Type:** `application/json`
@@ -721,6 +826,8 @@ Todas las respuestas de la API siguen esta estructura:
       "locationName": "Club Bohemia",
       "address": "Av. Corrientes 1234",
       "maxCapacity": 500,
+      "latitude": -34.6037,
+      "longitude": -58.3816,
       "city": {
         "id": 1,
         "cityName": "Buenos Aires",
@@ -748,6 +855,8 @@ Todas las respuestas de la API siguen esta estructura:
   "locationName": "string (máx 100 caracteres)",
   "address": "string (máx 100 caracteres, único)",
   "maxCapacity": "number (entero positivo)",
+  "latitude": "number (opcional)",
+  "longitude": "number (opcional)",
   "city": "number (ID de ciudad)"
 }
 ```
