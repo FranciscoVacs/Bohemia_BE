@@ -14,6 +14,6 @@ export class Ticket extends BaseEntity {
     @Property({ length: 100, fieldName: 'qr_code' })
     qrCode!: string;
 
-    @ManyToOne(() => Purchase, { nullable: false })
+    @ManyToOne(() => Purchase, { nullable: false, deleteRule: 'CASCADE' })
     purchase!: Rel<Purchase>;
 }

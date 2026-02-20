@@ -1,4 +1,4 @@
-import { Entity, Enum, OneToMany, ManyToOne, Property, Collection, BeforeCreate } from "@mikro-orm/core";
+import { Entity, Enum, OneToMany, ManyToOne, Property, Collection, BeforeCreate, Cascade } from "@mikro-orm/core";
 import type { Rel } from "@mikro-orm/core";
 import { BaseEntity } from "../shared/db/baseEntity.entity.js"
 import { Event } from "./event.entity.js";
@@ -42,7 +42,7 @@ export class TicketType extends BaseEntity {
     @ManyToOne(() => Event, { nullable: false, deleteRule: 'CASCADE' })
     event!: Rel<Event>;
 
-    @OneToMany(() => Purchase, purchase => purchase.ticketType, { orphanRemoval: false })
+    @OneToMany(() => Purchase, purchase => purchase.ticketType, { cascade: [Cascade.ALL], orphanRemoval: true })
     purchase = new Collection<Purchase>(this);
 
     @BeforeCreate()

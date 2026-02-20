@@ -26,10 +26,10 @@ export class Purchase extends BaseEntity {
     @ManyToOne(() => User, { nullable: false })
     user!: Rel<User>;
 
-    @ManyToOne(() => TicketType, { nullable: false, fieldName: 'ticket_type_id' })
+    @ManyToOne(() => TicketType, { nullable: false, fieldName: 'ticket_type_id', deleteRule: 'CASCADE' })
     ticketType!: Rel<TicketType>;
 
-    @OneToMany(() => Ticket, (ticket) => ticket.purchase, { cascade: [Cascade.ALL] })
+    @OneToMany(() => Ticket, (ticket) => ticket.purchase, { cascade: [Cascade.ALL], orphanRemoval: true })
     ticket = new Collection<Ticket>(this);
 }
 
