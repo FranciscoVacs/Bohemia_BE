@@ -71,17 +71,21 @@ export class PurchaseController extends BaseController<Purchase> {
 
     const parsedId = Number.parseInt(ticketId);
     let pdfBuffer: Buffer | undefined;
+    let index = 1;
     for (const ticket of item?.ticket || []) {
       if (ticket.id === parsedId) {
         const ActualTicket: Ticket = ticket;
         pdfBuffer = await PDFGenerator.generateTicketPDF(
           ActualTicket,
+          index, // Pasamos el índice inferido dinámicamente
           item?.ticketType,
           item?.ticketType.event,
           item,
           item?.ticketType.event.location,
         );
+        break;
       }
+      index++;
     }
     if (pdfBuffer) {
       res.contentType("application/pdf");
@@ -96,7 +100,7 @@ export class PurchaseController extends BaseController<Purchase> {
     const { id } = req.body;
 
     // Validate required fields
-    if (!id ) {
+    if (!id) {
       throwError.badRequest("id is required");
       return;
     }
@@ -132,8 +136,8 @@ export class PurchaseController extends BaseController<Purchase> {
           notification_url: `${process.env.BACKEND_URL}/api/purchase/payments/webhook`
         }
       });
-      return res.status(201).json({ 
-        init_point: preferenceResponse.init_point 
+      return res.status(201).json({
+        init_point: preferenceResponse.init_point
       });
     } catch (error: any) {
       console.error("MercadoPago error:", error);
@@ -156,65 +160,66 @@ export class PurchaseController extends BaseController<Purchase> {
       console.log("Not a payment notification, ignoring");
       return res.sendStatus(200);
     }
-    
+
     const response = await fetch(`https://api.mercadopago.com/v1/payments/${paymentId}`,
-    {
-      headers: {
-        Authorization: `Bearer ${process.env.MP_TEST_ACCESS_TOKEN}`
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.MP_TEST_ACCESS_TOKEN}`
+        }
       }
-    }
-  );
+    );
 
-  const payment = await response.json();
+    const payment = await response.json();
 
-//  console.log("STATUS:", payment.status);
-//  console.log("STATUS DETAIL:", payment.status_detail);
-//  console.log("purchase id:", payment.external_reference);
-  const status = mapMPStatus(payment.status);
-  console.log("PAYMENT", payment);  
-  console.log("REFERENCE:", payment.external_reference);
-  console.log("STATUS", status);
-  this.model.updatePaymentStatus(payment.external_reference, status);
-  res.sendStatus(200);} 
-  
+    //  console.log("STATUS:", payment.status);
+    //  console.log("STATUS DETAIL:", payment.status_detail);
+    //  console.log("purchase id:", payment.external_reference);
+    const status = mapMPStatus(payment.status);
+    console.log("PAYMENT", payment);
+    console.log("REFERENCE:", payment.external_reference);
+    console.log("STATUS", status);
+    this.model.updatePaymentStatus(payment.external_reference, status);
+    res.sendStatus(200);
+  }
+
   )
-  
+
   getPaymentFromMP = async function getPaymentFromMP(paymentId: string) {
     const res = await fetch(
-    `https://api.mercadopago.com/v1/payments/${paymentId}`,
-    {
-      headers: {
-        Authorization: `Bearer ${process.env.MP_TEST_ACCESS_TOKEN}`
+      `https://api.mercadopago.com/v1/payments/${paymentId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.MP_TEST_ACCESS_TOKEN}`
+        }
       }
-    }
     );
     if (!res.ok) {
       throw new Error(`MP error: ${res.status}`);
     }
-    
+
     return await res.json();
   }
 
-    
-    verifyPurchaseId = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
-      const { paymentId } = req.params;
-      if (!paymentId) {
-        return res.status(400).json({ error: 'Missing payment_id' });
-      }
-      
-      const payment = await this.getPaymentFromMP(paymentId);
-      console.log("MP PAYMENT:", payment);
-      if (payment.status !== 'approved') return res.status(400).json({ error: 'Payment not approved' });
 
-      const purchaseId = payment.external_reference;
-      const purchase = await this.model.getById(purchaseId);
+  verifyPurchaseId = asyncHandler(async (req: Request, res: Response, next: NextFunction) => {
+    const { paymentId } = req.params;
+    if (!paymentId) {
+      return res.status(400).json({ error: 'Missing payment_id' });
+    }
 
-      if (!purchase) return res.status(404).json({ error: 'Purchase not found' });
-            
-      res.json({
-        success: true,
-        purchaseId,
-      });
-    })
+    const payment = await this.getPaymentFromMP(paymentId);
+    console.log("MP PAYMENT:", payment);
+    if (payment.status !== 'approved') return res.status(400).json({ error: 'Payment not approved' });
+
+    const purchaseId = payment.external_reference;
+    const purchase = await this.model.getById(purchaseId);
+
+    if (!purchase) return res.status(404).json({ error: 'Purchase not found' });
+
+    res.json({
+      success: true,
+      purchaseId,
+    });
+  })
 
 }

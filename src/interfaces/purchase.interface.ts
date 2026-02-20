@@ -9,8 +9,8 @@ export interface IPurchaseModel<T> extends IModel<T> {
     userId: string
   ): Promise<T>;
 
-    updatePaymentStatus(
+  updatePaymentStatus(
     purchaseId: string,
     status: PaymentStatus,
-  ): Promise<void>;
+  ): Promise<T>;
 }

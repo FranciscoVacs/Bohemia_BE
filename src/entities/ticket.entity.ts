@@ -14,12 +14,6 @@ export class Ticket extends BaseEntity {
     @Property({ length: 100, fieldName: 'qr_code' })
     qrCode!: string;
 
-    @Property({ fieldName: 'number_in_purchase' })
-    numberInPurchase!: number;
-
-    @Property({ fieldName: 'number_in_ticket_type' })
-    numberInTicketType!: number;
-
     @ManyToOne(() => Purchase, { nullable: false })
     purchase!: Rel<Purchase>;
 }

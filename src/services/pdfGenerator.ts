@@ -10,10 +10,11 @@ import { BadRequestError } from '../shared/errors/AppError.js';
 
 export class PDFGenerator {
   static async generateTicketPDF(
-    ticket: Ticket | undefined, 
-    ticket_type: TicketType | undefined, 
+    ticket: Ticket | undefined,
+    ticketNumber: number | undefined,
+    ticket_type: TicketType | undefined,
     event: Event | undefined,
-    purchase: Purchase | undefined, 
+    purchase: Purchase | undefined,
     location: Location | undefined
   ): Promise<Buffer> {
     // Check if all required parameters are defined
@@ -24,16 +25,18 @@ export class PDFGenerator {
     // Create an instance of PDFGenerator and call the instance method
     const pdfGenerator = new PDFGenerator();
     return await pdfGenerator.generateTicketPDF(
-      ticket, 
-      ticket_type, 
+      ticket,
+      ticketNumber!,
+      ticket_type,
       event,
-      purchase, 
+      purchase,
       location
     );
   }
 
   async generateTicketPDF(
     ticket: Ticket,
+    ticketNumber: number,
     ticket_type: TicketType,
     event: Event,
     purchase: Purchase,
@@ -41,7 +44,7 @@ export class PDFGenerator {
   ): Promise<Buffer> {
     return new Promise((resolve, reject) => {
       const doc = new PDFDocument({
-        size: [706, 252], 
+        size: [706, 252],
         margin: 20,
       });
       const buffers: Buffer[] = [];
@@ -59,51 +62,91 @@ export class PDFGenerator {
           return;
         }
 
-        // Set font
-        doc.font('Helvetica');
+        // --- TICKET LAYOUT & DESIGN --- //
 
-        
+        // Brand Colors
+        const textColor = '#000000';
+        const subduedText = '#444444';
 
-        doc.fontSize(12)
-          .text(`Ticket: ${ticket.numberInPurchase} de ${purchase.ticketNumbers}`,{ align: 'right' });
+        // 1. Outer Border
+        doc.rect(15, 15, 676, 202)
+          .lineWidth(2)
+          .strokeColor(textColor)
+          .stroke();
 
-        doc.moveDown(0.5);
+        // 2. Dashed Tear-off line
+        doc.moveTo(520, 15)
+          .lineTo(520, 217)
+          .lineWidth(1)
+          .dash(5, { space: 5 })
+          .strokeColor(textColor)
+          .stroke();
+        doc.undash(); // Reset dash for the rest
 
-        // Header
-        doc.fontSize(20)
+        // --- LEFT SECTION: EVENT DETAILS --- //
+
+        // Event Name
         doc.font('Helvetica-Bold')
-           .text(event.eventName, { align: 'center', underline: true });
-        
-        doc.moveDown();
+          .fontSize(24)
+          .fillColor(textColor)
+          .text(event.eventName.toUpperCase(), 35, 35, {
+            width: 460,
+            align: 'left'
+          });
 
-        doc.fontSize(13)
+        // Date and Time
         doc.font('Helvetica-Bold')
-           .text('Fecha y Hora', { align: 'center'});
+          .fontSize(10)
+          .fillColor(subduedText)
+          .text('FECHA Y HORA', 35, 100);
+        doc.font('Helvetica-Bold')
+          .fontSize(14)
+          .fillColor(textColor)
+          .text(`${format(event.beginDatetime, 'dd/MM/yyyy - HH:mm')} hs`, 35, 115);
 
-        doc.moveDown(0.5);
-        doc.fontSize(12)
-           .text(format(event.beginDatetime, 'dd/MM/yy HH:mm'), { align: 'center' });
+        // Location
+        doc.font('Helvetica-Bold')
+          .fontSize(10)
+          .fillColor(subduedText)
+          .text('UBICACIÓN', 240, 100);
+        doc.font('Helvetica-Bold')
+          .fontSize(14)
+          .fillColor(textColor)
+          .text(location.locationName, 240, 115);
+        doc.font('Helvetica')
+          .fontSize(11)
+          .fillColor(subduedText)
+          .text(location.address, 240, 135, { width: 250 });
 
-        doc.moveDown();
+        // Ticket Type & Price
+        doc.font('Helvetica-Bold')
+          .fontSize(14)
+          .fillColor(textColor)
+          .text(`ENTRADA: ${ticket_type.ticketTypeName.toUpperCase()}`, 35, 165);
+        doc.font('Helvetica')
+          .fontSize(14)
+          .text(`$${ticket_type.price}`, 35, 182);
 
-        doc.fontSize(10)
-           .text(`${location.locationName}`, { align: 'center' })
-           .text(`${location.address}`, { align: 'center' })
-           .text(`ENTRADA - ${ticket_type.ticketTypeName.toUpperCase()} - $${ticket_type.price}`, { align: 'center' });
-           
+        // --- RIGHT SECTION: TEAR-OFF (QR & INFO) --- //
 
+        // Ticket Number
+        doc.font('Helvetica-Bold')
+          .fontSize(10)
+          .fillColor(subduedText)
+          .text('TICKET NO.', 540, 35);
+        doc.font('Helvetica-Bold')
+          .fontSize(14)
+          .fillColor(textColor)
+          .text(`${ticketNumber} / ${purchase.ticketNumbers}`, 540, 50);
 
         // QR Code
-       // Coordenadas más altas para evitar el salto de página
-        const qrCodeX = 50; // Posición X de la imagen
-        const qrCodeY = 90; // Posición Y más alta para la imagen
+        doc.image(qrCodeUrl, 545, 75, { fit: [110, 110] });
 
-        // QR Code
-        doc.image(qrCodeUrl, qrCodeX, qrCodeY, { fit: [100, 100] }); // Imagen QR posicionada más arriba
-
-        doc.moveDown(0.5);
-        doc.text(ticket.qrCode,65,50, { align: 'left', width: 100, });
-            
+        // QR Code alphanumeric string below
+        doc.font('Helvetica')
+          .fontSize(8)
+          .fillColor(subduedText)
+          .text(ticket.qrCode, 540, 195, { width: 120, align: 'center' });
 
         doc.end();
       });

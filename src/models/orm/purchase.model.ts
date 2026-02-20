@@ -81,15 +81,7 @@ export class PurchaseModel extends BaseModel<Purchase> {
       totalPrice: totalPrice,
     } as Purchase);
 
-    // Crear los tickets inmediatamente
-    for (let i = 1; i <= ticketQuantity; i++) {
-      this.em.create(Ticket, {
-        qrCode: uuid(),
-        numberInPurchase: i,
-        numberInTicketType: ticketType.maxQuantity - ticketType.availableTickets + i,
-        purchase: purchase,
-      } as Ticket);
-    }
+    // Los tickets se crearán en updatePaymentStatus cuando el pago sea aprobado.
 
     await this.em.flush();
     return purchase;
@@ -117,10 +109,20 @@ export class PurchaseModel extends BaseModel<Purchase> {
   async updatePaymentStatus(id: string, status: PaymentStatus): Promise<Purchase> {
     const parsedId = Number.parseInt(id);
     const purchase = await this.em.findOneOrFail(Purchase, parsedId, {
-      populate: ["ticketType"],
+      populate: ["ticketType", "ticket"], // Populamos los tickets para saber si ya existen
     });
 
     purchase.paymentStatus = status;
+
+    // Si el pago es aprobado y la compra aún no tiene tickets generados
+    if (status === PaymentStatus.APPROVED && (!purchase.ticket || purchase.ticket.length === 0)) {
+      for (let i = 1; i <= purchase.ticketNumbers; i++) {
+        this.em.create(Ticket, {
+          qrCode: uuid(),
+          purchase: purchase,
+        } as unknown as Ticket);
+      }
+    }
 
     // Si el pago fue rechazado o cancelado, liberar los tickets
     if (status === PaymentStatus.REJECTED || status === PaymentStatus.CANCELLED) {
