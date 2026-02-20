@@ -26,7 +26,7 @@ export const createPurchaseRouter = ({
 
   purchaseRouter.get("/verify/:paymentId", verifyToken, purchaseController.verifyPurchaseId);
 
-  // Crear compra (genera tickets inmediatamente)
+  // Crear compra
   purchaseRouter.post("/",
     verifyToken,
     schemaValidator(CreatePurchaseSchema),
