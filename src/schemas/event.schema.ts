@@ -40,7 +40,7 @@ export const CreateEventSchema = z.object({
       .refine(isFutureDate, {
         message: "La fecha y hora de finalización debe ser futura",
       }),
-    eventDescription: z.string().max(100, "La descripción del evento no puede exceder 100 caracteres"),
+    eventDescription: z.string().max(300, "La descripción del evento no puede exceder 300 caracteres"),
     minAge: z.coerce.number().int().positive("La edad mínima debe ser un número entero positivo"),
     location: z.coerce.number().int().positive("La ubicación debe ser un ID válido"),
     dj: z.coerce.number().int().positive("El DJ debe ser un ID válido"),
@@ -75,7 +75,7 @@ export const UpdateEventSchema = z.object({
           message: "La fecha y hora de finalización debe ser futura",
         })
         .optional(),
-      eventDescription: z.string().max(100, "La descripción del evento no puede exceder 100 caracteres").optional(),
+      eventDescription: z.string().max(200, "La descripción del evento no puede exceder 100 caracteres").optional(),
       minAge: z.coerce.number().int().positive("La edad mínima debe ser un número entero positivo").optional(),
       location: z.coerce.number().int().positive("La ubicación debe ser un ID válido").optional(),
       dj: z.coerce.number().int().positive("El DJ debe ser un ID válido").optional(),
