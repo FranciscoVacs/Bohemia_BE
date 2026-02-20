@@ -25,12 +25,12 @@ import { createEventPhotoRouter } from "./routes/eventPhoto.route.js";
  * Responsabilidad: Configurar Express y middleware, gestionar el ciclo de vida de la app
  */
 export class App {
-  private express: Express;
+  public expressApp: Express;
   private container: Container;
 
   constructor(container: Container) {
     this.container = container;
-    this.express = express();
+    this.expressApp = express();
     this.loadEnvironment();
     this.configureMiddleware();
     this.configureRoutes();
@@ -55,21 +55,21 @@ export class App {
     const __dirname = path.dirname(__filename);
 
     // Log de todas las requests entrantes
-    this.express.use((req, res, next) => {
+    this.expressApp.use((req, res, next) => {
       console.log(`[REQUEST] ${req.method} ${req.url} | Origin: ${req.headers.origin ?? 'none'}`);
       next();
     });
 
     // Middleware básico
-    this.express.use(express.json());
-    this.express.use(corsMiddleware());
-    this.express.disable("x-powered-by");
+    this.expressApp.use(express.json());
+    this.expressApp.use(corsMiddleware());
+    this.expressApp.disable("x-powered-by");
 
     // Archivos estáticos
-    this.express.use('/public/uploads', express.static(path.join(__dirname, '../public/uploads')));
+    this.expressApp.use('/public/uploads', express.static(path.join(__dirname, '../public/uploads')));
 
     // MikroORM RequestContext - Crítico para el manejo de transacciones
-    this.express.use((req, res, next) => {
+    this.expressApp.use((req, res, next) => {
       RequestContext.create(orm.em, next);
     });
   }
@@ -79,40 +79,40 @@ export class App {
    */
   private configureRoutes(): void {
 // Rutas de la API - usando el container para obtener modelos
-    this.express.use("/api/event", createEventRouter({
+    this.expressApp.use("/api/event", createEventRouter({
       eventModel: this.container.getEventModel(),
       getEntityManager: this.container.getEntityManager.bind(this.container)
     }));
 
-    this.express.use("/api/location", createLocationRouter({
+    this.expressApp.use("/api/location", createLocationRouter({
       locationModel: this.container.getLocationModel()
     }));
 
-    this.express.use("/api/city", createCityRouter({
+    this.expressApp.use("/api/city", createCityRouter({
       cityModel: this.container.getCityModel()
     }));
 
-    this.express.use("/api/event/:eventId/ticketType", createTicketTypeRouter({
+    this.expressApp.use("/api/event/:eventId/ticketType", createTicketTypeRouter({
       ticketTypeModel: this.container.getTicketTypeModel()
     }));
 
-    this.express.use("/api/ticket", createTicketRouter({
+    this.expressApp.use("/api/ticket", createTicketRouter({
       ticketModel: this.container.getTicketModel()
     }));
 
-    this.express.use("/api/user", createUserRouter({
+    this.expressApp.use("/api/user", createUserRouter({
       userModel: this.container.getUserModel()
     }));
 
-    this.express.use("/api/purchase", createPurchaseRouter({
+    this.expressApp.use("/api/purchase", createPurchaseRouter({
       purchaseModel: this.container.getPurchaseModel()
     }));
 
-    this.express.use("/api/dj", createDjRouter({
+    this.expressApp.use("/api/dj", createDjRouter({
       djModel: this.container.getDjModel()
     }));
 
-    this.express.use("/api/event-photos", createEventPhotoRouter({
+    this.expressApp.use("/api/event-photos", createEventPhotoRouter({
       eventPhotoModel: this.container.getEventPhotoModel(),
       eventModel: this.container.getEventModel()
     }));
@@ -122,19 +122,24 @@ export class App {
    * Configura el manejo de errores (debe ir al final)
    */
   private configureErrorHandling(): void {
-    this.express.use(errorHandler);
+    this.expressApp.use(errorHandler);
   }
-
+  /**
+   * SOLO para inicializar la base de datos (útil para los tests)
+   */
+  async initializeDatabase(): Promise<void> {
+     await syncSchema();
+  }
   /**
    * Inicia el servidor HTTP
    */
   async start(): Promise<void> {
     // Sincronizar esquema de base de datos
-    await syncSchema();
+    await this.initializeDatabase();
 
     const PORT = process.env.PORT ?? 3000;
 
-    this.express.listen(PORT, () => {
+    this.expressApp.listen(PORT, () => {
       console.log(`🚀 Server listening on http://localhost:${PORT}`);
     });
   }

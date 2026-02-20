@@ -12,8 +12,8 @@ const dbUser = process.env.DB_USER ?? "root";
 const dbPassword = process.env.DB_PASSWORD ?? "root";
 
 export const orm = await MikroORM.init({
-    entities : ["dist/**/*.entity.js"],
-    entitiesTs : ["src/**/*.entity.ts"],
+    entities: ["dist/**/*.entity.js"],
+    entitiesTs: ["src/**/*.entity.ts"],
     dbName: dbName,
     driver: MySqlDriver,
     host: dbHost,
@@ -22,10 +22,12 @@ export const orm = await MikroORM.init({
     password: dbPassword,
     debug: process.env.NODE_ENV !== "production",
     highlighter: new SqlHighlighter(),
+    // for vitest to get around `TypeError: Unknown file extension ".ts"` (ERR_UNKNOWN_FILE_EXTENSION)
+    dynamicImportProvider: id => import(id),
     schemaGenerator: {
-        disableForeignKeys:true,
-        createForeignKeyConstraints:true,
-        ignoreSchema:[],
+        disableForeignKeys: true,
+        createForeignKeyConstraints: true,
+        ignoreSchema: [],
     },
 });
 
